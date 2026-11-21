@@ -229,8 +229,9 @@ LAYOUT = """const st = document.getElementById('stage').getBoundingClientRect();
   for (const a of ls) if (a.x < 0 || a.y < 0 || a.x + a.w > st.width + 0.5 || a.y + a.h > st.height + 0.5) bad.push('outside: ' + a.name);
   for (let i = 0; i < ls.length; i++) for (let j = i + 1; j < ls.length; j++) { const a = ls[i], b = ls[j];
     if (a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h) bad.push('overlap: ' + a.name + ' / ' + b.name); }
-  const byTop = [...ls].sort((a, b) => a.y - b.y).map(l => l.name).join(), byPart = [...ls].sort((a, b) => a.ay - b.ay).map(l => l.name).join();
-  if (byTop !== byPart) bad.push('lines cross: ' + byTop + ' vs ' + byPart);
+  // Going down the column, the parts' anchors must go down too (a tie within half a pixel is two parts passing each other).
+  const byTop = [...ls].sort((a, b) => a.y - b.y);
+  for (let i = 1; i < byTop.length; i++) if (byTop[i].ay < byTop[i - 1].ay - 0.5) bad.push('lines cross: ' + byTop[i - 1].name + ' / ' + byTop[i].name);
   return {bad, labels: ls.map(l => l.n + ' ' + l.name), column: document.querySelector('.labels').classList.contains('col')};"""
 try:
     import base64
@@ -238,11 +239,14 @@ try:
     from PIL import Image
 except ImportError:
     Image = None
-WANT = {"iphone": {"2 Screen", "3 Battery", "5 Rear cameras"}, "galaxy": {"2 Screen", "3 Battery", "5 Rear cameras"},
-        "laptop": {"1 Keyboard", "3 Battery", "4 RAM", "4 SSD", "5 Fan and heat pipe"},
+WANT = {"iphone": {"2 Screen", "3 Battery", "5 Rear cameras"}, "galaxy": {"4 Screen", "5 Battery", "3 Rear cameras"},
+        "laptop": {"2 Keyboard", "3 Battery", "4 RAM", "4 SSD", "5 Fan and heat pipe"},
         "pc": {"1 Graphics card", "2 RAM", "3 SSD", "4 CPU"}, "router": {"1 Antennas", "5 Main board", "4 Network ports"}}
-p = page(1366, 768)
-try:
+for fw_, fh_ in ((1366, 768), (1280, 720)):
+  p = page(fw_, fh_)
+  try:
+    p.goto(URL, wait=1.5)   # a real page load, so the error hook is in place
+    armed = p.js("return Array.isArray(window.__errs)")
     for dev, sel in (("iphone", "phone-sim"), ("galaxy", "phone-sim"), ("laptop", "lap-cpu"), ("pc", "pc-clock"), ("router", "rt-lights")):
         p.goto(URL + f"#/d/{dev}/{sel}", wait=4.2)
         bad, frames, end = [], [], set()
@@ -255,7 +259,7 @@ try:
                 bad.append(f"t={t} no column")
             if t == 1:
                 end = set(r["labels"])
-            if Image:
+            if Image and fw_ == 1366:
                 box = p.js("const r = document.getElementById('stage').getBoundingClientRect(); return [r.left, r.top, r.width, r.height];")
                 png = p.call("Page.captureScreenshot", format="png", clip={"x": box[0], "y": box[1], "width": box[2], "height": box[3], "scale": 0.5})["data"]
                 frames.append(Image.open(io.BytesIO(base64.b64decode(png))).convert("RGB"))
@@ -265,8 +269,10 @@ try:
             for k, f in enumerate(frames):
                 sheet.paste(f, (k * fw, 0))
             sheet.save(HERE / f"check-sheet-{dev}.png")
-        check(f"take-apart frames, {dev}: six points from together to apart; labels inside, apart, lines never crossing; numbered by the order parts come off",
+        check(f"{fw_}x{fh_} take-apart frames, {dev}: six points from together to apart; labels inside, apart, lines never crossing; numbered by the order parts come off",
               not bad and WANT[dev] <= end, "; ".join(bad)[:240] + f" end={sorted(end)}")
+    if fw_ != 1366:
+        continue
     # The stagger in the real page: at 30% the outer layers are moving and the battery (third layer) has not started.
     p.goto(URL + "#/d/iphone/phone-battery", wait=4.0)
     ay = []
@@ -283,8 +289,8 @@ try:
     wait(p, "return !!window.__dl", 15)
     dl = p.js("return [window.__dl, document.getElementById('clipMsg').textContent]")
     check("Save a clip records the router coming apart and saves it as a video", busy and dl[0] and dl[0][0].startswith("router-taken-apart.") and dl[0][1] > 20000 and dl[0][2].startswith("video/") and "Saved" in dl[1], json.dumps(dl))
-    check("no script errors while taking apart and recording", not p.js("return window.__errs"), json.dumps(p.js("return window.__errs")))
-finally:
+    check("no script errors while taking apart and recording (the error hook was in place)", armed and p.js("return Array.isArray(window.__errs) && window.__errs.length === 0"), json.dumps(p.js("return window.__errs")))
+  finally:
     p.close()
 
 # ---------------------------------------------------------------- 4. Phones: the page actions sit in a menu

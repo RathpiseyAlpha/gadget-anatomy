@@ -22,7 +22,7 @@ export const DEVICES: Device[] = [
     size: { text: '146.3 × 70.9 × 7.6 mm', source: 'Samsung, Galaxy S23 specifications' },
     parts: ['phone-screen', 'phone-camera', 'phone-board', 'phone-battery', 'phone-sim', 'phone-back'],
     labelled: ['phone-screen', 'phone-battery', 'phone-camera'], first: 'phone-battery',
-    layers: [['phone-sim'], ['phone-screen'], ['phone-battery'], ['phone-board'], ['phone-camera'], ['phone-back']],
+    layers: [['phone-sim'], ['phone-back'], ['phone-camera'], ['phone-screen'], ['phone-battery'], ['phone-board']],   // opens from the back, as Samsung phones do
     partPhotos: { 'phone-battery': PHOTOS.galaxyBattery },
     photo: { ...PHOTOS.galaxyParts, pins: [
       { part: 'phone-battery', x: 87.5, y: 50.9 }, { part: 'phone-board', x: 80.3, y: 26.3 }, { part: 'phone-screen', x: 61.2, y: 49.1 },
@@ -35,7 +35,7 @@ export const DEVICES: Device[] = [
     size: { text: '359.2 × 236.5 × 19.9 mm', source: 'Lenovo PSREF, IdeaPad 3 15IAU7' },
     parts: ['lap-screen', 'lap-keyboard', 'lap-touchpad', 'lap-cpu', 'lap-fan', 'lap-ram', 'lap-ssd', 'lap-wifi', 'lap-battery', 'lap-speaker', 'lap-usb', 'lap-board', 'lap-cover'],
     labelled: ['lap-keyboard', 'lap-fan', 'lap-ram', 'lap-ssd', 'lap-battery'], first: 'lap-fan', apart: 1,
-    layers: [['lap-keyboard', 'lap-touchpad', 'lap-screen'], ['lap-cover'], ['lap-battery', 'lap-speaker'], ['lap-ssd', 'lap-ram', 'lap-wifi'], ['lap-fan'], ['lap-cpu', 'lap-usb'], ['lap-board']],
+    layers: [['lap-cover'], ['lap-keyboard', 'lap-touchpad', 'lap-screen'], ['lap-battery', 'lap-speaker'], ['lap-ssd', 'lap-ram', 'lap-wifi'], ['lap-fan'], ['lap-cpu', 'lap-usb'], ['lap-board']],
     partPhotos: { 'lap-ssd': PHOTOS.ideapadSsd },
     photo: { ...PHOTOS.ideapadInside, pins: [
       { part: 'lap-cpu', x: 43.4, y: 52.6 }, { part: 'lap-fan', x: 25.7, y: 56.1 }, { part: 'lap-ram', x: 69.7, y: 57 }, { part: 'lap-ssd', x: 84.2, y: 52.6 },

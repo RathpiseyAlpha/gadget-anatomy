@@ -99,7 +99,7 @@ export function projector(root: HTMLElement, deviceId: string, partId: string | 
   const apartBtn = root.querySelector<HTMLButtonElement>('#apart')!, clipBtn = root.querySelector<HTMLButtonElement>('#clip')!, clipMsg = root.querySelector<HTMLElement>('#clipMsg')!;
   apartBtn.hidden = clipBtn.hidden = !stage;
   if (typeof MediaRecorder === 'undefined') clipBtn.hidden = true;
-  const toggle = () => { if (!stage) return; const to = stage.apart > 0.5 ? 0 : 1; stage.explode(to, true); apartBtn.textContent = to ? 'Put together' : 'Take apart'; };
+  const toggle = () => { if (!stage || clipBtn.disabled) return; const to = stage.apart > 0.5 ? 0 : 1; stage.explode(to, true); apartBtn.textContent = to ? 'Put together' : 'Take apart'; };
   apartBtn.addEventListener('click', toggle);
   // A clip for a class page or a message: the model together, coming apart layer by layer, with its labels.
   clipBtn.addEventListener('click', async () => {

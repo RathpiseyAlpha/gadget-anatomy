@@ -150,7 +150,7 @@ export class Stage {
     this.svg.setAttribute('class', 'leaders');
     this.caption = document.createElement('p');
     this.caption.className = 'col-cap';
-    this.caption.textContent = 'In the order they come off';
+    this.caption.textContent = 'Order in this 3D model';
     this.layer.append(this.svg, this.caption);
     host.append(this.layer);
     this.labelEls = this.labels.map((l) => this.makeLabel(l));
@@ -332,7 +332,7 @@ export class Stage {
   private layoutColumn(shown: Shown[], w: number, h: number) {
     const cw = this.colW, x0 = w - cw, pad = COLUMN.pad, numbered = shown.some((s) => s.n > 0);
     this.caption.hidden = !numbered;
-    const top = pad + (numbered ? 26 : 0);
+    const top = pad + (numbered ? this.caption.offsetHeight + 8 : 0);
     shown.sort((a, b) => a.ay - b.ay);
     let k = 0;
     for (const s of shown) { s.el.classList.remove('below'); s.el.style.width = `${cw - pad}px`; s.el.querySelector('.n')!.textContent = String(s.n || ++k); }

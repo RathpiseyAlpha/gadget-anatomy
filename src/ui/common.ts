@@ -18,7 +18,7 @@ export function credit(p: Photo) {
 }
 
 /** The part card: photo, job, name, two sentences, one example, size with its source, topic. */
-export function partCard(id: string, extra = '', own?: Photo) {
+export function partCard(id: string, extra = '', own?: Photo, rows = '') {
   const p = PARTS[id];
   if (!p) return '';
   const ph = own ?? p.photo;
@@ -33,7 +33,7 @@ export function partCard(id: string, extra = '', own?: Photo) {
     <div class="eg"><b>For example</b>${esc(p.example)}</div>
     ${photo}
     ${closer || extra ? `<div class="row">${closer}${extra}</div>` : ''}
-    <dl class="meta">${size}<div><dt>Topic</dt><dd>${esc(p.topic)}</dd></div></dl></article>`;
+    <dl class="meta">${size}<div><dt>Topic</dt><dd>${esc(p.topic)}</dd></div>${rows}</dl></article>`;
 }
 
 export const MARK = `<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="9" width="22" height="16" rx="2" fill="var(--role-process)" stroke="var(--edge)" stroke-width="2"/><rect x="10" y="13" width="12" height="8" rx="1" fill="var(--sheet)" stroke="var(--edge)" stroke-width="2"/><path d="M9 9V5M14 9V5M18 9V5M23 9V5M9 29v-4M14 29v-4M18 29v-4M23 29v-4" stroke="var(--edge)" stroke-width="2"/></svg>`;

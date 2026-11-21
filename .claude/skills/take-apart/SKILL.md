@@ -26,9 +26,10 @@ Where it lives (the code is the source of truth for every number):
    moves. Covers and shells leave *away from the camera* (back and up, like the laptop's top half and the router's
    case), so the inside lies open in front of the view direction (`view` in `devices.ts`). Done when no part passes
    through another at any point of the take-apart.
-2. **Layers.** In `devices.ts`, list `layers` outermost first: the order a person would take the device apart,
-   adjusted only where the model's lifts need it. Parts that leave together share a layer and a number. Done when
-   every part sits in exactly one layer.
+2. **Layers.** In `devices.ts`, list `layers` outermost first, starting where a real repair starts (the laptop's bottom
+   cover, the Galaxy's back), then whatever order the model's lifts allow without collisions. The page calls it the
+   "order in this 3D model", never the repair order: the full real teardown sequence is M4 (SPEC 12.5). Parts that
+   leave together share a layer and a number. Done when every part sits in exactly one layer.
 3. **Labels.** `labelled` holds at most five parts (the column holds six with the selected part). Part names stay
    within `COLUMN.name` characters and notes within `COLUMN.note`; the note is the part's job, or one plain fact on a
    close-up ("fits one way only"). Done when the vitest take-apart tests pass.

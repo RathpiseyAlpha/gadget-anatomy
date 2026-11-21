@@ -21,6 +21,8 @@ export function photoMap(d: Device, group: string) {
 /** A device's labels on the 3D model: every part, with its job as the note; the labelled ones show once they are off. */
 export const stageLabels = (d: Device) => d.parts.map((id) => ({ part: id, text: PARTS[id]!.name, note: ROLES[PARTS[id]!.role].short, color: roleColor(PARTS[id]!.role), always: d.labelled.includes(id) }));
 
+const ordinal = (n: number) => `${n}${n % 10 === 1 && n !== 11 ? 'st' : n % 10 === 2 && n !== 12 ? 'nd' : n % 10 === 3 && n !== 13 ? 'rd' : 'th'}`;
+
 export function viewer(root: HTMLElement, deviceId: string, partId: string | null, wantPhoto: boolean): View {
   const d = deviceById(deviceId);
   if (!d) { location.hash = '#/'; return { dispose() {} }; }
@@ -65,7 +67,9 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
     sel = id;
     root.querySelectorAll<HTMLElement>('[data-part]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === id)));
     const extra = phone ? `<a class="btn btn--sm" href="${href({ view: 'device', device: other, part: id, photo })}">See it in the ${esc(deviceById(other)!.name)}</a>` : '';
-    card.innerHTML = partCard(id, extra, d!.partPhotos?.[id]) + NOTE;
+    const k = d!.layers.findIndex((l) => l.includes(id)), n = d!.layers.length;
+    const order = k < 0 ? '' : `<div><dt>Order</dt><dd>${ordinal(k + 1)} of ${n} to come off in the 3D model</dd></div>`;
+    card.innerHTML = partCard(id, extra, d!.partPhotos?.[id], order) + NOTE;
     stage?.select(id);
     history.replaceState(null, '', href({ view: 'device', device: d!.id, part: id, photo }));
     const cmp = root.querySelector<HTMLAnchorElement>('#cmpLink'); if (cmp) cmp.href = href({ view: 'compare', part: id });

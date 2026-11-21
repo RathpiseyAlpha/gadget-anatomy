@@ -129,10 +129,10 @@ function phone(kind: 'iphone' | 'galaxy'): Model {
   if (kind === 'iphone') {
     cam.add(rbox(38, 2.2, 38, 6, backMat));
     for (const [x, z] of [[-8, -8], [-8, 9], [9, 0]] as const) cam.add(cyl(7, 3.6, M.lens, x, -1.6, z));
-    b.part('phone-camera', [cam], [-P.w / 2 + 22, -0.6, top + 22], [0, -40, 0]);
+    b.part('phone-camera', [cam], [-P.w / 2 + 22, -0.6, top + 22], [130, -40, 0]);   // slides out sideways, below the rest, so it is not hidden
   } else {
     for (const z of [-14, 0, 14]) cam.add(cyl(5.6, 2.6, M.lens, 0, 0, z));
-    b.part('phone-camera', [cam], [-P.w / 2 + 13, -0.6, top + 30], [0, -40, 0]);
+    b.part('phone-camera', [cam], [-P.w / 2 + 13, -0.6, top + 30], [130, -40, 0]);
   }
   b.part('phone-battery', [box(kind === 'iphone' ? 46 : 56, 4, kind === 'iphone' ? 82 : 76, M.battery)], [kind === 'iphone' ? 10 : 0, 3, kind === 'iphone' ? 20 : 24], [0, 18, 0]);
   const logic = new THREE.Group();
