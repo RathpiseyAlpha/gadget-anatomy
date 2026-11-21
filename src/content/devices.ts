@@ -43,6 +43,15 @@ export const DEVICES: Device[] = [
     view: [0.45, 0.75, 1],
   },
   {
+    id: 'legion', name: 'Gaming laptop', product: 'Lenovo Legion 5 15ACH6H',
+    blurb: 'A laptop with its own graphics chip and a bigger cooling system, taken apart down to every part.',
+    size: { text: '362.56 × 260.61 × 22.5–25.75 mm', source: 'Lenovo PSREF, Legion 5 15ACH6H' },
+    parts: ['legion-deck', 'legion-trackpad', 'legionboard', 'legiondisplay', 'legion-speakers', 'legionbattery', 'legioncooling', 'legion-hinges', 'legion-cover', 'legion-fasteners'],
+    labelled: ['legion-deck', 'legiondisplay', 'legionbattery', 'legioncooling', 'legionboard'], first: 'legionboard', apart: 1,
+    layers: [['legion-fasteners'], ['legion-cover'], ['legion-deck', 'legion-trackpad', 'legiondisplay', 'legion-hinges'], ['legionbattery'], ['legion-speakers'], ['legioncooling'], ['legionboard']],
+    view: [0.45, 0.75, 1], look: 'studio',
+  },
+  {
     id: 'pc', name: 'Desktop PC', product: 'a standard ATX motherboard',
     blurb: 'The motherboard and everything that plugs into it.',
     size: { text: 'ATX board 305 × 244 mm', source: 'Wikipedia "ATX" (Intel ATX specification)' },

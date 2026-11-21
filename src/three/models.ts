@@ -3,6 +3,7 @@
 // device is approximate, read from the teardown photos. No logos are drawn.
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { buildKitLevel, MM_PER_UNIT, type KitLevel } from 'pc-anatomy';
 import type { Device } from '../content/types.ts';
 
 // ---------------- materials (realistic, the same in both themes) and the ink outline (themed by the stage)
@@ -38,7 +39,7 @@ function rbox(w: number, h: number, d: number, r: number, mat: THREE.Material, x
   return m;
 }
 
-export interface Model { object: THREE.Group; parts: THREE.Group[] }
+export interface Model { object: THREE.Group; parts: THREE.Object3D[] }
 
 /** Collects the parts of a model: each a group with its id, its place, and which way it moves when taken apart. */
 class Builder {
@@ -55,13 +56,31 @@ class Builder {
   }
   fixed(...kids: THREE.Object3D[]) { kids.forEach((k) => this.object.add(k)); }
   done(): Model {
-    // Each part's label sits on top of it: the top centre of its box, in its own coordinates.
-    for (const p of this.parts) {
-      const b = new THREE.Box3().setFromObject(p), c = b.getCenter(new THREE.Vector3());
-      p.userData.anchor = new THREE.Vector3(c.x, b.max.y, c.z).sub(p.position);
-    }
+    anchors(this.parts);
     return { object: this.object, parts: this.parts };
   }
+}
+
+/** Each part's label sits on top of it: the top centre of its box, in its own coordinates. */
+function anchors(parts: THREE.Object3D[]) {
+  for (const p of parts) {
+    const b = new THREE.Box3().setFromObject(p), c = b.getCenter(new THREE.Vector3());
+    p.userData.anchor = new THREE.Vector3(c.x, b.max.y, c.z).sub(p.position);
+  }
+}
+
+/** A level built by PC Anatomy's builders (src/vendor/pc-anatomy, SPEC decision 15), as one of our models: each piece
+ *  it adds becomes a part with its place (`home`) and the way it leaves (`lift`). */
+export function kitModel(level: KitLevel, lifts: Record<string, [number, number, number]> = {}): Model {
+  const k = buildKitLevel(level);
+  for (const p of k.pieces) { const l = lifts[p.id]; if (l) p.lift.set(l[0] / MM_PER_UNIT, l[1] / MM_PER_UNIT, l[2] / MM_PER_UNIT); }
+  k.object.updateMatrixWorld(true);
+  const parts = k.pieces.map((p) => {
+    Object.assign(p.object.userData, { id: p.id, home: p.home, lift: p.lift });
+    return p.object;
+  });
+  anchors(parts);
+  return { object: k.object, parts };
 }
 
 // ---------------- RAM sticks. Desktop DIMM: 133.35 × 31.25 mm, 288 contacts (Wikipedia "DIMM", JEDEC MO-309E).
@@ -218,6 +237,12 @@ function router(): Model {
   return b.done();
 }
 
+/** Our take-apart moves for the Legion (millimetres), replacing PC Anatomy's where they differ: the top half (deck,
+ *  touchpad, screen, hinges) leaves as one, up and back, so the inside lies open in front of the camera. */
+const TOP_HALF: [number, number, number] = [0, 110, -330];
+const LEGION_LIFTS: Record<string, [number, number, number]> = { 'legion-deck': TOP_HALF, 'legion-trackpad': TOP_HALF, legiondisplay: TOP_HALF, 'legion-hinges': TOP_HALF };
+
 export function buildDevice(id: Device['id']): Model {
+  if (id === 'legion') return kitModel('legion', LEGION_LIFTS);
   return id === 'iphone' || id === 'galaxy' ? phone(id) : id === 'laptop' ? laptop() : id === 'pc' ? pc() : router();
 }

@@ -1,0 +1,14 @@
+// PC Anatomy's own strictness (strict, without the unchecked-index rule Gadget Anatomy adds), so its code is not edited to fit ours.
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "verbatimModuleSyntax": false
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": []
+}

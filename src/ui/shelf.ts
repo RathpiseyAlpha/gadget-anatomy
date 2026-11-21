@@ -14,11 +14,12 @@ const THUMB_VIEW: Record<Device['id'], { view: [number, number, number]; apart: 
   iphone: { view: [-0.35, -1, -0.65], apart: 0 },   // from the back: the camera layouts differ
   galaxy: { view: [-0.35, -1, -0.65], apart: 0 },
   laptop: { view: [0.8, 0.75, 1], apart: 0.35 },
+  legion: { view: [0.8, 0.75, 1], apart: 0 },
   pc: { view: [0.6, 0.8, 1], apart: 0.4 },
   router: { view: [0.9, 0.8, 1], apart: 0 },
 };
 function thumb(d: Device) {
-  if (!thumbs.has(d.id)) { const t = THUMB_VIEW[d.id]; thumbs.set(d.id, snapshot(buildDevice(d.id), t.view, 300, 180, t.apart)); }
+  if (!thumbs.has(d.id)) { const t = THUMB_VIEW[d.id]; thumbs.set(d.id, snapshot(buildDevice(d.id), t.view, 300, 180, t.apart, d.look)); }
   return thumbs.get(d.id)!;
 }
 window.addEventListener('ga-theme', () => thumbs.clear());
@@ -40,7 +41,7 @@ export function shelf(root: HTMLElement): View {
     <section aria-labelledby="h-dev"><h2 id="h-dev">Devices</h2>
       <ul class="devices">${DEVICES.map((d) => `<li><a class="device" href="${href({ view: 'device', device: d.id, part: null, photo: !gl })}">
         <span class="thumb">${gl ? `<img alt="" data-thumb="${d.id}">` : ''}</span>
-        <span class="txt"><b>${esc(d.name)}</b><span class="product">${esc(d.product ?? '')}</span><span>${esc(d.blurb)}</span>
+        <span class="txt"><b>${esc(d.name)}</b><span class="product" title="${esc(d.product ?? '')}">${esc(d.product ?? '')}</span><span>${esc(d.blurb)}</span>
         <span class="count">${d.parts.length} parts · ${roles(d).length} jobs</span></span></a></li>`).join('')}</ul>
     </section>
     <section aria-labelledby="h-jrn" id="journeys"><h2 id="h-jrn">Journeys</h2>

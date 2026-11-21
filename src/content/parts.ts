@@ -1,5 +1,11 @@
 import { PHOTOS } from './photos.ts';
-import type { Part } from './types.ts';
+import type { Part, Source } from './types.ts';
+
+/** Sources shared by several parts. */
+const SRC = {
+  legionSpec: { name: 'Lenovo, Legion 5 15ACH6H platform specifications (PSREF)', url: 'https://psref.lenovo.com/syspool/Sys/PDF/Legion/Lenovo_Legion_5_15ACH6H/Lenovo_Legion_5_15ACH6H_Spec.pdf' },
+  legionService: { name: 'Lenovo, Legion 5 (15 and 17 inch, gen 6) maintenance manual', url: 'https://download.lenovo.com/consumer/mobiles_pub/legion_5_15_17_6_hmm.pdf' },
+} satisfies Record<string, Source>;
 
 // Every part, in plain words for about age 12 and up: two short sentences, then one example from a student's day.
 // No invented numbers; a size says where it comes from, or "approximate".
@@ -66,6 +72,43 @@ const list: Part[] = [
   { id: 'lap-cover', name: 'Bottom cover', role: 'power', topic: 'How it fits together',
     plain: 'The plastic cover underneath, held on by small screws. The air vents in it let the fan breathe.',
     example: 'A laptop used on a bed can overheat because the vents are blocked.' },
+
+  // ---------- gaming laptop: Lenovo Legion 5 15ACH6H. 3D models from PC Anatomy (MIT, SPEC decision 15); our words,
+  // written from its descriptions, with its sources (Lenovo's specifications and maintenance manual).
+  { id: 'legion-cover', name: 'Bottom cover', role: 'power', topic: 'How it fits together', model: 'pc-anatomy',
+    plain: 'The plastic plate underneath closes the laptop. Taking it off is the first step of any repair, and its vents let cool air in for the fans.',
+    example: 'Fluff caught in the vents underneath makes a laptop run hot.', sources: [SRC.legionService] },
+  { id: 'legion-fasteners', name: 'Cover screws', role: 'power', topic: 'How it fits together', model: 'pc-anatomy',
+    plain: 'Small screws hold the bottom cover on. Repair guides list each one, because a long screw in a short hole can pierce the board.',
+    example: 'A repair starts with a small screwdriver and a tray to keep the screws in order.', sources: [SRC.legionService],
+    specs: { Scope: 'positions and count illustrative' } },
+  { id: 'legion-deck', name: 'Keyboard deck', role: 'input', topic: 'Input and output', model: 'pc-anatomy',
+    plain: 'The top half: the keyboard, with its own number pad and backlight, sits in the palm rest. It is also the frame everything else is fixed to.',
+    example: 'Typing in the dark works because each key is lit from below.', sources: [SRC.legionSpec, SRC.legionService] },
+  { id: 'legion-trackpad', name: 'Touchpad', role: 'input', topic: 'Input and output', model: 'pc-anatomy',
+    plain: 'It feels where your finger is and how it moves, and turns that into the pointer on the screen.',
+    example: 'Two fingers sliding on it scroll a web page.', sources: [SRC.legionSpec] },
+  { id: 'legion-hinges', name: 'Hinges', role: 'power', topic: 'How it fits together', model: 'pc-anatomy',
+    plain: 'Two hinges join the screen to the base and hold it at any angle. The screen cables pass close to them.',
+    example: 'A screen that flops backwards has a worn hinge.', sources: [SRC.legionService] },
+  { id: 'legiondisplay', name: 'Screen', role: 'output', topic: 'Input and output', model: 'pc-anatomy',
+    plain: 'The lid holds an LCD panel lit from behind, with the webcam above it. A thin cable carries the picture from the main board.',
+    example: 'A fast screen, refreshing many times a second, makes games look smoother.', sources: [SRC.legionSpec, SRC.legionService],
+    specs: { Display: '15.6-inch IPS · 1920 × 1080 · 165 Hz option' } },
+  { id: 'legionboard', name: 'Main board', role: 'process', topic: 'Processing', model: 'pc-anatomy',
+    plain: 'The board everything connects to. It carries the processor, a separate graphics chip with its own memory, and the slots for the RAM and the SSD.',
+    example: 'A game runs on the graphics chip while the processor handles everything else.', sources: [SRC.legionSpec, SRC.legionService],
+    specs: { Processor: 'AMD Ryzen 7 5800H · 8 cores', Graphics: 'GeForce RTX 3060 Laptop GPU · 6 GB' } },
+  { id: 'legioncooling', name: 'Cooling system', role: 'power', topic: 'Power and cooling', model: 'pc-anatomy',
+    plain: 'Copper heat pipes carry heat away from the processor and graphics chip to fins, and two fans blow it out of the laptop.',
+    example: 'The fans speed up and get loud when a game makes the chips work hard.', sources: [SRC.legionService] },
+  { id: 'legionbattery', name: 'Battery', role: 'power', topic: 'Power and cooling', model: 'pc-anatomy',
+    plain: 'A rechargeable lithium battery made of flat cells. It runs the laptop when it is unplugged.',
+    example: 'A gaming laptop lasts longer on battery when you are only writing or reading.', sources: [SRC.legionSpec, SRC.legionService],
+    specs: { Capacity: '80 Wh option' } },
+  { id: 'legion-speakers', name: 'Speakers', role: 'output', topic: 'Input and output', model: 'pc-anatomy',
+    plain: 'Two small speakers in boxes at the front corners turn the sound signal into sound you can hear.',
+    example: 'Covering the front edge with your wrists makes the sound quieter.', sources: [SRC.legionSpec, SRC.legionService] },
 
   // ---------- desktop PC (a standard ATX motherboard and what plugs into it)
   { id: 'pc-cpu', name: 'CPU', role: 'process', topic: 'Processing', photo: PHOTOS.cpu, closeup: 'cpu',

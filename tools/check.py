@@ -68,7 +68,7 @@ try:
     p.goto(URL, wait=3.5)
     s = p.js("""return {cards: document.querySelectorAll('.device').length, thumbs: [...document.querySelectorAll('.device img')].filter(i => i.src.startsWith('data:image/png') && i.naturalWidth > 100).length,
       compare: !!document.querySelector('a[href="#/compare"]'), foot: document.querySelector('.foot')?.textContent || ''};""")
-    check("the shelf shows five devices, each pictured from its 3D model", s["cards"] == 5 and s["thumbs"] == 5, json.dumps(s)[:120])
+    check("the shelf shows six devices, each pictured from its 3D model", s["cards"] == 6 and s["thumbs"] == 6, json.dumps(s)[:120])
     check("the shelf links to the comparison and to the credits, and says it is not affiliated", s["compare"] and "Not affiliated with Apple, Samsung, Lenovo or iFixit" in s["foot"] and "licences" in s["foot"])
 
     p.js("document.querySelector('.device').click();")
@@ -171,9 +171,14 @@ try:
     time.sleep(2.0)
     check("a step's 'See the ... in the laptop' opens that part in 3D", p.js("return location.hash").startswith("#/d/laptop/lap-"), p.js("return location.hash"))
 
+    p.goto(URL + "#/d/legion/legioncooling", wait=3.0)
+    lg = p.js("return {canvas: !!document.querySelector('.stage canvas'), list: document.querySelectorAll('.plist [data-part]').length, card: document.querySelector('.part-card h2')?.textContent, src: [...document.querySelectorAll('.part-card .meta a')].map(a => a.getAttribute('aria-label') || a.textContent), brand: /LEGION|PC ANATOMY/.test(document.body.innerText)}")
+    check("the Legion (PC Anatomy's model) opens in 3D with ten parts; its cards name their sources and credit the model", lg["canvas"] and lg["list"] == 10 and lg["card"] == "Cooling system"
+          and any("maintenance manual" in x for x in lg["src"]) and "PC Anatomy" in lg["src"] and not lg["brand"], json.dumps(lg)[:240])
+
     p.goto(URL + "#/credits", wait=1.5)
-    cr = p.js("return {photos: document.querySelectorAll('.photo-list li').length, nc: document.body.innerText.includes('not for commercial use'), rows: document.querySelectorAll('tbody tr').length, links: [...document.querySelectorAll('.photo-list a')].filter(a => a.href.includes('creativecommons.org') || a.href.includes('artlibre')).length};")
-    check("the credits list all nine photos with their licences, the non-commercial reason, and every published size", cr["photos"] == 9 and cr["links"] == 9 and cr["nc"] and cr["rows"] >= 8, json.dumps(cr))
+    cr = p.js("return {photos: document.querySelectorAll('.photo-list li').length, nc: document.body.innerText.includes('not for commercial use'), rows: document.querySelectorAll('tbody tr').length, links: [...document.querySelectorAll('.photo-list a')].filter(a => a.href.includes('creativecommons.org') || a.href.includes('artlibre')).length, pca: [...document.querySelectorAll('a')].some(a => a.href.includes('github.com/Yoosseph/pc-anatomy')) && document.body.innerText.includes('MIT')};")
+    check("the credits list all nine photos with their licences, the non-commercial reason, every published size, and credit PC Anatomy (MIT)", cr["photos"] == 9 and cr["links"] == 9 and cr["nc"] and cr["rows"] >= 9 and cr["pca"], json.dumps(cr))
 
     p.goto(URL, wait=1.5)
     p.js("document.getElementById('theme').click();")
@@ -208,7 +213,7 @@ for w, h in ((1280, 720), (1366, 768), (1920, 1080)):
     p = page(w, h)
     try:
         bad = []
-        for frag in ("", "#/j/open-a-website/5", "#/j/save-a-photo/7", "#/d/iphone/phone-board", "#/d/galaxy/phone-battery", "#/d/laptop/lap-fan", "#/d/pc/pc-ram", "#/d/router/rt-board", "#/d/laptop/lap-ssd?photo", "#/compare/phone-battery", "#/x/pc-ram", "#/x/pc-cpu", "#/show/pc/pc-cpu"):
+        for frag in ("", "#/j/open-a-website/5", "#/j/save-a-photo/7", "#/d/iphone/phone-board", "#/d/galaxy/phone-battery", "#/d/laptop/lap-fan", "#/d/pc/pc-ram", "#/d/router/rt-board", "#/d/legion/legionboard", "#/d/laptop/lap-ssd?photo", "#/compare/phone-battery", "#/x/pc-ram", "#/x/pc-cpu", "#/show/pc/pc-cpu"):
             p.goto(URL + frag, wait=1.6)
             r = p.js(FIT)
             if r:
@@ -241,13 +246,14 @@ except ImportError:
     Image = None
 WANT = {"iphone": {"2 Screen", "3 Battery", "5 Rear cameras"}, "galaxy": {"4 Screen", "5 Battery", "3 Rear cameras"},
         "laptop": {"2 Keyboard", "3 Battery", "4 RAM", "4 SSD", "5 Fan and heat pipe"},
-        "pc": {"1 Graphics card", "2 RAM", "3 SSD", "4 CPU"}, "router": {"1 Antennas", "5 Main board", "4 Network ports"}}
+        "pc": {"1 Graphics card", "2 RAM", "3 SSD", "4 CPU"}, "router": {"1 Antennas", "5 Main board", "4 Network ports"},
+        "legion": {"3 Keyboard deck", "3 Screen", "4 Battery", "6 Cooling system", "7 Main board"}}
 for fw_, fh_ in ((1366, 768), (1280, 720)):
   p = page(fw_, fh_)
   try:
     p.goto(URL, wait=1.5)   # a real page load, so the error hook is in place
     armed = p.js("return Array.isArray(window.__errs)")
-    for dev, sel in (("iphone", "phone-sim"), ("galaxy", "phone-sim"), ("laptop", "lap-cpu"), ("pc", "pc-clock"), ("router", "rt-lights")):
+    for dev, sel in (("iphone", "phone-sim"), ("galaxy", "phone-sim"), ("laptop", "lap-cpu"), ("pc", "pc-clock"), ("router", "rt-lights"), ("legion", "legion-speakers")):
         p.goto(URL + f"#/d/{dev}/{sel}", wait=4.2)
         bad, frames, end = [], [], set()
         for t in SHEET:

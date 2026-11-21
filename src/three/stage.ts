@@ -7,6 +7,7 @@
 // leader line with one bend, and the labels never cover each other or the model.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { HULL, INK, type Model } from './models.ts';
 
 export const REDUCE = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -68,6 +69,28 @@ export interface StageOptions {
   onMove?: (t: number) => void;
   /** A name for the canvas, for people who cannot see it. */
   name: string;
+  /** 'studio': PC Anatomy's lighting for its realistic models (Device.look). */
+  look?: 'studio';
+}
+
+/** The lights for a look. Default: soft light for outlined models. Studio: PC Anatomy's rig (its lib/stage-runtime.ts:
+ *  filmic tone mapping, a room reflected in metal, key, rim and kick lights), for its realistic materials. */
+function light(scene: THREE.Scene, renderer: THREE.WebGLRenderer, look?: 'studio') {
+  if (look === 'studio') {
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.02;
+    const pmrem = new THREE.PMREMGenerator(renderer), room = new RoomEnvironment();
+    scene.environment = pmrem.fromScene(room, 0.04).texture;
+    room.dispose(); pmrem.dispose();
+    scene.add(new THREE.HemisphereLight(0xccd9e2, 0x23211f, 0.3));
+    for (const [c, i, x, y, z] of [[0xfff2e2, 2.2, -5, 7.5, 9], [0xb6d0e0, 1.6, -6, 3.5, -5], [0xa2bdcf, 0.55, 7, -4, 8]] as const) {
+      const d = new THREE.DirectionalLight(c, i); d.position.set(x, y, z); scene.add(d);
+    }
+    return;
+  }
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8070, 1.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(200, 400, 260); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.7); fill.position.set(-300, -120, -200); scene.add(fill);
 }
 
 const stages = new Set<Stage>();
@@ -132,9 +155,7 @@ export class Stage {
     canvas.setAttribute('role', 'img');
     canvas.setAttribute('aria-label', o.name);
     host.prepend(canvas);
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8070, 1.6));
-    const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(200, 400, 260); this.scene.add(sun);
-    const fill = new THREE.DirectionalLight(0xffffff, 0.7); fill.position.set(-300, -120, -200); this.scene.add(fill);
+    light(this.scene, this.renderer, o.look);
     this.scene.add(this.model.object);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = !REDUCE;
@@ -459,14 +480,13 @@ export class Stage {
 
 /** Render a model once to a picture (the shelf's thumbnails), with one shared renderer. */
 let shot: THREE.WebGLRenderer | null = null;
-export function snapshot(model: Model, view: [number, number, number], w: number, h: number, apart = 0): string {
+export function snapshot(model: Model, view: [number, number, number], w: number, h: number, apart = 0, look?: 'studio'): string {
   if (!webglAvailable()) return '';
   shot ??= new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   shot.setPixelRatio(2); shot.setSize(w, h, false);
+  shot.toneMapping = THREE.NoToneMapping;
   const scene = new THREE.Scene();
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8070, 1.6));
-  const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(200, 400, 260); scene.add(sun);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.7); fill.position.set(-300, -120, -200); scene.add(fill);
+  light(scene, shot, look);
   model.parts.forEach((p) => p.position.copy(p.userData.home).addScaledVector(p.userData.lift, apart));
   scene.add(model.object);
   const sphere = new THREE.Box3().setFromObject(model.object).getBoundingSphere(new THREE.Sphere());

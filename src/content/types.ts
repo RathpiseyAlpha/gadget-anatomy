@@ -35,7 +35,15 @@ export interface Part {
   photo?: Photo;
   /** A part that can be looked at alone, turned and labelled. */
   closeup?: 'dimm' | 'sodimm' | 'cpu';
+  /** Published specifications, each line from one of `sources`. */
+  specs?: Record<string, string>;
+  /** Where the facts come from (depth 2: every part names its sources; SPEC section 13). */
+  sources?: Source[];
+  /** The 3D model of this part is PC Anatomy's (MIT licence, SPEC decision 15); shown under the card. */
+  model?: 'pc-anatomy';
 }
+
+export interface Source { name: string; url: string }
 
 export type Topic = 'Input and output' | 'Processing' | 'Memory and storage' | 'Networks and the internet' | 'Power and cooling' | 'How it fits together';
 
@@ -43,7 +51,7 @@ export type Topic = 'Input and output' | 'Processing' | 'Memory and storage' | '
 export interface Pin { part: string; x: number; y: number }
 
 export interface Device {
-  id: 'iphone' | 'galaxy' | 'laptop' | 'pc' | 'router';
+  id: 'iphone' | 'galaxy' | 'laptop' | 'legion' | 'pc' | 'router';
   name: string;
   /** The real product this model follows, if any. */
   product?: string;
@@ -66,4 +74,6 @@ export interface Device {
   apart?: number;
   /** Where the camera looks from (a direction; the distance is worked out from the model's size). */
   view: [number, number, number];
+  /** 'studio': realistic materials under PC Anatomy's lighting (its reused models); default: our outlined look. */
+  look?: 'studio';
 }

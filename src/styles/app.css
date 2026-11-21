@@ -75,7 +75,7 @@ main:focus { outline: none; }
 .hello h1 { font: 800 34px/40px var(--font-mono); letter-spacing: -.02em; }
 .lede { font: var(--t-body); max-width: 80ch; }
 .shelf h2 { font: var(--t-h3); margin-bottom: var(--s3); }
-.devices { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); gap: var(--s4); }
+.devices { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: var(--s4); }
 .device { display: grid; grid-template-rows: 108px auto; height: 100%; border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); box-shadow: var(--pop);
   overflow: hidden; color: var(--ink); text-decoration: none; transition: transform var(--dur-press) var(--ease); }
 .device:hover { transform: var(--lift); }
@@ -86,6 +86,7 @@ main:focus { outline: none; }
 .device .product { font: var(--t-hint); color: var(--muted); }
 .device span { font: var(--t-body-sm); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .device .product, .device .count { display: block; }
+.device .product { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* one line, so six cards fit one screen */
 .journeys { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(216px, 1fr)); gap: var(--s4); }
 .jcard { display: grid; gap: 4px; align-content: start; height: 100%; padding: var(--s3) var(--s4); border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet);
   box-shadow: var(--pop); color: var(--ink); text-decoration: none; transition: transform var(--dur-press) var(--ease); }
@@ -176,8 +177,8 @@ main:focus { outline: none; }
 .photo img { width: 100%; height: clamp(96px, 17vh, 180px); object-fit: contain; background: #121212; border: var(--bw) solid var(--edge); border-radius: var(--r-control); display: block; }
 .photo figcaption, .src { font: var(--t-hint); color: var(--muted); }
 .photo figcaption a { color: var(--muted); }
-.meta { margin: 0; display: grid; gap: 4px; font: var(--t-small); color: var(--muted); padding-top: var(--s3); border-top: var(--bw-fine) solid var(--line); }
-.meta div { display: grid; grid-template-columns: 3.5em minmax(0, 1fr); gap: var(--s2); }
+.meta { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: var(--s3); row-gap: 4px; font: var(--t-small); color: var(--muted); padding-top: var(--s3); border-top: var(--bw-fine) solid var(--line); }
+.meta div { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; }
 .meta dt { font-weight: 700; color: var(--ink); }
 .meta dd { margin: 0; }
 .note { font: var(--t-hint); color: var(--muted); }

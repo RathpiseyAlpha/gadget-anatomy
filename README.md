@@ -22,6 +22,10 @@ Every push to `main` is tested, built and published to GitHub Pages by `.github/
 Teardown photos: [iFixit](https://www.ifixit.com), CC BY-NC-SA 3.0. Other photos: Wikimedia Commons, each with its
 own author and licence. Every source is listed in [`design/SOURCES.md`](design/SOURCES.md).
 
-iPhone, Galaxy, IdeaPad and iFixit are their owners' trademarks, used only to name the devices and the photos' source.
+The gaming laptop's 3D models (Lenovo Legion 5 and its board, cooling, battery, screen, storage and memory) are from
+[PC Anatomy](https://github.com/Yoosseph/pc-anatomy) by Yoseph, MIT licence (© 2026 Yoseph); the copied code, its
+licence and every change are in [`src/vendor/pc-anatomy/`](src/vendor/pc-anatomy/CHANGES.md).
+
+iPhone, Galaxy, IdeaPad, Legion and iFixit are their owners' trademarks, used only to name the devices and the photos' source.
 Gadget Anatomy is not affiliated with Apple, Samsung, Lenovo or iFixit. Because the iFixit photos are licensed for
 non-commercial use, this app is free and non-commercial.
