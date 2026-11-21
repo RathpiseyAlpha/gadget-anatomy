@@ -3,7 +3,8 @@
 Status: **M1 and M2 built, 2026-11-21**: the anatomy half (shelf, 3D viewer for the five devices, photo view, two-phone
 comparison, part close-ups, projector view, credits) and the four journeys, checked by `src/content/content.test.ts`
 and `tools/check.py` (100 browser checks). On 2026-11-22 the take-apart was rebuilt on the `/breakdown` method
-(decision 12, skill `.claude/skills/take-apart`). **M3 (more input, output and storage devices) is next** (section 12.7).
+(decision 12, skill `.claude/skills/take-apart`). **Next: M3, depth 2** (section 13): every visible part of a device,
+reusing PC Anatomy's models with credit; the Lenovo Legion 5 first, then the iPhone 13 Pro.
 Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
 
 ## 1. What it is
@@ -22,8 +23,8 @@ students. Two halves:
 
 | Who | Where | What they need |
 |---|---|---|
-| A young student (about 12 and up) | Their own phone, a school computer, home | Find a part on a device they own, read what it does in two sentences, follow a journey at their own pace |
-| Anyone curious (older students, parents, adults learning) | Any browser | The same, without being talked down to |
+| Anyone curious (students, parents, adults learning; decision 14) | Any browser | Find a part on a device they own, read what it does in plain words, open it to see what is inside, as deep as they want to go |
+| A student (about 12 and up) | Their own phone, a school computer, home | The same, plus a journey at their own pace; every technical word explained the first time it appears |
 | A teacher | A classroom projector | A large, clean view of one part or one journey step to talk over; nothing about any student on screen |
 
 No accounts and nothing to install. It is not tied to any one course: topics use the names every school computing
@@ -153,6 +154,10 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
 | 12 | **Take-apart after the `/breakdown` method (2026-11-22)**, from Artem Novitckii's MIT-licensed Claude Code animation skill, played live instead of rendered to video: each device lists its parts in **layers**, outermost first; opening a device plays them coming off one layer at a time (each starting while the one before is halfway), and the slider scrubs the same timeline; labels sit in a **numbered column** at the right (the number is the order the part comes off in this model, captioned "Order in this 3D model" and written in the part card for readers without the 3D view; it starts where a real repair starts, the laptop's bottom cover and the Galaxy's back, but the real teardown sequence is M4), joined to their parts by leader lines with one bend that never cross; at most six labels, names up to 18 characters, a note (the part's job, or one fact on a close-up) up to 22; the model moves left to give the column room; phones keep floating labels. `tools/check.py` scrubs every device to six points, fails on a label outside the stage, two labels touching or two lines crossing, and saves the six frames as a **contact sheet** (`tools/check-sheet-<device>.png`) to look at for lines ending on hidden parts. The projector view's **Save a clip** records the model coming apart, with its labels, as a video to download. Not taken from `/breakdown`: its tall phone-video format, its fixed dark backdrop and its jokey notes. The router's case now moves back as it lifts, and the phones' cameras slide out sideways, so every line ends on a part you can see. | The skill's planning, timing and label rules teach one part at a time and keep labels readable; the frame check makes them testable; a clip lets teachers share the take-apart without other software. |
 | 10 | **Layout rules after the UX audit (2026-11-21)**: working pages (viewer, compare, close-up, projector) fit one screen from 1280 × 720 up and never scroll as a page (checked at 1280 × 720, 1366 × 768 and 1920 × 1080); one compact parts row each, the job written under the name; every control at least 44 px; one breakpoint (narrow, under 768 px), where panels stack, the page may scroll and the page's actions move into a menu; the footer only on the home and credits pages, the "not affiliated" line under every part card; the job shown as a colour dot and a word, not a pill. Kept on purpose from the Archboard look: hard offset shadows and an 800-weight display headline. | The instructor asked for less clutter and no scrolling; the VectorLab UX audit (19 rule sets) set the touch-target, breakpoint, label, verb, weight and motion rules. |
 
+| 13 | **Depth 2 first, depth 3 later** (instructor, 2026-11-22). Depth 1 is what M1 built (6 to 13 parts a device, one level). **Depth 2** is a teardown: every visible part of the device and of each assembly you can open (the board, cooling, battery, display, storage, the memory stick), 40 to 80 parts a device, each with a source. **Depth 3** goes inside the chips (CPU cores, memory die, bank, cell), built once per kind of chip and shared by every device that has one. Section 13 has the plan and the cost estimate. | The instructor wants detail "down to the last component" (PC Anatomy's level); depth 2 gives most of it for a third of the cost, and depth 3 is cheaper once shared. |
+| 14 | **The audience is general** (instructor, 2026-11-22: "students would be ok, they can explore"). Every part still opens with one plain sentence; below it, the proper technical words and real specifications are welcome, each technical word explained the first time it appears. | Deeper levels need real terms; students can go as deep as they like. |
+| 15 | **Reuse PC Anatomy, with credit** (instructor, 2026-11-22). [PC Anatomy](https://github.com/Yoosseph/pc-anatomy) by Yoseph, MIT licence, © 2026: its laptop, Mac and desktop models are built in TypeScript with three.js, as ours are. Its code is copied into `src/vendor/pc-anatomy/` with its licence and a note of every change, connected to our stage through a small adapter for its builder toolkit (`add`, `instances`, `box`, `pcb`, `material`, `label`, `assembly`). We keep our own interface (one screen, plain DOM, our tokens), write our own card text, and keep its source citations. Credited on the credits page and in the README. | Its models are the most detailed free set there is, and the licence allows reuse; its interface does not fit our one-screen rules, and its texts are written for enthusiasts. |
+
 ## 11. Open
 
 - Your own photos later (they would lift the non-commercial limit of the iFixit photos).
@@ -160,6 +165,9 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
   iFixit has fewer teardowns of those).
 - Khmer: in the first release or later.
 - A custom domain, or the GitHub Pages address.
+- The look of depth-2 devices: PC Anatomy's models are realistic (materials, no outlines); ours have ink outlines.
+  Decide after seeing the Legion pilot whether to outline the reused models, or move every device to the realistic
+  look.
 
 ## 12. Future plan (after M2)
 
@@ -281,8 +289,10 @@ shown step by step, then played by the learner alone:
 
 ### 12.7 Suggested order
 
-1. **M2** journeys (already planned).
-2. **M3** more input, output and storage devices (12.1), starting with the hard disk, keyboard, mouse, printer and monitor.
+1. **M2** journeys (done).
+2. **M3** depth 2 (section 13): the Legion 5 pilot (reused from PC Anatomy), then the iPhone 13 Pro (built new), then
+   the MacBook Pro and the desktop PC (reused), then the IdeaPad, the Galaxy and the router. More input, output and
+   storage devices (12.1: hard disk, keyboard, mouse, printer, monitor) follow at depth 2 directly.
 3. **M4** detailed assembly timelines (12.5) for the PC and the laptop, on the take-apart already built (decision 12):
    screws, cables, tools and real teardown order per step.
 4. **M5** the Build a PC game (12.6).
@@ -292,3 +302,52 @@ shown step by step, then played by the learner alone:
 
 Open for these: which devices the instructor's classes meet first; whether a light teacher view (assign a mission, see
 class progress) is wanted, which would need accounts; and the undersea cable data's licence.
+
+## 13. Depth 2 and 3 (plan, 2026-11-22)
+
+### 13.1 What each depth means
+
+| Depth | What you see | Parts a device | When |
+|---|---|---|---|
+| 1 | The device and its main parts, one level (M1) | 6 to 13 | Built |
+| **2** | A **teardown**: every visible part, and each assembly opens into its own parts (the laptop's board, cooling, battery, display, storage, memory stick) | 40 to 80 | **M3, now** |
+| 3 | **Inside the chips**: CPU and GPU cores, the memory chip's die, bank and cell, the storage chip | shared, built once per kind of chip | Later |
+
+### 13.2 How depth 2 works in the app
+
+- **Levels.** A device has a top level (the whole device) and assemblies that open (`open` on a part). Opening one
+  shows that assembly alone, taken apart, with its own parts list, layers and labels; a breadcrumb ("Legion 5 ›
+  System board") and "Back to the laptop" lead up. Address: `#/d/<device>/<part>?in=<assembly>`.
+- **One screen still.** Each level lists at most about 13 parts, so the list never scrolls; a level with more is split
+  into assemblies.
+- **Every part** has a role, one plain sentence, an example, its specifications where published, and its sources
+  (titles and links). Text marked as adapted from PC Anatomy where it is.
+- **The take-apart** (decision 12) works per level: layers, at most six labels, the contact-sheet check per level.
+- **Engine work, once:** levels and the breadcrumb; the adapter for PC Anatomy's builder toolkit; three.js upgraded
+  from 0.170 to 0.186 (theirs); sources per part; fast picking (`three-mesh-bvh`) only if large models make clicking
+  slow.
+
+### 13.3 Order
+
+1. **Lenovo Legion 5 15ACH6H**, a new device (a gaming laptop, next to the IdeaPad): the pilot. PC Anatomy's models
+   for the laptop, board, cooling, battery, display, storage and memory stick, about 50 parts at depth 2. Measures the
+   real cost.
+2. **iPhone 13 Pro** at depth 2, built new from the iFixit teardown with the same toolkit (PC Anatomy has no phone).
+3. MacBook Pro 14 (reused), the desktop PC (reused, one build), then the IdeaPad, the Galaxy and the router.
+
+### 13.4 Cost estimate (Claude tokens, ranges, 2026-11-22)
+
+Measured: PC Anatomy is about 39,000 lines of TypeScript plus tests and docs (about 1.7 MB, 400 to 500 thousand
+tokens), with more than 590 parts; its two laptops add about 4,400 lines on top of its shared engine. Most of the cost
+of building is context read again on every step (research, checks, screenshots), not the code written.
+
+| Per device | Written by Claude | Processed in total |
+|---|---|---|
+| Depth 1 | 20 to 40 thousand | 1 to 3 million |
+| Depth 2 | 60 to 120 thousand | 8 to 20 million |
+| Depth 3 | 150 to 300 thousand | 30 to 60 million |
+| Engine work, once | 150 to 300 thousand | 40 to 80 million |
+
+About 15 devices: all at depth 2, 150 to 350 million processed; all at depth 3, 0.5 to 1 billion; depth 2 everywhere
+plus shared depth-3 chips, 250 to 400 million. Reused devices (Legion, MacBook, PC) cost less to model, not less to
+write. The Legion pilot replaces these estimates with a measurement (`/usage` or `/cost`).
