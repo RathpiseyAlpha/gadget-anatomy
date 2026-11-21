@@ -2,36 +2,34 @@
 import { DEVICES, deviceById, PIN_NAMES } from '../content/devices.ts';
 import { ALL_PARTS, PARTS } from '../content/parts.ts';
 import { LICENCE_URL, PHOTOS } from '../content/photos.ts';
-import { ROLES } from '../content/roles.ts';
 import { href } from '../router.ts';
 import { buildCPU, buildDevice, buildRAM, type Model } from '../three/models.ts';
 import { Stage, webglAvailable } from '../three/stage.ts';
 import * as THREE from 'three';
-import { chip, credit, esc, FOOT, partCard, roleColor, topBar, wireTopBar, type View } from './common.ts';
+import { chip, credit, esc, FOOT, NOTE, partCard, pinColor, roleColor, topBar, wireTopBar, type View } from './common.ts';
 import { photoMap } from './viewer.ts';
 
 // ---------------- Two phones, same parts
 export function compare(root: HTMLElement, partId: string | null): View {
   const a = deviceById('iphone')!, b = deviceById('galaxy')!;
   let sel = partId && a.parts.includes(partId) ? partId : 'phone-battery';
-  root.innerHTML = `${topBar('<h1 class="title">Two phones, same parts</h1>')}
+  root.innerHTML = `${topBar('<h1 class="title">Two phones, same parts<small>Different makers, the same anatomy</small></h1>')}
   <main class="compare" id="main" tabindex="-1">
-    <p class="lede-sm">An iPhone and an Android phone, taken apart. Different makers, the same anatomy: pick a part and it lights up on both.</p>
-    <div class="cmp-grid">
-      ${[a, b].map((d) => `<figure class="cmp">${photoMap(d, 'c')}<figcaption><b><a href="${href({ view: 'device', device: d.id, part: null, photo: false })}">${esc(d.product ?? d.name)}</a></b><span>${credit(d.photo!)}</span></figcaption></figure>`).join('')}
-    </div>
-    <div class="cmp-bottom">
+    <section class="cmp-main" aria-label="The two phones, taken apart">
+      <div class="cmp-grid">
+        ${[a, b].map((d) => `<figure class="cmp">${photoMap(d, 'c')}<figcaption><b><a href="${href({ view: 'device', device: d.id, part: null, photo: false })}">${esc(d.product ?? d.name)}</a></b><span>${credit(d.photo!)}</span></figcaption></figure>`).join('')}
+      </div>
       <nav class="legend" aria-label="Parts in both phones">${a.photo!.pins.map((p, i) =>
-        `<button type="button" data-group="c" data-part="${p.part}" aria-pressed="false" style="--c: ${roleColor(PARTS[p.part]!.role)}"><span class="num">${i + 1}</span><span>${esc(PARTS[p.part]!.name)}</span><small>${ROLES[PARTS[p.part]!.role].name}</small></button>`).join('')}</nav>
-      <div id="card" aria-live="polite"></div>
-    </div>
-  </main>${FOOT}`;
+        `<button type="button" data-group="c" data-part="${p.part}" aria-pressed="false" style="--c: ${pinColor(PARTS[p.part]!.role)}"><span class="num">${i + 1}</span>${esc(PARTS[p.part]!.name)}</button>`).join('')}</nav>
+    </section>
+    <aside class="side"><div id="card" aria-live="polite"></div></aside>
+  </main>`;
   wireTopBar(root);
   const card = root.querySelector<HTMLElement>('#card')!;
   const select = (id: string) => {
     sel = id;
     root.querySelectorAll<HTMLElement>('[data-part]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.part === id)));
-    card.innerHTML = partCard(id, `<a class="btn btn--sm" href="${href({ view: 'device', device: 'iphone', part: id, photo: false })}">In 3D: iPhone</a><a class="btn btn--sm" href="${href({ view: 'device', device: 'galaxy', part: id, photo: false })}">In 3D: Galaxy</a>`);
+    card.innerHTML = partCard(id, `<a class="btn btn--sm" href="${href({ view: 'device', device: 'iphone', part: id, photo: false })}">Open the iPhone in 3D</a><a class="btn btn--sm" href="${href({ view: 'device', device: 'galaxy', part: id, photo: false })}">Open the Galaxy in 3D</a>`) + NOTE;
     history.replaceState(null, '', href({ view: 'compare', part: id }));
   };
   root.querySelectorAll<HTMLElement>('[data-part]').forEach((x) => x.addEventListener('click', () => select(x.dataset.part!)));
@@ -53,15 +51,16 @@ export function closeup(root: HTMLElement, partId: string): View {
   root.innerHTML = `${topBar(`<h1 class="title">${esc(p.name)} up close<small>${esc(back.name)}</small></h1>`)}
   <main class="closeup" id="main" tabindex="-1">
     <div class="stage" id="stage"></div>
-    <aside class="side">
+    <aside class="side"><div>
       ${p.photo ? `<figure class="photo"><img src="${p.photo.file}" alt="${esc(p.photo.alt)}"><figcaption>${credit(p.photo)}</figcaption></figure>` : ''}
       <div class="name">${chip(p.role)}<h2>${esc(p.name)}</h2></div>
       <p class="what">${esc(p.plain)}</p>
       <dl class="measure">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>
       <p class="src">Sizes: ${esc(src)}</p>
       <a class="btn btn--sm" href="${href({ view: 'device', device: back.id, part: partId, photo: false })}">Back to the ${esc(back.name)}</a>
-    </aside>
-  </main>${FOOT}`;
+      ${NOTE}
+    </div></aside>
+  </main>`;
   wireTopBar(root);
   let stage: Stage | null = null;
   const host = root.querySelector<HTMLElement>('#stage')!;
@@ -85,8 +84,8 @@ export function projector(root: HTMLElement, deviceId: string, partId: string | 
       <span id="role"></span>
       <h1 id="pname"></h1>
       <p id="pline"></p>
-      <p class="foot-proj"><span>${esc(d.name)}: part <span id="pnum"></span> of ${d.parts.length}</span><span>← → next part · Esc to leave</span></p>
-      <div class="row proj-tools"><button class="btn btn--sm" type="button" id="prev">Previous part</button><button class="btn btn--sm" type="button" id="next">Next part</button><button class="btn btn--sm" type="button" id="full">Full screen</button><a class="btn btn--sm btn--ghost" id="leave" href="#">Leave</a></div>
+      <p class="foot-proj"><span>${esc(d.name)}: part <span id="pnum"></span> of ${d.parts.length}</span><span>← → next part · Esc to stop</span></p>
+      <div class="row proj-tools"><button class="btn btn--sm" type="button" id="prev">Previous part</button><button class="btn btn--sm" type="button" id="next">Next part</button><button class="btn btn--sm" type="button" id="full">Go full screen</button><a class="btn btn--sm btn--ghost" id="leave" href="#">Stop presenting</a></div>
     </div>
   </main>`;
   let stage: Stage | null = null;

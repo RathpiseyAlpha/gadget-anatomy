@@ -199,6 +199,7 @@ export class Stage {
     this.dirty = false;
     this.renderer.render(this.scene, this.camera);
     const w = this.host.clientWidth, h = this.host.clientHeight, v = new THREE.Vector3();
+    const shown: { el: HTMLElement; sel: boolean; x: number; y: number }[] = [];
     this.labels.forEach((l, i) => {
       const el = this.labelEls[i]!;
       let show = true;
@@ -216,7 +217,16 @@ export class Stage {
       el.style.display = show && !behind ? '' : 'none';
       el.style.left = `${((v.x + 1) / 2) * w}px`;
       el.style.top = `${((1 - v.y) / 2) * h + (l.below ? 14 : -14)}px`;
+      if (show && !behind) shown.push({ el, sel: !!l.part && l.part === this.sel, x: ((v.x + 1) / 2) * w, y: ((1 - v.y) / 2) * h });
     });
+    // A label that would cover another one is hidden: the selected part's label first, then the order given.
+    shown.sort((a, b) => Number(b.sel) - Number(a.sel));
+    const kept: DOMRect[] = [];
+    for (const s of shown) {
+      const r = s.el.getBoundingClientRect();
+      if (kept.some((k) => r.left < k.right + 4 && r.right > k.left - 4 && r.top < k.bottom + 2 && r.bottom > k.top - 2)) s.el.style.display = 'none';
+      else kept.push(r);
+    }
   }
 
   dispose() {

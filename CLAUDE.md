@@ -32,6 +32,9 @@ apart, theme, reduced motion, dispose), `src/ui/` (one function per page, each r
 - Every 3D view has the same content without WebGL (the photo view with pins), a keyboard path (parts list), reduced
   motion (no auto-turn, no animated take-apart) and both themes.
 - Nothing on the projector view shows anything about a student.
+- Layout (SPEC decision 10): working pages fit one screen from 1280 × 720 up with no page scrolling; controls at
+  least 44 px; one breakpoint (under 768 px); buttons start with a verb; three font weights (800 only for the two display
+  headlines). `tools/check.py` checks the no-scroll rule at three sizes: keep it passing.
 - Separate from Archboard: share its tokens and look; use its code only through its embed API.
 
 ## Commands

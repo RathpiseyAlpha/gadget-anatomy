@@ -81,7 +81,7 @@
   --t-small: 400 13px/18px var(--font-mono);
   --t-ui: 500 14px/20px var(--font-mono);
   --t-label: 700 13px/16px var(--font-mono);     /* a label on the 3D model */
-  --t-body: 400 17px/28px var(--font-prose);
+  --t-body: 400 17px/27px var(--font-prose);
   --t-body-sm: 400 15px/24px var(--font-prose);
   --t-lede: 400 19px/30px var(--font-prose);
   --t-h3: 700 17px/24px var(--font-mono);
@@ -100,7 +100,7 @@
   --pop-lg: 5px 5px 0 var(--drop);
   --lift: translate(-1px, -1px);
   --ease: cubic-bezier(.2, .7, .2, 1);
-  --dur-press: 90ms;
+  --dur-press: 100ms;
   --dur-explode: 900ms;     /* Take apart: parts lift apart once, then stay */
   --dur-step: 1200ms;       /* the packet moves one journey step */
 }

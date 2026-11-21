@@ -5,7 +5,7 @@ import type { Device, Role } from '../content/types.ts';
 import { href } from '../router.ts';
 import { buildDevice } from '../three/models.ts';
 import { snapshot, webglAvailable } from '../three/stage.ts';
-import { chip, esc, FOOT, topBar, wireTopBar, type View } from './common.ts';
+import { esc, FOOT, topBar, wireTopBar, type View } from './common.ts';
 
 // Thumbnails are drawn once per visit (and again when the theme changes, for the outlines).
 const thumbs = new Map<string, string>();
@@ -25,12 +25,12 @@ window.addEventListener('ga-theme', () => thumbs.clear());
 function roles(d: Device): Role[] {
   const seen = new Set<Role>();
   for (const id of d.parts) seen.add(PARTS[id]!.role);
-  return [...seen].slice(0, 4);
+  return [...seen];
 }
 
 export function shelf(root: HTMLElement): View {
   const gl = webglAvailable();
-  root.innerHTML = `${topBar()}
+  root.innerHTML = `${topBar('', `<a class="btn btn--sm btn--ghost" href="#/credits">Credits</a>`, true)}
   <main class="shelf" id="main" tabindex="-1">
     <section class="hello">
       <h1>Open it up.</h1>
@@ -40,7 +40,7 @@ export function shelf(root: HTMLElement): View {
       <ul class="devices">${DEVICES.map((d) => `<li><a class="device" href="${href({ view: 'device', device: d.id, part: null, photo: !gl })}">
         <span class="thumb">${gl ? `<img alt="" data-thumb="${d.id}">` : ''}</span>
         <span class="txt"><b>${esc(d.name)}</b><span class="product">${esc(d.product ?? '')}</span><span>${esc(d.blurb)}</span>
-        <span class="chips">${roles(d).map(chip).join('')}</span></span></a></li>`).join('')}</ul>
+        <span class="count">${d.parts.length} parts · ${roles(d).length} jobs</span></span></a></li>`).join('')}</ul>
     </section>
     <section aria-labelledby="h-cmp" class="cmp-band">
       <div><h2 id="h-cmp">Two phones, same parts</h2><p>An iPhone and an Android phone, taken apart side by side. Different makers, the same anatomy: pick a part and it lights up on both.</p></div>

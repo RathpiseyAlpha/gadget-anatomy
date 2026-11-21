@@ -6,12 +6,16 @@ import type { Device, Role } from '../content/types.ts';
 import { href } from '../router.ts';
 import { buildDevice } from '../three/models.ts';
 import { Stage, webglAvailable } from '../three/stage.ts';
-import { credit, esc, FOOT, partCard, roleColor, topBar, wireTopBar, type View } from './common.ts';
+import { credit, esc, NOTE, partCard, pinColor, roleColor, topBar, wireTopBar, type View } from './common.ts';
+
+// The "how to move it" hint shows until the first drag, once per browser.
+const seenHint = () => { try { return localStorage.getItem('ga-hint') === '1'; } catch { return false; } };
+const markHint = () => { try { localStorage.setItem('ga-hint', '1'); } catch { /* blocked */ } };
 
 export function photoMap(d: Device, group: string) {
   if (!d.photo) return '';
   return `<div class="photo-map"><img src="${d.photo.file}" alt="${esc(d.photo.alt)}">${d.photo.pins.map((p, i) =>
-    `<button class="pin" type="button" data-group="${group}" data-part="${p.part}" style="left:${p.x}%; top:${p.y}%; --c: ${roleColor(PARTS[p.part]!.role)}" aria-label="${esc(PIN_NAMES[p.part] ?? PARTS[p.part]!.name)}" aria-pressed="false">${i + 1}</button>`).join('')}</div>`;
+    `<button class="pin" type="button" data-group="${group}" data-part="${p.part}" style="left:${p.x}%; top:${p.y}%; --c: ${pinColor(PARTS[p.part]!.role)}" aria-label="${esc(PIN_NAMES[p.part] ?? PARTS[p.part]!.name)}" aria-pressed="false">${i + 1}</button>`).join('')}</div>`;
 }
 
 export function viewer(root: HTMLElement, deviceId: string, partId: string | null, wantPhoto: boolean): View {
@@ -24,33 +28,31 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
   const phone = d.id === 'iphone' || d.id === 'galaxy';
   const other = d.id === 'iphone' ? 'galaxy' : 'iphone';
 
-  const groups = new Map<Role, string[]>();
-  for (const id of d.parts) { const r = PARTS[id]!.role; groups.set(r, [...(groups.get(r) ?? []), id]); }
-  const list = ROLE_ORDER.filter((r) => groups.has(r)).map((r) => `<div class="pgroup"><h3 style="--c: ${roleColor(r)}"><i></i>${ROLES[r].name}</h3><ul>${
-    groups.get(r)!.map((id) => `<li><button type="button" class="pbtn" data-part="${id}" aria-pressed="false">${esc(PARTS[id]!.name)}</button></li>`).join('')}</ul></div>`).join('');
+  // One compact row per part, ordered by job; the job is written under the name (no separate headings to scroll past).
+  const ordered = ROLE_ORDER.flatMap((r: Role) => d.parts.filter((id) => PARTS[id]!.role === r));
+  const list = `<ul>${ordered.map((id) => { const p = PARTS[id]!; return `<li><button type="button" class="pbtn" data-part="${id}" aria-pressed="false"><i class="dot" style="--c: ${roleColor(p.role)}"></i><span class="pname">${esc(p.name)}</span><span class="prole">${ROLES[p.role].short}</span></button></li>`; }).join('')}</ul>`;
 
-  root.innerHTML = `${topBar(`<h1 class="title">${esc(d.name)}<small>${esc(d.product ?? '')}</small></h1>`)}
+  const actions = `${phone ? `<a class="btn btn--sm btn--ghost" href="${href({ view: 'compare', part: sel })}" id="cmpLink">Compare phones</a>` : ''}
+    <a class="btn btn--sm btn--ghost" href="${href({ view: 'show', device: d.id, part: sel })}" id="showLink">Present</a>`;
+  root.innerHTML = `${topBar(`<h1 class="title">${esc(d.name)}<small>${esc(d.product ?? '')}</small></h1>`, actions)}
   <main class="viewer" id="main" tabindex="-1">
     <nav class="plist" aria-label="Parts of the ${esc(d.name)}">${list}</nav>
     <section class="stage-wrap" aria-label="The ${esc(d.name)}">
       <div class="stage" id="stage"></div>
-      <div class="stage-tools">
+      <p class="hint" id="hint"></p>
+      <div class="tools" role="toolbar" aria-label="View tools">
         <div class="seg" role="group" aria-label="View">
           <button type="button" data-mode="3d" aria-pressed="${!photo}"${gl ? '' : ' disabled'}>3D</button>
           <button type="button" data-mode="photo" aria-pressed="${photo}"${d.photo ? '' : ' disabled'}>Photo</button>
         </div>
         <div class="explode" ${photo ? 'hidden' : ''}>
           <button class="btn btn--sm" type="button" id="apart" aria-pressed="false">Take apart</button>
-          <input id="apartRange" type="range" min="0" max="1" step="0.01" value="0" aria-label="How far apart">
+          <label class="range"><span aria-hidden="true">Together</span><input id="apartRange" type="range" min="0" max="1" step="0.01" value="0" aria-label="How far apart"><span aria-hidden="true">Apart</span></label>
         </div>
-        <span class="spacer"></span>
-        ${phone ? `<a class="btn btn--sm btn--ghost" href="${href({ view: 'compare', part: sel })}" id="cmpLink">Compare phones</a>` : ''}
-        <a class="btn btn--sm btn--ghost" href="${href({ view: 'show', device: d.id, part: sel })}" id="showLink">Projector</a>
       </div>
-      <p class="hint" id="hint"></p>
     </section>
-    <aside class="side" aria-live="polite" id="card"></aside>
-  </main>${FOOT}`;
+    <aside class="side"><div id="card" aria-live="polite"></div></aside>
+  </main>`;
   wireTopBar(root);
   const stageEl = root.querySelector<HTMLElement>('#stage')!, card = root.querySelector<HTMLElement>('#card')!, hint = root.querySelector<HTMLElement>('#hint')!;
   const range = root.querySelector<HTMLInputElement>('#apartRange')!, apartBtn = root.querySelector<HTMLButtonElement>('#apart')!;
@@ -60,7 +62,7 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
     sel = id;
     root.querySelectorAll<HTMLElement>('[data-part]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === id)));
     const extra = phone ? `<a class="btn btn--sm" href="${href({ view: 'device', device: other, part: id, photo })}">See it in the ${esc(deviceById(other)!.name)}</a>` : '';
-    card.innerHTML = partCard(id, extra, d!.partPhotos?.[id]);
+    card.innerHTML = partCard(id, extra, d!.partPhotos?.[id]) + NOTE;
     stage?.select(id);
     history.replaceState(null, '', href({ view: 'device', device: d!.id, part: id, photo }));
     const cmp = root.querySelector<HTMLAnchorElement>('#cmpLink'); if (cmp) cmp.href = href({ view: 'compare', part: id });
@@ -83,17 +85,20 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
     if (photo && d!.photo) {
       stageEl.innerHTML = `${photoMap(d!, 'v')}<p class="credit">${credit(d!.photo)}</p>`;
       stageEl.querySelectorAll<HTMLElement>('[data-part]').forEach((b) => b.addEventListener('click', () => select(b.dataset.part!)));
-      hint.textContent = gl ? 'Numbered pins show where each part sits. Pick a pin or a part in the list.' : 'This browser cannot draw 3D, so this is the photo view. Pick a pin or a part in the list.';
+      hint.textContent = gl ? '' : 'This browser cannot draw 3D, so the real photo is shown. Pick a pin or a part.';
+      hint.hidden = !hint.textContent;
     } else if (gl) {
       stage = new Stage(stageEl, {
         model: buildDevice(d!.id), view: d!.view, name: `3D model of the ${d!.name}. Pick parts from the list.`, onPick: (id) => select(id),
         labels: d!.parts.map((id) => ({ part: id, text: PARTS[id]!.name, color: roleColor(PARTS[id]!.role), always: d!.labelled.includes(id) })),
       });
       setApart(Number(range.value) || (d!.apart ?? 0.6));
-      hint.textContent = 'Drag to turn, scroll or pinch to zoom. Click a part, or pick it in the list.';
+      hint.textContent = matchMedia('(pointer: coarse)').matches ? 'Drag to turn · pinch to zoom · tap a part' : 'Drag to turn · scroll to zoom · click a part';
+      hint.hidden = seenHint();
+      stageEl.addEventListener('pointerdown', () => { hint.hidden = true; markHint(); }, { once: true });
     } else {
-      stageEl.innerHTML = `<p class="nogl">This browser cannot draw 3D, and there is no photo of this device yet. The list and the cards still work.</p>`;
-      hint.textContent = '';
+      stageEl.innerHTML = `<p class="nogl">This browser cannot draw 3D, and there is no photo of this device yet. Pick a part in the list to read about it.</p>`;
+      hint.textContent = ''; hint.hidden = true;
     }
     select(sel);
   }
@@ -102,6 +107,7 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
   // Up and down arrows move through the parts list.
   root.querySelector('.plist')!.addEventListener('keydown', (e) => {
     const k = (e as KeyboardEvent).key;
+    if (k === 'Enter' && (e.target as HTMLElement).dataset.part) { e.preventDefault(); select((e.target as HTMLElement).dataset.part!); card.querySelector<HTMLElement>('h2')?.focus(); return; }
     if (k !== 'ArrowDown' && k !== 'ArrowUp') return;
     e.preventDefault();
     const ids = [...root.querySelectorAll<HTMLElement>('.plist [data-part]')].map((b) => b.dataset.part!);

@@ -68,11 +68,12 @@ Archboard's learning mode is an add-on.
   a scene, a moving packet, Back and Next, and a narration card naming the part or place at work.
 
 ### Later
-A quiz for the projector ("Which part is this?", never scored per student), Khmer, an IoT sensor journey, "build a
-PC", an optional course map (topics → a course's weeks) for teachers, more phones and laptops.
+The future plan is section 12. Also: a quiz for the projector ("Which part is this?", never scored per student),
+Khmer, an optional course map (topics → a course's weeks) for teachers, more phones and laptops.
 
 ### Not doing
-Prices, buying advice, brand rankings, repair instructions, accounts.
+Prices, buying advice, brand rankings, accounts. Real repair advice for a student's own device: the assembly and repair
+material (section 12) is a safe simulation, and says so.
 
 ## 5. Content model
 
@@ -146,6 +147,7 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
 | 7 | **Hosting: GitHub Pages**, static, no accounts. | Free; the repository is already on GitHub; nothing to run. |
 | 9 | **As built (M1)**: addresses in the hash (`#/d/iphone/phone-battery`, `#/compare`, `#/x/pc-ram`, `#/show/laptop`, `#/credits`) so links to one part can be shared and the site runs from any folder; each device opens partly taken apart (the laptop fully: its top half lifts off and moves back, so the inside lies open); a device's own photo of a part wins over the general one; without WebGL every device opens in the photo view (the router, with no photo, as its list and cards). | Shareable links for teachers; the inside must be visible at once; a photo must show the device on screen; nothing is lost on old machines. |
 | 8 | **Body text in IBM Plex Sans at 17 px**, interface and part names in JetBrains Mono (Archboard's faces). | Young readers need a comfortable prose face; the mono keeps the family look. |
+| 10 | **Layout rules after the UX audit (2026-11-21)**: working pages (viewer, compare, close-up, projector) fit one screen from 1280 × 720 up and never scroll as a page (checked at 1280 × 720, 1366 × 768 and 1920 × 1080); one compact parts row each, the job written under the name; every control at least 44 px; one breakpoint (narrow, under 768 px), where panels stack, the page may scroll and the page's actions move into a menu; the footer only on the home and credits pages, the "not affiliated" line under every part card; the job shown as a colour dot and a word, not a pill. Kept on purpose from the Archboard look: hard offset shadows and an 800-weight display headline. | The instructor asked for less clutter and no scrolling; the VectorLab UX audit (19 rule sets) set the touch-target, breakpoint, label, verb, weight and motion rules. |
 
 ## 11. Open
 
@@ -154,3 +156,135 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
   iFixit has fewer teardowns of those).
 - Khmer: in the first release or later.
 - A custom domain, or the GitHub Pages address.
+
+## 12. Future plan (after M2)
+
+Asked for by the instructor on 2026-11-21. These are plans, not commitments; each becomes a milestone with its own design
+pass first. The same rules hold throughout: plain words, real sizes with sources, credited pictures, no invented
+numbers, keyboard and no-WebGL paths, both themes, and nothing about a student on the projector.
+
+### 12.1 More devices (the input, output and storage devices school ICT courses cover)
+
+| Job | Devices to add |
+|---|---|
+| Input | keyboard (keys, switches, controller), mouse (sensor, buttons, wheel), touch screen layers, flatbed scanner, barcode and QR scanner, webcam, microphone, game controller, fingerprint reader, smart card and NFC reader |
+| Output | monitor (LCD and OLED layers, backlight), projector, inkjet and laser printers (ink, toner, drum), 3D printer, speakers and headphones, smartwatch |
+| Storage | hard disk (platters, head, motor: the clearest "moving parts" anatomy), 2.5-inch SSD, USB flash drive, SD card, optical disc |
+| Communicate | modem and fibre box (ONT), network switch, Wi-Fi access point, Ethernet cable and RJ45 plug, fibre-optic cable, SIM and eSIM, a mobile phone tower |
+| Everyday | game console, point-of-sale card terminal, smart speaker, a home IoT sensor |
+
+Each follows the M1 pattern: a model built in code from a published size, its parts by job, a teardown photo with pins
+(iFixit or our own), cards in plain words.
+
+### 12.2 Networks you can see: LAN, WAN and the internet
+
+Scenes in Archboard's isometric style that grow from small to large, each with a "what is inside" layer:
+
+- **PAN**: a phone, earbuds and a watch over Bluetooth.
+- **LAN**: a home (router, Wi-Fi, a printer, a TV) and a school lab (a switch, a server, 30 PCs on cables).
+- **WAN**: two school campuses joined through internet providers; why a VPN or a leased line.
+- **The internet**: providers, exchange points, data centres and the undersea cables between continents.
+
+The learner turns on layers (devices, cables, radio, addresses, packets) one at a time rather than seeing everything at
+once.
+
+### 12.3 How things work: scenes and journeys
+
+Short, step-through scenes with the M2 journey controls (Back, Next, a moving packet or signal, one narration card):
+
+- **The internet**: a packet's trip, DNS, routers, why pages load in pieces.
+- **Undersea cables**: a globe with the real cable routes and landing stations, the cables that reach the learner's own
+  country, what is inside a cable (fibre, copper, armour), how a ship repairs one. Map data from a published dataset whose
+  licence is checked first (TeleGeography's Submarine Cable Map is the usual source; its terms must be read before use).
+- **NFC**: tap to pay; two coils a few centimetres apart; why the card needs no battery.
+- **RFID**: a library or shop tag woken up by the reader's field; passive and active tags.
+- **Also**: Bluetooth pairing, GPS (satellites and timing), QR codes, mobile networks (cells and towers), Wi-Fi radio,
+  fibre (light in glass), cloud storage in a data centre, how a touch screen senses a finger.
+
+### 12.4 The Device Lab: a simple sandbox simulator (recommendation)
+
+**Aim:** basic digital and computer literacy by doing, at the level of Tinkercad Circuits: drag real-looking everyday
+devices onto a desk, connect them, and complete short missions. It is not a network engineer's tool; nothing typed at a
+command line is needed at the first levels.
+
+**Recommended design**
+
+- **The bench**: an isometric room (the same look as the journeys) with a device tray: phone, laptop, desktop, router,
+  modem, printer, smart TV, speaker, USB drive, power strip.
+- **Connections a beginner can see**: power, USB, Ethernet, HDMI, Wi-Fi (join a named network with a password),
+  Bluetooth (pair), mobile data, hotspot. Each connection shows whether it works, and why not, in plain words.
+- **Missions of five to ten minutes**, each checked automatically by a rule engine like Archboard's, with a hint after a
+  wrong try and an explanation after success. Nothing can break for real, and every mistake explains itself.
+- **Levels** (each unlocks the next; teachers can open any level):
+
+| Level | The learner can... | Example missions |
+|---|---|---|
+| 1. Connect | power devices, plug cables into the right port, join Wi-Fi | Get the laptop online; connect a monitor |
+| 2. Share | print over Wi-Fi, pair Bluetooth, share a hotspot, move files with a USB drive | Print homework from a phone |
+| 3. Fix it | find why something does not work, in a safe order | "No internet": check the lights, airplane mode, the password, restart the router |
+| 4. Understand | see addresses, DNS and speed; compare Wi-Fi and cable | Why is the video slow in the bedroom? |
+| 5. Build a small network | a switch, IP addresses, a shared printer, a guest network | Set up a school lab of 6 PCs |
+
+- **Safety and privacy missions** alongside: strong Wi-Fi passwords, guest networks, updates, spotting fake Wi-Fi names.
+
+**Where the ideas come from** (paraphrased, never copied; links in the app's teacher notes):
+
+- **Cisco Networking Academy** free courses: *Digital Literacy* (digital awareness, communicating online, digital
+  safety), *Computer Hardware Basics* (PC, laptop and mobile parts), *Networking Basics*, *Getting Started with Cisco
+  Packet Tracer* (the model for level 5: a guided sandbox before a free one), and *IT Essentials* (assembly and
+  operating-system installation, which feed 12.5 and 12.6). Packet Tracer is Cisco's software: we link to it and do not
+  imitate its interface.
+- **Code.org CS Principles, unit "The Internet"**: its *Internet Simulator* adds one layer at a time (sending bits, then
+  addresses, then routers, then DNS and HTTP), and its *How the Internet Works* videos (wires, cables and Wi-Fi; IP
+  addresses and DNS; packets and routing; HTTP; encryption) set a clear order. The Device Lab borrows that teaching
+  approach: start with one connection, add one idea per level, try it before reading about it.
+- **Tinkercad Circuits**: the feel of a sandbox, with real-looking parts, drag to connect, run it and see what happens,
+  and lessons that start from a ready-made build.
+
+### 12.5 Detailed assembly of each device
+
+- **Step-by-step disassembly and reassembly** for every device, in the order of its real teardown: covers, screws (count
+  and type), clips, cables and connectors, adhesive, thermal paste, shields. Each step names the tool (Phillips #00,
+  spudger, suction cup, anti-static strap) and why the order matters.
+- **More detail in the models**: screws, ribbon cables and connectors, the CPU cooler and thermal paste, the RAM latches,
+  the M.2 screw, standoffs, the battery adhesive. Sizes from repair manuals and measured parts, marked approximate where
+  they are not.
+- **Animation approach**: the `/breakdown` skill (Artem Novitckii's MIT-licensed Claude Code animation skills) renders a
+  vertical MP4 in which an object comes apart layer by layer with leader lines and labels, checked frame by frame on a
+  contact sheet. The app keeps that method but plays it live: a scrubbable three.js timeline, layer by layer, one
+  leader-labelled part at a time, with the same check that no label covers another. The skill itself (Mac or Linux,
+  renders video, not installed here) fits short teaching videos made from the same models later, not the app.
+- The steps teach how a device is built, and say "practise here, not on your own device".
+
+### 12.6 Game scenarios: learn by doing it yourself
+
+A **game mode** with a real game's structure (a scene, a goal, an inventory, a list of actions, feedback, stars), first
+shown step by step, then played by the learner alone:
+
+- **Build a PC**: a workbench and a box of parts. The learner chooses each action from a set of commands ("Lift the
+  socket lever", "Line up the CPU's triangle", "Add thermal paste", "Click the RAM into slot 2", "Screw in the M.2
+  drive", "Fit the standoffs", "Connect the 24-pin power", "Connect the 8-pin CPU power"...). Mistakes have visible,
+  explained results: RAM the wrong way round does not fit (the notch), no standoffs shorts the board, no paste overheats
+  the CPU, a missing cable means no power. It ends with a power-on test.
+- **Install an operating system**: a generic installer (our own look, not copied screens): a bootable USB, the boot menu
+  and boot order, language and keyboard, the disk and its partitions, a user account and password, privacy choices,
+  drivers and updates. A second track uses a simulated terminal with a short list of commands for a Linux install.
+- **Fix it** missions: a laptop that will not turn on, a slow PC (RAM, a full disk), no Wi-Fi, a phone that charges
+  slowly.
+- **Modes**: Watch (the steps played and narrated), Guided (a hint after a wrong choice), Solo (no hints, stars for
+  accuracy, an optional timer). Progress is kept in the browser only: no accounts, and no ranking of students on the
+  projector.
+- Content sources: the same teardowns (iFixit) and course outlines (Cisco *IT Essentials*), paraphrased.
+
+### 12.7 Suggested order
+
+1. **M2** journeys (already planned).
+2. **M3** more input, output and storage devices (12.1), starting with the hard disk, keyboard, mouse, printer and monitor.
+3. **M4** detailed assembly timelines (12.5) for the PC and the laptop.
+4. **M5** the Build a PC game (12.6).
+5. **M6** Device Lab levels 1 to 3 (12.4).
+6. **M7** network scenes (12.2) and how-things-work scenes (12.3): LAN and WAN, the internet, undersea cables, NFC, RFID.
+7. **M8** the Install an OS game, Device Lab levels 4 and 5, Khmer.
+
+Open for these: which devices the instructor's classes meet first; whether a light teacher view (assign a mission, see
+class progress) is wanted, which would need accounts; and the undersea cable data's licence.

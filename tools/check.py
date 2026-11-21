@@ -73,7 +73,7 @@ try:
 
     p.js("document.querySelector('.device').click();")
     wait(p, "return !!document.querySelector('.stage canvas');")
-    d = p.js("return {canvas: !!document.querySelector('.stage canvas'), list: document.querySelectorAll('.plist [data-part]').length, sel: document.querySelector('.plist [aria-pressed=true]')?.textContent, title: document.querySelector('.title')?.textContent};")
+    d = p.js("return {canvas: !!document.querySelector('.stage canvas'), list: document.querySelectorAll('.plist [data-part]').length, sel: document.querySelector('.plist [aria-pressed=true] .pname')?.textContent, title: document.querySelector('.title')?.textContent};")
     check("opening the iPhone shows it in 3D with its six parts listed by job, the battery selected", d["canvas"] and d["list"] == 6 and d["sel"] == "Battery" and "iPhone 13 Pro" in d["title"], json.dumps(d))
     check("the battery's card: its job, two sentences, an example, and that its place is approximate",
           card_title(p) == "Battery" and p.js("return document.querySelector('.part-card').textContent.includes('Connect and power') && document.querySelector('.part-card .eg') !== null && document.querySelector('.part-card').textContent.includes('approximate');"))
@@ -149,8 +149,8 @@ try:
     check("the credits list all nine photos with their licences, the non-commercial reason, and every published size", cr["photos"] == 9 and cr["links"] == 9 and cr["nc"] and cr["rows"] >= 8, json.dumps(cr))
 
     p.goto(URL, wait=1.5)
-    p.js("const s = document.getElementById('theme'); s.value = 'dark'; s.dispatchEvent(new Event('change'));")
-    check("the theme menu switches to dark and remembers it", p.js("return document.documentElement.dataset.theme === 'dark' && localStorage.getItem('ga-theme') === 'dark'"))
+    p.js("document.getElementById('theme').click();")
+    check("the theme button moves from light to dark and remembers it", p.js("return document.documentElement.dataset.theme === 'dark' && localStorage.getItem('ga-theme') === 'dark'"))
     check("no script errors anywhere", not p.js("return window.__errs"), json.dumps(p.js("return window.__errs")))
 finally:
     p.close()
@@ -170,8 +170,38 @@ try:
 finally:
     p.close()
 
-# ---------------------------------------------------------------- 3. Sizes, themes, accessibility
-for w, h in ((1280, 720), (1366, 768), (1536, 864), (1920, 1080), (390, 844)):
+# ---------------------------------------------------------------- 3. One screen, no scrolling (laptop at 150% and up)
+FIT = """const o = {page: document.documentElement.scrollHeight > innerHeight + 1};
+  for (const s of ['.plist', '.side', '.cmp-main']) { const e = document.querySelector(s); if (e && e.scrollHeight > e.clientHeight + 1) o[s] = e.scrollHeight - e.clientHeight; }
+  return Object.keys(o).length === 1 && !o.page ? null : o;"""
+for w, h in ((1280, 720), (1366, 768), (1920, 1080)):
+    p = page(w, h)
+    try:
+        bad = []
+        for frag in ("#/d/iphone/phone-board", "#/d/galaxy/phone-battery", "#/d/laptop/lap-fan", "#/d/pc/pc-ram", "#/d/router/rt-board", "#/d/laptop/lap-ssd?photo", "#/compare/phone-battery", "#/x/pc-ram", "#/x/pc-cpu", "#/show/pc/pc-cpu"):
+            p.goto(URL + frag, wait=1.6)
+            r = p.js(FIT)
+            if r:
+                bad.append(f"{frag} {r}")
+        check(f"{w}x{h}: every working page fits the screen; no page, list or card scrolls", not bad, "; ".join(bad)[:300])
+    finally:
+        p.close()
+
+# ---------------------------------------------------------------- 4. Phones: the page actions sit in a menu
+p = page(375, 812)
+try:
+    p.goto(URL + "#/d/iphone", wait=2.0)
+    hidden = p.js("return getComputedStyle(document.getElementById('barActions')).display === 'none'")
+    p.js("document.getElementById('more').click();")
+    opened = p.js("return getComputedStyle(document.getElementById('barActions')).display !== 'none' && document.getElementById('more').getAttribute('aria-expanded') === 'true' && document.activeElement.closest('#barActions') !== null")
+    key(p, "Escape", vk=27)
+    closed = p.js("return getComputedStyle(document.getElementById('barActions')).display === 'none' && document.activeElement.id === 'more'")
+    check("375px: the page actions are in a menu; the dots button opens it, Escape closes it and returns focus", hidden and opened and closed, f"{hidden} {opened} {closed}")
+finally:
+    p.close()
+
+# ---------------------------------------------------------------- 5. Sizes, themes, accessibility
+for w, h in ((1280, 720), (1366, 768), (1536, 864), (1920, 1080), (375, 812)):
     for theme in ("light", "dark"):
         p = page(w, h, theme)
         try:
