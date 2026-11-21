@@ -99,7 +99,7 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
     } else if (gl) {
       stage = new Stage(stageEl, {
         model: buildDevice(d!.id), view: d!.view, name: `3D model of the ${d!.name}. Pick parts from the list.`, onPick: (id) => select(id),
-        labels: stageLabels(d!), layers: d!.layers, spread: d!.apart ?? 0.6, look: d!.look, onMove: (t) => { range.value = t.toFixed(2); },
+        labels: stageLabels(d!), layers: d!.layers, spread: d!.apart ?? 0.6, onMove: (t) => { range.value = t.toFixed(2); },
       });
       // The first time the model opens it comes apart once, layer by layer; after that it stays where it was left.
       setApart(opened ? Number(range.value) : 1, !opened);

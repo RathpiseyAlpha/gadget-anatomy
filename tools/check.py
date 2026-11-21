@@ -65,7 +65,9 @@ def page(w=1366, h=768, theme="light", gl=True):
 # ---------------------------------------------------------------- 1. Using it
 p = page()
 try:
-    p.goto(URL, wait=3.5)
+    p.goto(URL, wait=1.5)
+    # Thumbnails are drawn one a frame after the page shows; the reused laptop takes longest. Wait for all of them.
+    wait(p, "return [...document.querySelectorAll('.device img')].filter(i => i.src.startsWith('data:image/png') && i.naturalWidth > 100).length === 6", 8)
     s = p.js("""return {cards: document.querySelectorAll('.device').length, thumbs: [...document.querySelectorAll('.device img')].filter(i => i.src.startsWith('data:image/png') && i.naturalWidth > 100).length,
       compare: !!document.querySelector('a[href="#/compare"]'), foot: document.querySelector('.foot')?.textContent || ''};""")
     check("the shelf shows six devices, each pictured from its 3D model", s["cards"] == 6 and s["thumbs"] == 6, json.dumps(s)[:120])

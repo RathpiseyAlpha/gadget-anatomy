@@ -19,7 +19,7 @@ const THUMB_VIEW: Record<Device['id'], { view: [number, number, number]; apart: 
   router: { view: [0.9, 0.8, 1], apart: 0 },
 };
 function thumb(d: Device) {
-  if (!thumbs.has(d.id)) { const t = THUMB_VIEW[d.id]; thumbs.set(d.id, snapshot(buildDevice(d.id), t.view, 300, 180, t.apart, d.look)); }
+  if (!thumbs.has(d.id)) { const t = THUMB_VIEW[d.id]; thumbs.set(d.id, snapshot(buildDevice(d.id), t.view, 300, 180, t.apart)); }
   return thumbs.get(d.id)!;
 }
 window.addEventListener('ga-theme', () => thumbs.clear());

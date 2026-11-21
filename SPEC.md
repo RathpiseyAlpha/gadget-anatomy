@@ -157,6 +157,7 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
 | 13 | **Depth 2 first, depth 3 later** (instructor, 2026-11-22). Depth 1 is what M1 built (6 to 13 parts a device, one level). **Depth 2** is a teardown: every visible part of the device and of each assembly you can open (the board, cooling, battery, display, storage, the memory stick), 40 to 80 parts a device, each with a source. **Depth 3** goes inside the chips (CPU cores, memory die, bank, cell), built once per kind of chip and shared by every device that has one. Section 13 has the plan and the cost estimate. | The instructor wants detail "down to the last component" (PC Anatomy's level); depth 2 gives most of it for a third of the cost, and depth 3 is cheaper once shared. |
 | 14 | **The audience is general** (instructor, 2026-11-22: "students would be ok, they can explore"). Every part still opens with one plain sentence; below it, the proper technical words and real specifications are welcome, each technical word explained the first time it appears. | Deeper levels need real terms; students can go as deep as they like. |
 | 15 | **Reuse PC Anatomy, with credit** (instructor, 2026-11-22). [PC Anatomy](https://github.com/Yoosseph/pc-anatomy) by Yoseph, MIT licence, © 2026: its laptop, Mac and desktop models are built in TypeScript with three.js, as ours are. Its code is copied into `src/vendor/pc-anatomy/` with its licence and a note of every change, connected to our stage through a small adapter for its builder toolkit (`add`, `instances`, `box`, `pcb`, `material`, `label`, `assembly`). We keep our own interface (one screen, plain DOM, our tokens), write our own card text, and keep its source citations. Credited on the credits page and in the README. | Its models are the most detailed free set there is, and the licence allows reuse; its interface does not fit our one-screen rules, and its texts are written for enthusiasts. |
+| 16 | **One realistic look for every device** (instructor, 2026-11-22, after comparing the outlined IdeaPad with PC Anatomy's Legion): no ink outlines on device models; PC Anatomy's studio lighting (filmic tone mapping, a room reflected in metal, key, rim and kick lights) on every 3D view and thumbnail; metals reflect, matte parts reflect little. The journey maps keep their outlined diagram look (they are diagrams, not devices). Our five simpler models look plain in it until each is rebuilt at depth 2; reusing PC Anatomy's circuit-board and surface textures for them is part of that rebuild. | Fine detail reads better without outlines, and one look keeps reused and our own devices consistent. |
 
 ## 11. Open
 
@@ -165,9 +166,6 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
   iFixit has fewer teardowns of those).
 - Khmer: in the first release or later.
 - A custom domain, or the GitHub Pages address.
-- The look of depth-2 devices: PC Anatomy's models are realistic (materials, no outlines); ours have ink outlines.
-  Decide after seeing the Legion pilot whether to outline the reused models, or move every device to the realistic
-  look.
 
 ## 12. Future plan (after M2)
 

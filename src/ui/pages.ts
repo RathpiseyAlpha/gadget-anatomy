@@ -93,7 +93,7 @@ export function projector(root: HTMLElement, deviceId: string, partId: string | 
   const host = root.querySelector<HTMLElement>('#stage')!;
   if (webglAvailable()) {
     stage = new Stage(host, { model: buildDevice(d.id), view: d.view, name: `3D model of the ${d.name}`, turn: true, margin: 1.0,
-      labels: stageLabels(d), layers: d.layers, spread: d.apart ?? 0.6, look: d.look });
+      labels: stageLabels(d), layers: d.layers, spread: d.apart ?? 0.6 });
     stage.explode(1, true);
   } else if (d.photo) host.innerHTML = photoMap(d, 'p');
   const apartBtn = root.querySelector<HTMLButtonElement>('#apart')!, clipBtn = root.querySelector<HTMLButtonElement>('#clip')!, clipMsg = root.querySelector<HTMLElement>('#clipMsg')!;

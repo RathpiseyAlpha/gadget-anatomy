@@ -49,7 +49,7 @@ export const DEVICES: Device[] = [
     parts: ['legion-deck', 'legion-trackpad', 'legionboard', 'legiondisplay', 'legion-speakers', 'legionbattery', 'legioncooling', 'legion-hinges', 'legion-cover', 'legion-fasteners'],
     labelled: ['legion-deck', 'legiondisplay', 'legionbattery', 'legioncooling', 'legionboard'], first: 'legionboard', apart: 1,
     layers: [['legion-fasteners'], ['legion-cover'], ['legion-deck', 'legion-trackpad', 'legiondisplay', 'legion-hinges'], ['legionbattery'], ['legion-speakers'], ['legioncooling'], ['legionboard']],
-    view: [0.45, 0.75, 1], look: 'studio',
+    view: [0.45, 0.75, 1],
   },
   {
     id: 'pc', name: 'Desktop PC', product: 'a standard ATX motherboard',

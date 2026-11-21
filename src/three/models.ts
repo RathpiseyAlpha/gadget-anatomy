@@ -6,36 +6,35 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { buildKitLevel, MM_PER_UNIT, type KitLevel } from 'pc-anatomy';
 import type { Device } from '../content/types.ts';
 
-// ---------------- materials (realistic, the same in both themes) and the ink outline (themed by the stage)
+// ---------------- materials: realistic, the same in both themes, lit by the studio (SPEC decision 16): metal reflects
+// the room the way PC Anatomy's materials do. INK is the journey board's outline (its diagram look), not the devices'.
 export const INK = new THREE.LineBasicMaterial({ color: 0x1e1b17 });
-export const HULL = new THREE.MeshBasicMaterial({ color: 0x1e1b17, side: THREE.BackSide });
-const std = (color: number, roughness = 0.55, metalness = 0.05) => new THREE.MeshStandardMaterial({ color, roughness, metalness });
+const std = (color: number, roughness = 0.55, metalness = 0.05) =>
+  new THREE.MeshStandardMaterial({ color, roughness: metalness > 0.7 ? roughness * 0.72 : roughness, metalness, envMapIntensity: metalness > 0.7 ? 1.85 : 0.35 });
 const M = {
   pcb: std(0x1f6b3c), pcbBlue: std(0x2a5d8a), board: std(0x23211f, 0.6), chip: std(0x18181a, 0.45), gold: std(0xd8a83a, 0.3, 0.9),
   alu: std(0xc4c8ce, 0.32, 0.85), slot: std(0x2d2f36, 0.6), slotGrey: std(0x8a8e96, 0.6), label: std(0xece9e2, 0.8),
   substrate: std(0x2f5d2c, 0.6), heat: std(0x3a3d44, 0.4, 0.6), gpu: std(0x2a2c31, 0.5, 0.3), fan: std(0x15161a, 0.7),
-  cap: std(0x9aa0a8, 0.35, 0.7), glass: std(0x0e1116, 0.15, 0.2), battery: std(0x2b2d33, 0.6), lens: std(0x050608, 0.1, 0.5),
+  cap: std(0x9aa0a8, 0.35, 0.7), glass: std(0x0e1116, 0.32, 0.2), battery: std(0x2b2d33, 0.6), lens: std(0x050608, 0.1, 0.5),
   white: std(0xf1ece4, 0.7), copper: std(0xc07a4a, 0.35, 0.8), laptop: std(0x3a4a63, 0.55), key: std(0x1c2230, 0.6),
   led: new THREE.MeshStandardMaterial({ color: 0x3c8a47, emissive: 0x2b6a35, emissiveIntensity: 0.8 }),
 };
 
-function box(w: number, h: number, d: number, mat: THREE.Material, x = 0, y = 0, z = 0, edges = true) {
-  const g = new THREE.BoxGeometry(w, h, d), m = new THREE.Mesh(g, mat);
+/** A box. (`_flat` marked the boxes drawn without an outline, before the devices moved to the studio look.) */
+function box(w: number, h: number, d: number, mat: THREE.Material, x = 0, y = 0, z = 0, _flat = true) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
   m.position.set(x, y, z);
-  if (edges) m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 25), INK));
   return m;
 }
 function cyl(r: number, h: number, mat: THREE.Material, x = 0, y = 0, z = 0, seg = 28) {
-  const g = new THREE.CylinderGeometry(r, r, h, seg), m = new THREE.Mesh(g, mat);
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg), mat);
   m.position.set(x, y, z);
-  m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 40), INK));
   return m;
 }
-/** A rounded box with an ink outline drawn as an inverted hull (the same shape, a little larger, seen from behind). */
+/** A box with rounded edges and corners. */
 function rbox(w: number, h: number, d: number, r: number, mat: THREE.Material, x = 0, y = 0, z = 0) {
   const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 4, r), mat);
   m.position.set(x, y, z);
-  m.add(new THREE.Mesh(new RoundedBoxGeometry(w + 1.2, h + 1.2, d + 1.2, 4, r + 0.6), HULL));
   return m;
 }
 
@@ -142,7 +141,7 @@ const PHONES = {
 };
 function phone(kind: 'iphone' | 'galaxy'): Model {
   const P = PHONES[kind], b = new Builder(), top = -P.l / 2;
-  const backMat = std(P.back, 0.3, 0.25);
+  const backMat = std(P.back, 0.62, 0);   // frosted glass: matte, not metal
   b.part('phone-back', [rbox(P.w, 1, P.l, 3, backMat)], [0, 0.5, 0], [0, -62, 0]);
   const cam = new THREE.Group();
   if (kind === 'iphone') {

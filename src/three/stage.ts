@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { HULL, INK, type Model } from './models.ts';
+import type { Model } from './models.ts';
 
 export const REDUCE = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const token = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -69,28 +69,28 @@ export interface StageOptions {
   onMove?: (t: number) => void;
   /** A name for the canvas, for people who cannot see it. */
   name: string;
-  /** 'studio': PC Anatomy's lighting for its realistic models (Device.look). */
-  look?: 'studio';
 }
 
-/** The lights for a look. Default: soft light for outlined models. Studio: PC Anatomy's rig (its lib/stage-runtime.ts:
- *  filmic tone mapping, a room reflected in metal, key, rim and kick lights), for its realistic materials. */
-function light(scene: THREE.Scene, renderer: THREE.WebGLRenderer, look?: 'studio') {
-  if (look === 'studio') {
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.02;
+/** The studio (SPEC decision 16): PC Anatomy's lighting rig (its lib/stage-runtime.ts): filmic tone mapping, a room
+ *  reflected in the metal, and key, rim and kick lights. Directional lights shine the same at any distance, so the
+ *  same rig lights a phone in millimetres and PC Anatomy's laptop at 20 mm a unit. */
+const rooms = new WeakMap<THREE.WebGLRenderer, THREE.Texture>();
+function light(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.02;
+  // The room is drawn once per renderer (the shelf's six thumbnails share one).
+  let env = rooms.get(renderer);
+  if (!env) {
     const pmrem = new THREE.PMREMGenerator(renderer), room = new RoomEnvironment();
-    scene.environment = pmrem.fromScene(room, 0.04).texture;
+    env = pmrem.fromScene(room, 0.04).texture;
     room.dispose(); pmrem.dispose();
-    scene.add(new THREE.HemisphereLight(0xccd9e2, 0x23211f, 0.3));
-    for (const [c, i, x, y, z] of [[0xfff2e2, 2.2, -5, 7.5, 9], [0xb6d0e0, 1.6, -6, 3.5, -5], [0xa2bdcf, 0.55, 7, -4, 8]] as const) {
-      const d = new THREE.DirectionalLight(c, i); d.position.set(x, y, z); scene.add(d);
-    }
-    return;
+    rooms.set(renderer, env);
   }
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8070, 1.6));
-  const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(200, 400, 260); scene.add(sun);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.7); fill.position.set(-300, -120, -200); scene.add(fill);
+  scene.environment = env;
+  scene.add(new THREE.HemisphereLight(0xccd9e2, 0x23211f, 0.3));
+  for (const [c, i, x, y, z] of [[0xfff2e2, 2.2, -5, 7.5, 9], [0xb6d0e0, 1.6, -6, 3.5, -5], [0xa2bdcf, 0.55, 7, -4, 8]] as const) {
+    const d = new THREE.DirectionalLight(c, i); d.position.set(x, y, z); scene.add(d);
+  }
 }
 
 const stages = new Set<Stage>();
@@ -100,8 +100,6 @@ function loop() {
   if (stages.size) requestAnimationFrame(loop); else looping = false;
 }
 function themeChanged() {
-  const ink = token('--edge') || '#1e1b17';
-  INK.color.set(ink); HULL.color.set(ink);
   for (const s of stages) s.dirty = true;
 }
 if (typeof window !== 'undefined') {
@@ -155,7 +153,7 @@ export class Stage {
     canvas.setAttribute('role', 'img');
     canvas.setAttribute('aria-label', o.name);
     host.prepend(canvas);
-    light(this.scene, this.renderer, o.look);
+    light(this.scene, this.renderer);
     this.scene.add(this.model.object);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = !REDUCE;
@@ -190,7 +188,7 @@ export class Stage {
       if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5 || !o.onPick) return;
       const r = canvas.getBoundingClientRect(), ray = new THREE.Raycaster();
       ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), this.camera);
-      const hit = ray.intersectObjects(this.model.parts, true).find((h) => (h.object as THREE.Mesh).isMesh && (h.object as THREE.Mesh).material !== HULL);
+      const hit = ray.intersectObjects(this.model.parts, true).find((h) => (h.object as THREE.Mesh).isMesh);
       let obj: THREE.Object3D | null | undefined = hit?.object;
       while (obj && !obj.userData.id) obj = obj.parent;
       if (obj) o.onPick(obj.userData.id as string);
@@ -266,7 +264,7 @@ export class Stage {
       const on = p.userData.id === id;
       p.traverse((o) => {
         const m = o as THREE.Mesh;
-        if (!m.isMesh || m.material === HULL) return;
+        if (!m.isMesh) return;
         const mat = m.material as THREE.MeshStandardMaterial;
         if (!mat.emissive) return;
         if (!m.userData.own) { m.material = mat.clone(); m.userData.own = true; }
@@ -480,13 +478,12 @@ export class Stage {
 
 /** Render a model once to a picture (the shelf's thumbnails), with one shared renderer. */
 let shot: THREE.WebGLRenderer | null = null;
-export function snapshot(model: Model, view: [number, number, number], w: number, h: number, apart = 0, look?: 'studio'): string {
+export function snapshot(model: Model, view: [number, number, number], w: number, h: number, apart = 0): string {
   if (!webglAvailable()) return '';
   shot ??= new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   shot.setPixelRatio(2); shot.setSize(w, h, false);
-  shot.toneMapping = THREE.NoToneMapping;
   const scene = new THREE.Scene();
-  light(scene, shot, look);
+  light(scene, shot);
   model.parts.forEach((p) => p.position.copy(p.userData.home).addScaledVector(p.userData.lift, apart));
   scene.add(model.object);
   const sphere = new THREE.Box3().setFromObject(model.object).getBoundingSphere(new THREE.Sphere());

@@ -74,6 +74,4 @@ export interface Device {
   apart?: number;
   /** Where the camera looks from (a direction; the distance is worked out from the model's size). */
   view: [number, number, number];
-  /** 'studio': realistic materials under PC Anatomy's lighting (its reused models); default: our outlined look. */
-  look?: 'studio';
 }
