@@ -1,7 +1,8 @@
 # Gadget Anatomy — plan
 
-Status: **planning (M0), 2026-11-21.** This file, `design/tokens.css` and the design page `design/design-system.html`
-are the plan. Nothing is built. Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
+Status: **M1 built, 2026-11-21**: the anatomy half (shelf, 3D viewer for the five devices, photo view, two-phone
+comparison, part close-ups, projector view, credits), checked by `src/content/content.test.ts` and `tools/check.py`
+(66 browser checks). **M2 (journeys) is next.** Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
 
 ## 1. What it is
 
@@ -124,8 +125,9 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
 
 ## 9. Stack (proposed)
 
-- Vite + TypeScript, Three.js (pinned; 0.170.0 on the design page) for the 3D, SolidJS or plain DOM for the panels;
-  the content as JSON checked at build time.
+- Vite 7 + TypeScript, Three.js 0.170.0 for the 3D, plain DOM for the panels (no UI framework: the pages are small);
+  fonts bundled with @fontsource (no third-party requests). The content is typed data in `src/content/`, checked by
+  `content.test.ts` (every part's job, sentence count, photos with credits, sizes with sources, no course weeks).
 - Journeys outside the device: Archboard's isometric look, through its read-only embed or the same geometry in Three.js
   with an orthographic camera (decided in M2).
 - **A static site: no server, no accounts.** Hosted on **GitHub Pages** from the repository (free, and the repository
@@ -142,6 +144,7 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
 | 5 | **Devices: iPhone 13 Pro and Galaxy S23 first, then the IdeaPad 3 laptop, the desktop PC and the router** (instructor asked for a recommendation). | Phones are what young students own and carry; the pair teaches "same anatomy"; the laptop is the common school and home computer; the PC and router follow. |
 | 6 | **iFixit teardown photos (CC BY-NC-SA 3.0) as the main photo source**; the app stays non-commercial. | The only large, real, legally reusable set of phones and laptops taken apart; Wikimedia has few. |
 | 7 | **Hosting: GitHub Pages**, static, no accounts. | Free; the repository is already on GitHub; nothing to run. |
+| 9 | **As built (M1)**: addresses in the hash (`#/d/iphone/phone-battery`, `#/compare`, `#/x/pc-ram`, `#/show/laptop`, `#/credits`) so links to one part can be shared and the site runs from any folder; each device opens partly taken apart (the laptop fully: its top half lifts off and moves back, so the inside lies open); a device's own photo of a part wins over the general one; without WebGL every device opens in the photo view (the router, with no photo, as its list and cards). | Shareable links for teachers; the inside must be visible at once; a photo must show the device on screen; nothing is lost on old machines. |
 | 8 | **Body text in IBM Plex Sans at 17 px**, interface and part names in JetBrains Mono (Archboard's faces). | Young readers need a comfortable prose face; the mono keeps the family look. |
 
 ## 11. Open

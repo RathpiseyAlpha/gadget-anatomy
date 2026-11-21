@@ -4,9 +4,18 @@ A free web app for anyone who wants to know how their devices work, mostly young
 Android phone, a laptop and a PC in 3D, take them apart, and find out what each part does. Then follow everyday
 actions, such as opening a website or saving a photo to the cloud, from your finger out to a data centre and back.
 
-**Status: planning.** Nothing is built yet. The plan is in [`SPEC.md`](SPEC.md), and the design system with live 3D
-screens is in [`design/design-system.html`](design/design-system.html) (serve the `design/` folder and open it in a
-browser).
+**Status:** the anatomy half works: five devices in 3D (iPhone 13 Pro, Galaxy S23, Lenovo IdeaPad 3, a desktop PC,
+a Wi-Fi router), their real teardown photos, a two-phone comparison, close-ups and a projector view. Journeys come
+next. The plan is in [`SPEC.md`](SPEC.md).
+
+## Run it
+
+```sh
+npm install
+npm run dev        # or: npm test, npm run build
+```
+
+Every push to `main` is tested, built and published to GitHub Pages by `.github/workflows/pages.yml`.
 
 ## Credits
 
