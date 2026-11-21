@@ -9,6 +9,7 @@ import { applyTheme, readTheme, type View } from './ui/common.ts';
 import { closeup, compare, credits, projector } from './ui/pages.ts';
 import { shelf } from './ui/shelf.ts';
 import { viewer } from './ui/viewer.ts';
+import { journey } from './ui/journey.ts';
 
 const root = document.getElementById('app')!;
 let current: View | null = null;
@@ -22,6 +23,7 @@ function render() {
     : r.view === 'compare' ? compare(root, r.part)
     : r.view === 'closeup' ? closeup(root, r.part)
     : r.view === 'show' ? projector(root, r.device, r.part)
+    : r.view === 'journey' ? journey(root, r.journey, r.step)
     : r.view === 'credits' ? credits(root)
     : shelf(root);
   const h1 = root.querySelector('h1')?.textContent?.trim();

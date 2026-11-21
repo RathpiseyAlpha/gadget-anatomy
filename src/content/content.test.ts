@@ -59,10 +59,32 @@ describe('addresses', () => {
     const routes = [
       { view: 'shelf' }, { view: 'device', device: 'iphone', part: 'phone-battery', photo: false },
       { view: 'device', device: 'laptop', part: null, photo: true }, { view: 'compare', part: 'phone-board' },
-      { view: 'closeup', part: 'pc-ram' }, { view: 'show', device: 'pc', part: 'pc-cpu' }, { view: 'credits' },
+      { view: 'closeup', part: 'pc-ram' }, { view: 'show', device: 'pc', part: 'pc-cpu' }, { view: 'journey', journey: 'open-a-website', step: 5 }, { view: 'credits' },
     ] as const;
     for (const r of routes) expect(parse(href(r))).toEqual(r);
     expect(parse('')).toEqual({ view: 'shelf' });
     expect(parse('#/nowhere')).toEqual({ view: 'shelf' });
+  });
+});
+
+describe('journeys', () => {
+  it('every step names a place and things that exist; a step is at most three sentences; no invented numbers', async () => {
+    const { JOURNEYS } = await import('./journeys.ts');
+    expect(JOURNEYS.map((j) => j.id)).toEqual(['press-a-key', 'save-a-photo', 'open-a-website', 'pay-with-qr']);
+    for (const j of JOURNEYS) {
+      const ids = new Set(j.nodes.map((n) => n.id));
+      expect(ids.size, j.id).toBe(j.nodes.length);
+      for (const n of j.nodes) {
+        expect(n.place, `${j.id} ${n.id}`).toBeLessThan(j.places.length);
+        if (n.part) expect(DEVICES.find((d) => d.id === n.part!.device)?.parts, `${j.id} ${n.id}`).toContain(n.part.part);
+      }
+      j.places.forEach((_, k) => expect(j.nodes.some((n) => n.place === k), `${j.id} place ${k} is empty`).toBe(true));
+      for (const s of j.steps) {
+        expect(ids.has(s.from) && ids.has(s.to), `${j.id}: ${s.title}`).toBe(true);
+        expect(s.place, s.title).toBeLessThan(j.places.length);
+        expect(sentences(s.text), s.title).toBeLessThanOrEqual(3);
+        expect(s.text, s.title).not.toMatch(/\d+\s?(ms|seconds?|minutes?|%|Mbps|km|times)/i);
+      }
+    }
   });
 });

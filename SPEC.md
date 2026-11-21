@@ -1,8 +1,9 @@
 # Gadget Anatomy — plan
 
-Status: **M1 built, 2026-11-21**: the anatomy half (shelf, 3D viewer for the five devices, photo view, two-phone
-comparison, part close-ups, projector view, credits), checked by `src/content/content.test.ts` and `tools/check.py`
-(66 browser checks). **M2 (journeys) is next.** Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
+Status: **M1 and M2 built, 2026-11-21**: the anatomy half (shelf, 3D viewer for the five devices, photo view, two-phone
+comparison, part close-ups, projector view, credits) and the four journeys, checked by `src/content/content.test.ts`
+and `tools/check.py` (86 browser checks). **M3 (more input, output and storage devices) is next** (section 12.7).
+Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
 
 ## 1. What it is
 
@@ -147,6 +148,7 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
 | 7 | **Hosting: GitHub Pages**, static, no accounts. | Free; the repository is already on GitHub; nothing to run. |
 | 9 | **As built (M1)**: addresses in the hash (`#/d/iphone/phone-battery`, `#/compare`, `#/x/pc-ram`, `#/show/laptop`, `#/credits`) so links to one part can be shared and the site runs from any folder; each device opens partly taken apart (the laptop fully: its top half lifts off and moves back, so the inside lies open); a device's own photo of a part wins over the general one; without WebGL every device opens in the photo view (the router, with no photo, as its list and cards). | Shareable links for teachers; the inside must be visible at once; a photo must show the device on screen; nothing is lost on old machines. |
 | 8 | **Body text in IBM Plex Sans at 17 px**, interface and part names in JetBrains Mono (Archboard's faces). | Young readers need a comfortable prose face; the mono keeps the family look. |
+| 11 | **Journeys as built (M2)**: `#/j/<journey>/<step>`; a ribbon of the places the journey crosses (where it is now, ticks where it has been); a board in Archboard's isometric look with the trip running left to right, one plate per place, blocks coloured by job, the whole route faint and the current step bold with a travelling packet (still at its end under reduced motion); one step at a time on the right (what happens, the things at work, a link to the part in 3D), Back and Next, the arrow keys, numbered step buttons; without WebGL the steps are all still there in words. Four journeys: press a key (6 steps), save a photo to the cloud (7), open a website (9), pay with a QR code (7); no times or speeds anywhere. The home page fits one screen at 1280 × 720 with the devices and the journeys. | The instructor hates scrolling; one idea per step; every part on a journey links back to its anatomy. |
 | 10 | **Layout rules after the UX audit (2026-11-21)**: working pages (viewer, compare, close-up, projector) fit one screen from 1280 × 720 up and never scroll as a page (checked at 1280 × 720, 1366 × 768 and 1920 × 1080); one compact parts row each, the job written under the name; every control at least 44 px; one breakpoint (narrow, under 768 px), where panels stack, the page may scroll and the page's actions move into a menu; the footer only on the home and credits pages, the "not affiliated" line under every part card; the job shown as a colour dot and a word, not a pill. Kept on purpose from the Archboard look: hard offset shadows and an 800-weight display headline. | The instructor asked for less clutter and no scrolling; the VectorLab UX audit (19 rule sets) set the touch-target, breakpoint, label, verb, weight and motion rules. |
 
 ## 11. Open

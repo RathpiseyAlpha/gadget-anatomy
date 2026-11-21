@@ -1,5 +1,6 @@
 // The device shelf (home): the devices, each pictured from its 3D model, and the two-phone comparison.
 import { DEVICES } from '../content/devices.ts';
+import { JOURNEYS } from '../content/journeys.ts';
 import { PARTS } from '../content/parts.ts';
 import type { Device, Role } from '../content/types.ts';
 import { href } from '../router.ts';
@@ -34,7 +35,7 @@ export function shelf(root: HTMLElement): View {
   <main class="shelf" id="main" tabindex="-1">
     <section class="hello">
       <h1>Open it up.</h1>
-      <p class="lede">Pick a device you use every day. Turn it around, take it apart, and find out what each part does.</p>
+      <p class="lede">Take apart the devices you use every day, then follow what they do out to the internet.</p>
     </section>
     <section aria-labelledby="h-dev"><h2 id="h-dev">Devices</h2>
       <ul class="devices">${DEVICES.map((d) => `<li><a class="device" href="${href({ view: 'device', device: d.id, part: null, photo: !gl })}">
@@ -42,12 +43,11 @@ export function shelf(root: HTMLElement): View {
         <span class="txt"><b>${esc(d.name)}</b><span class="product">${esc(d.product ?? '')}</span><span>${esc(d.blurb)}</span>
         <span class="count">${d.parts.length} parts · ${roles(d).length} jobs</span></span></a></li>`).join('')}</ul>
     </section>
-    <section aria-labelledby="h-cmp" class="cmp-band">
-      <div><h2 id="h-cmp">Two phones, same parts</h2><p>An iPhone and an Android phone, taken apart side by side. Different makers, the same anatomy: pick a part and it lights up on both.</p></div>
-      <a class="btn btn--primary" href="${href({ view: 'compare', part: null })}">Compare the phones</a>
+    <section aria-labelledby="h-jrn" id="journeys"><h2 id="h-jrn">Journeys</h2>
+      <ul class="journeys">${JOURNEYS.map((j) => `<li><a class="jcard" href="${href({ view: 'journey', journey: j.id, step: 1 })}">
+        <span class="tag">${esc(j.topic)}</span><b>${esc(j.title)}</b><span>${esc(j.summary)}</span><span class="count">${j.steps.length} steps · ${j.places.length} ${j.places.length === 1 ? 'place' : 'places'}</span></a></li>`).join('')}
+        <li><a class="jcard jcard--cmp" href="${href({ view: 'compare', part: null })}"><span class="tag">How it fits together</span><b>Two phones, same parts</b><span>An iPhone and an Android phone taken apart side by side. Pick a part and it lights up on both.</span><span class="count">Compare</span></a></li></ul>
     </section>
-    <section aria-labelledby="h-next" class="next"><h2 id="h-next">Coming next: journeys</h2>
-      <p>Follow one action from your finger to a data centre and back: press a key, save a photo to the cloud, open a website, pay with a QR code.</p></section>
   </main>${FOOT}`;
   wireTopBar(root);
   // Draw the thumbnails after the page is on screen, one per frame, so the shelf shows at once.
@@ -61,5 +61,6 @@ export function shelf(root: HTMLElement): View {
     requestAnimationFrame(next);
   };
   if (gl) requestAnimationFrame(next);
+  if (location.hash.startsWith('#/journeys')) root.querySelector('#journeys')?.scrollIntoView();
   return { dispose: () => { cancelled = true; } };
 }

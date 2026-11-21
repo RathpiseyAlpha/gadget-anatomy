@@ -144,6 +144,28 @@ try:
     time.sleep(1.0)
     check("Escape leaves the projector to the same part in the viewer", p.js("return location.hash") == "#/d/laptop/lap-ram", p.js("return location.hash"))
 
+    # Journeys
+    p.goto(URL, wait=2.0)
+    p.js("[...document.querySelectorAll('.jcard')].find(a => a.textContent.includes('Open a website')).click();")
+    wait(p, "return !!document.getElementById('count')")
+    time.sleep(1.0)
+    j1 = p.js("return {count: document.getElementById('count').textContent, title: document.getElementById('stitle').textContent, place: document.querySelector('.ribbon [aria-current]')?.textContent, back: document.getElementById('back').disabled, canvas: !!document.querySelector('.board canvas')}")
+    check("a journey opens at step 1 of 9 from the home page, inside the laptop, with its map", j1["count"].startswith("Step 1 of 9") and j1["place"] == "Inside the laptop" and j1["back"] and j1["canvas"], json.dumps(j1))
+    p.js("document.getElementById('next').click();")
+    key(p, "ArrowRight", vk=39); key(p, "ArrowRight", vk=39); key(p, "ArrowRight", vk=39)
+    time.sleep(0.4)
+    j2 = p.js("return {count: document.getElementById('count').textContent, title: document.getElementById('stitle').textContent, hash: location.hash, place: document.querySelector('.ribbon [aria-current]')?.textContent, done: [...document.querySelectorAll('.ribbon .done')].map(l => l.textContent), who: document.getElementById('who').textContent}")
+    check("Next and the right arrow move along; the ribbon marks where it is and where it has been", j2["count"].startswith("Step 5 of 9") and j2["title"] == "A DNS server finds the address" and j2["hash"] == "#/j/open-a-website/5"
+          and j2["place"] == "The internet" and len(j2["done"]) == 3 and "DNS server" in j2["who"], json.dumps(j2)[:240])
+    p.js("document.querySelector('[data-step=\"8\"]').click();")
+    j3 = p.js("return [document.getElementById('count').textContent, document.getElementById('next').textContent, document.activeElement.id]")
+    check("a step number jumps there (focus moves to the step); the last step offers Start again", j3[0].startswith("Step 9 of 9") and j3[1] == "Start again" and j3[2] == "stitle", json.dumps(j3))
+    p.js("document.getElementById('next').click();")
+    check("Start again goes back to step 1", p.js("return document.getElementById('count').textContent").startswith("Step 1 of 9"))
+    p.js("[...document.querySelectorAll('#who a')][0].click();")
+    time.sleep(2.0)
+    check("a step's 'See the ... in the laptop' opens that part in 3D", p.js("return location.hash").startswith("#/d/laptop/lap-"), p.js("return location.hash"))
+
     p.goto(URL + "#/credits", wait=1.5)
     cr = p.js("return {photos: document.querySelectorAll('.photo-list li').length, nc: document.body.innerText.includes('not for commercial use'), rows: document.querySelectorAll('tbody tr').length, links: [...document.querySelectorAll('.photo-list a')].filter(a => a.href.includes('creativecommons.org') || a.href.includes('artlibre')).length};")
     check("the credits list all nine photos with their licences, the non-commercial reason, and every published size", cr["photos"] == 9 and cr["links"] == 9 and cr["nc"] and cr["rows"] >= 8, json.dumps(cr))
@@ -164,6 +186,9 @@ try:
     p.goto(URL + "#/d/laptop", wait=1.5)
     n = p.js("return {pins: document.querySelectorAll('.stage .pin').length, gl: document.querySelector('[data-mode=\"3d\"]').disabled, hint: document.getElementById('hint').textContent}")
     check("without WebGL the laptop opens as its photo with pins; 3D is greyed out and the page says why", n["pins"] == 8 and n["gl"] and "cannot draw 3D" in n["hint"], json.dumps(n))
+    p.goto(URL + "#/j/pay-with-qr/2", wait=1.5)
+    p.js("document.getElementById('next').click();")
+    check("without WebGL a journey says so and still steps through in words", p.js("return !!document.querySelector('.board .nogl') && document.getElementById('count').textContent.startsWith('Step 3 of 7')"))
     p.goto(URL + "#/d/router", wait=1.5)
     check("without WebGL a device with no photo still lists its parts and shows their cards", p.js("return !!document.querySelector('.nogl') && document.querySelectorAll('.plist [data-part]').length === 6 && !!document.querySelector('.part-card h2')"))
     check("no script errors without WebGL", not p.js("return window.__errs"), json.dumps(p.js("return window.__errs")))
@@ -178,7 +203,7 @@ for w, h in ((1280, 720), (1366, 768), (1920, 1080)):
     p = page(w, h)
     try:
         bad = []
-        for frag in ("#/d/iphone/phone-board", "#/d/galaxy/phone-battery", "#/d/laptop/lap-fan", "#/d/pc/pc-ram", "#/d/router/rt-board", "#/d/laptop/lap-ssd?photo", "#/compare/phone-battery", "#/x/pc-ram", "#/x/pc-cpu", "#/show/pc/pc-cpu"):
+        for frag in ("", "#/j/open-a-website/5", "#/j/save-a-photo/7", "#/d/iphone/phone-board", "#/d/galaxy/phone-battery", "#/d/laptop/lap-fan", "#/d/pc/pc-ram", "#/d/router/rt-board", "#/d/laptop/lap-ssd?photo", "#/compare/phone-battery", "#/x/pc-ram", "#/x/pc-cpu", "#/show/pc/pc-cpu"):
             p.goto(URL + frag, wait=1.6)
             r = p.js(FIT)
             if r:
@@ -205,7 +230,7 @@ for w, h in ((1280, 720), (1366, 768), (1536, 864), (1920, 1080), (375, 812)):
     for theme in ("light", "dark"):
         p = page(w, h, theme)
         try:
-            for name, frag in (("shelf", ""), ("viewer", "#/d/laptop"), ("compare", "#/compare"), ("closeup", "#/x/lap-ram")):
+            for name, frag in (("shelf", ""), ("viewer", "#/d/laptop"), ("compare", "#/compare"), ("closeup", "#/x/lap-ram"), ("journey", "#/j/save-a-photo/3")):
                 p.goto(URL + frag, wait=2.2)
                 m = p.js("const de = document.documentElement; return de.scrollWidth > de.clientWidth;")
                 if not p.js("return !!window.axe;"):

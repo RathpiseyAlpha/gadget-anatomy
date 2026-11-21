@@ -5,8 +5,8 @@ Android phone, a laptop and a PC in 3D, take them apart, and find out what each 
 actions, such as opening a website or saving a photo to the cloud, from your finger out to a data centre and back.
 
 **Status:** the anatomy half works: five devices in 3D (iPhone 13 Pro, Galaxy S23, Lenovo IdeaPad 3, a desktop PC,
-a Wi-Fi router), their real teardown photos, a two-phone comparison, close-ups and a projector view. Journeys come
-next. The plan is in [`SPEC.md`](SPEC.md).
+a Wi-Fi router), their real teardown photos, a two-phone comparison, close-ups, a projector view, and four journeys
+(press a key, save a photo to the cloud, open a website, pay with a QR code). The plan is in [`SPEC.md`](SPEC.md).
 
 ## Run it
 
