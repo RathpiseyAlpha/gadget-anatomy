@@ -33,5 +33,8 @@ Every change is also marked in the code with a `Gadget Anatomy:` comment.
   alias and the types in `api.d.ts`; the folder is type-checked on its own with PC Anatomy's settings
   (`node node_modules/typescript/bin/tsc --noEmit -p src/vendor/pc-anatomy`).
 
+The licence text also ships with the built site, as `public/licences/pc-anatomy-LICENSE.txt` (linked from the
+credits page), because the build drops the source comments and this folder.
+
 The part texts shown in Gadget Anatomy are our own, written from PC Anatomy's descriptions and keeping its sources
 (Lenovo's specifications and maintenance manual).

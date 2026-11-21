@@ -222,7 +222,7 @@ function pc(): Model {
   b.part('pc-ssd', [ssd], [4, 3, 0], [0, 46, 0]);
   const gpu = new THREE.Group(); gpu.add(box(240, 110, 2, M.pcb, 0, 55, -6)); gpu.add(box(240, 104, 32, M.gpu, 0, 56, 12));
   gpu.add(cyl(36, 1.5, M.fan, -55, 56, 28.8).rotateX(Math.PI / 2)); gpu.add(cyl(36, 1.5, M.fan, 40, 56, 28.8).rotateX(Math.PI / 2));
-  b.part('pc-gpu', [gpu], [-30, 11, 40], [0, 190, 30]);
+  b.part('pc-gpu', [gpu], [-30, 11, 40], [-110, 250, -40]);   // up, left and back, so the CPU behind it stays in view
   b.part('pc-clock', [cyl(10, 3.2, M.cap)], [10, 1.6, 60], [0, 40, 0]);
   const io = new THREE.Group(); io.add(box(20, 40, 120, M.alu, 0, 20, 0)); for (let i = 0; i < 4; i++) io.add(box(6, 6, 14, M.slot, -10.5, 8 + i * 8, -40));
   b.part('pc-ports', [io], [-142, 0, -40], [-50, 30, 0]);

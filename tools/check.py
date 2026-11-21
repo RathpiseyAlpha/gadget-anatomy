@@ -200,8 +200,8 @@ try:
     check("Back to the main board returns to the board with the SSD selected", o3[0].startswith("#/d/legion/legionstorage?in=legionboard") and o3[1] == "legionstorage", json.dumps(o3))
 
     p.goto(URL + "#/credits", wait=1.5)
-    cr = p.js("return {photos: document.querySelectorAll('.photo-list li').length, nc: document.body.innerText.includes('not for commercial use'), rows: document.querySelectorAll('tbody tr').length, links: [...document.querySelectorAll('.photo-list a')].filter(a => a.href.includes('creativecommons.org') || a.href.includes('artlibre')).length, pca: [...document.querySelectorAll('a')].some(a => a.href.includes('github.com/Yoosseph/pc-anatomy')) && document.body.innerText.includes('MIT')};")
-    check("the credits list all nine photos with their licences, the non-commercial reason, every published size, and credit PC Anatomy (MIT)", cr["photos"] == 9 and cr["links"] == 9 and cr["nc"] and cr["rows"] >= 9 and cr["pca"], json.dumps(cr))
+    cr = p.js("return {photos: document.querySelectorAll('.photo-list li').length, nc: document.body.innerText.includes('not for commercial use'), rows: document.querySelectorAll('tbody tr').length, links: [...document.querySelectorAll('.photo-list a')].filter(a => a.href.includes('creativecommons.org') || a.href.includes('artlibre')).length, pca: [...document.querySelectorAll('a')].some(a => a.href.includes('github.com/Yoosseph/pc-anatomy')) && document.body.innerText.includes('MIT'), lic: await fetch('licences/pc-anatomy-LICENSE.txt').then(r => r.ok ? r.text() : '').then(t => t.includes('MIT License') && t.includes('Yoseph'))};")
+    check("the credits list all nine photos with their licences, the non-commercial reason, every published size, and credit PC Anatomy (MIT)", cr["photos"] == 9 and cr["links"] == 9 and cr["nc"] and cr["rows"] >= 9 and cr["pca"] and cr["lic"], json.dumps(cr))
 
     p.goto(URL, wait=1.5)
     p.js("document.getElementById('theme').click();")
@@ -222,6 +222,11 @@ try:
     p.goto(URL + "#/j/pay-with-qr/2", wait=1.5)
     p.js("document.getElementById('next').click();")
     check("without WebGL a journey says so and still steps through in words", p.js("return !!document.querySelector('.board .nogl') && document.getElementById('count').textContent.startsWith('Step 3 of 7')"))
+    p.goto(URL + "#/d/legion/legioncpu?in=legionboard", wait=1.5)
+    nl = p.js("return {list: document.querySelectorAll('.plist [data-part]').length, nogl: !!document.querySelector('.nogl'), back: document.getElementById('upLink')?.textContent, card: document.querySelector('.part-card h2')?.textContent}")
+    p.js("document.querySelector('.plist [data-part=\"legionstorage\"]').click();")
+    opens = p.js("return document.getElementById('openLink')?.getAttribute('href') || ''")
+    check("without WebGL an opened level still lists its parts, shows cards, opens deeper and leads back", nl["list"] == 13 and nl["nogl"] and nl["back"] == "Back to the gaming laptop" and nl["card"] == "CPU" and "in=legionstorage" in opens, json.dumps(nl) + " " + opens)
     p.goto(URL + "#/d/router", wait=1.5)
     check("without WebGL a device with no photo still lists its parts and shows their cards", p.js("return !!document.querySelector('.nogl') && document.querySelectorAll('.plist [data-part]').length === 6 && !!document.querySelector('.part-card h2')"))
     check("no script errors without WebGL", not p.js("return window.__errs"), json.dumps(p.js("return window.__errs")))
@@ -350,7 +355,7 @@ for w, h in ((1280, 720), (1366, 768), (1536, 864), (1920, 1080), (375, 812)):
     for theme in ("light", "dark"):
         p = page(w, h, theme)
         try:
-            for name, frag in (("shelf", ""), ("viewer", "#/d/laptop"), ("compare", "#/compare"), ("closeup", "#/x/lap-ram"), ("journey", "#/j/save-a-photo/3")):
+            for name, frag in (("shelf", ""), ("viewer", "#/d/laptop"), ("legion", "#/d/legion/legionboard"), ("level", "#/d/legion/legionstorage-nand?in=legionstorage"), ("compare", "#/compare"), ("closeup", "#/x/lap-ram"), ("journey", "#/j/save-a-photo/3")):
                 p.goto(URL + frag, wait=2.2)
                 m = p.js("const de = document.documentElement; return de.scrollWidth > de.clientWidth;")
                 if not p.js("return !!window.axe;"):
