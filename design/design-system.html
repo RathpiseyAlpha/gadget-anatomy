@@ -103,7 +103,7 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 .shelf .hello { display: grid; gap: var(--s3); max-width: 62ch; }
 .shelf .hello h2 { font: var(--t-display); letter-spacing: -.02em; }
 .shelf .hello p { font: var(--t-lede); }
-.devices { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s4); }
+.devices { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s4); }
 .device { display: grid; grid-template-rows: 170px auto; border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); box-shadow: var(--pop); overflow: hidden; text-align: left; color: var(--ink); font: inherit; padding: 0; cursor: pointer; }
 .device:hover { transform: var(--lift); box-shadow: var(--pop-lg); }
 .device .thumb { background: var(--stage); border-bottom: var(--bw) solid var(--edge); display: grid; place-items: center; }
@@ -212,6 +212,13 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 .legend button[aria-pressed="true"] { background: var(--marker); color: var(--marker-ink); border-color: var(--edge); }
 .legend small { font: 400 13px/19px var(--font-prose); color: var(--muted); grid-column: 2; }
 
+.compare { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.cmp { margin: 0; display: grid; align-content: start; }
+.cmp .photo-map { margin: var(--s5) var(--s5) var(--s2); }
+.cmp figcaption { padding: 0 var(--s5) var(--s4); display: grid; gap: 2px; }
+.cmp figcaption b { font: 800 17px/24px var(--font-mono); } .cmp figcaption span { font: var(--t-hint); color: var(--muted); }
+.cmp + .cmp { border-left: var(--bw) solid var(--edge); }
+.legend--row { grid-column: 1 / -1; border-left: 0; border-top: var(--bw) solid var(--edge); grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 .model-tbl { width: 100%; border-collapse: collapse; font: var(--t-small); }
 .model-tbl th, .model-tbl td { text-align: left; padding: 8px 10px; border-bottom: var(--bw-fine) solid var(--line); vertical-align: top; }
 .model-tbl th { font-weight: 700; }
@@ -220,14 +227,16 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 /* ---------- the screens answer their own width (they are embedded in this page at any size) */
 @container screen (max-width: 1100px) {
   .viewer { grid-template-columns: 200px minmax(0, 1fr) 300px; }
-  .devices, .journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .devices { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @container screen (max-width: 860px) {
   .viewer { grid-template-columns: minmax(0, 1fr); height: auto; }
   .viewer .stage { height: 420px; }
   .plist { border-right: 0; border-bottom: var(--bw) solid var(--edge); grid-auto-flow: column; overflow-x: auto; }
   .side { border-left: 0; border-top: var(--bw) solid var(--edge); }
-  .closeup, .journey-body, .flat2d { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .closeup, .journey-body, .flat2d, .compare { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .cmp + .cmp { border-left: 0; border-top: var(--bw) solid var(--edge); }
   .journey-body .stage { height: 380px; }
   .facts-side, .narr, .legend { border-left: 0; border-top: var(--bw) solid var(--edge); }
   .bar nav { display: none; }
@@ -269,13 +278,14 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
   <div class="intro">
     <div>
       <h1>Design system and key screens</h1>
-      <p class="lede">A web app for first-year ICT students that opens up the phone, laptop and PC they already use, in real 3D, and follows everyday actions from a finger out to a data centre. It wears Archboard's look, with larger reading text and one colour for each job a part does.</p>
+      <p class="lede">A free web app for anyone who wants to know how their devices work, mostly young students. It opens up a real iPhone, an Android phone, a laptop and a PC in 3D, and follows everyday actions from a finger out to a data centre. It wears Archboard's look, with larger reading text and one colour for each job a part does.</p>
     </div>
     <div class="facts" aria-label="About this plan">
-      <div><b>Course</b><span>CMFP0060 ICT, year 1, about 90 students</span></div>
-      <div><b>Used on</b><span>lab PCs (one monitor), phones, the lecture projector</span></div>
-      <div><b>Family</b><span>Archboard's tokens and outlines; a separate app</span></div>
-      <div><b>3D</b><span>Three.js 0.170.0; parts built to their published sizes</span></div>
+      <div><b>For</b><span>anyone learning how devices work; mostly young students, about 12 and up</span></div>
+      <div><b>Used on</b><span>phones, school computers, a classroom projector</span></div>
+      <div><b>Family</b><span>Archboard's tokens and outlines; a separate, standalone app</span></div>
+      <div><b>3D</b><span>Three.js 0.170.0; devices and parts built to their published sizes</span></div>
+      <div><b>Photos</b><span>real teardowns from iFixit (CC BY-NC-SA), Wikimedia Commons</span></div>
       <div><b>Status</b><span>Plan only. Nothing is built.</span></div>
     </div>
   </div>
@@ -284,8 +294,8 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 <section class="sec" aria-labelledby="h-dir">
   <header><h2 id="h-dir">Direction</h2></header>
   <div class="principles">
-    <div><h3>The course's own frame</h3><p>Every part is tagged with its job in the model Lecture 2 teaches: input, process, output, storage. Memory (Lecture 3), communicate and connect and power complete it.</p></div>
-    <div><h3>Real, then simple</h3><p>Parts are drawn to their published sizes and shown beside a real photo. Then two plain sentences and one example from a student's day.</p></div>
+    <div><h3>One simple frame</h3><p>Every part is tagged with its job: input, process, output or storage, the model school computing courses teach everywhere. Memory, communicate and power complete it.</p></div>
+    <div><h3>Real, then simple</h3><p>Real devices at their published sizes, beside photos of the same devices taken apart. Then two short sentences and one example from a student's day.</p></div>
     <div><h3>Two scales, one look</h3><p>Inside the device is 3D. Outside, the room, the provider and the data centre use Archboard's isometric blocks. A journey crosses both without a change of style.</p></div>
     <div><h3>Works on every machine</h3><p>No WebGL, an old phone or a busy projector gets the same content as a photo with labels. Keyboard, reduced motion and both themes everywhere.</p></div>
   </div>
@@ -297,7 +307,7 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 </section>
 
 <section class="sec" aria-labelledby="h-type">
-  <header><h2 id="h-type">Type</h2><p>Archboard's two faces. Every sentence is in IBM Plex Sans at 17 px for year-1 readers; the interface, part names and labels are in JetBrains Mono. The projector sizes are read from the back of the room.</p></header>
+  <header><h2 id="h-type">Type</h2><p>Archboard's two faces. Every sentence is in IBM Plex Sans at 17 px for young readers; the interface, part names and labels are in JetBrains Mono. The projector sizes are read from the back of the room.</p></header>
   <div class="type-scale">
     <div><small>display 48/54 Mono 800</small><span style="font: var(--t-display); letter-spacing: -.02em">Open it up</span></div>
     <div><small>h1 34/40 Mono 800</small><span style="font: var(--t-h1)">Desktop PC</span></div>
@@ -327,7 +337,7 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
         <span class="chip"><i style="--c: var(--role-process)"></i>Process</span>
         <span class="chip"><i style="--c: var(--role-memory)"></i>Memory</span>
         <span class="chip"><i style="--c: var(--role-storage)"></i>Storage</span>
-        <span class="tag">Week 3: memory and storage</span>
+        <span class="tag">Topic: memory and storage</span>
       </div>
       <div class="row">
         <span class="lbl flat" style="position:static; transform:none; --c: var(--role-process)"><i></i>CPU</span>
@@ -342,11 +352,11 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 </section>
 
 <section class="sec" aria-labelledby="h-a">
-  <header><h2 id="h-a">Screen A: the device shelf (home)</h2><p>What a student sees first. The devices they own, each turning slowly in 3D, and the journeys, each tagged with the lecture it belongs to. No sign-in.</p></header>
+  <header><h2 id="h-a">Screen A: the device shelf (home)</h2><p>What anyone sees first. Devices people own, each in 3D, and the journeys, each tagged with its topic. No sign-in, nothing to install.</p></header>
   <div class="frame">
-    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><nav aria-label="App"><a href="#h-a" aria-current="page">Devices</a><a href="#h-d">Journeys</a><a href="#h-f">Projector</a></nav><span class="spacer"></span><span class="note">Lab PC 1280 × 720</span></div>
+    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><nav aria-label="App"><a href="#h-a" aria-current="page">Devices</a><a href="#h-d">Journeys</a><a href="#h-f">Projector</a></nav><span class="spacer"></span><span class="note">Laptop 1280 × 720</span></div>
     <div class="shelf">
-      <div class="hello"><h2>Open it up.</h2><p>Pick a device you use every day. Turn it around, take it apart, and find out what each part does.</p></div>
+      <div class="hello"><h2>Open it up.</h2><p>Pick a device you use every day. Turn it around, take it apart, and find out what each part does and how it talks to the internet.</p></div>
       <div><h3>Devices</h3><div class="devices" id="devices"></div></div>
       <div><h3>Journeys</h3><div class="journeys" id="journeys"></div></div>
     </div>
@@ -395,14 +405,14 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 <section class="sec" aria-labelledby="h-d">
   <header><h2 id="h-d">Screen D: a journey step</h2><p>Open a website, step 5 of 9. The ribbon shows how far the request has travelled; the scene is drawn in Archboard's isometric style; the packet moves along the step it is on. No times or speeds: they would be invented.</p></header>
   <div class="frame">
-    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><span class="title">Open a website</span><span class="tag">Week 5: the Internet and the Web</span><span class="spacer"></span><button class="btn btn--sm btn--ghost" type="button">All journeys</button></div>
+    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><span class="title">Open a website</span><span class="tag">Topic: networks and the internet</span><span class="spacer"></span><button class="btn btn--sm btn--ghost" type="button">All journeys</button></div>
     <div class="ribbon" aria-label="Where the request is"><span class="done">Inside the laptop</span><span class="done">Your room</span><span class="done">Your internet provider</span><span aria-current="step">The internet</span><span>A data centre</span></div>
     <div class="journey-body">
       <div class="stage" id="stageD"><div class="labels" aria-hidden="true"></div></div>
       <div class="narr">
         <div class="step"><span>Step 5 of 9</span><div class="dots" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
         <h3>A DNS server finds the address</h3>
-        <p>Computers find each other by numbers, not names. Your internet provider asks a DNS server for the number that belongs to <b>www.itc.edu.kh</b>, and the request goes on to that number.</p>
+        <p>Computers find each other by numbers, not names. Your internet provider asks a DNS server for the number that belongs to <b>www.wikipedia.org</b>, and the request goes on to that number.</p>
         <div class="who"><span class="chip"><i style="--c: var(--role-communicate)"></i>DNS server</span><span class="chip"><i style="--c: var(--role-communicate)"></i>Internet provider</span></div>
         <div class="row"><button class="btn btn--sm" type="button">Back</button><button class="btn btn--sm btn--primary" type="button">Next step</button></div>
         <p class="note">Steps: you type and press Enter; the CPU hands the request to the Wi-Fi card; radio to the router; the router to your provider; DNS finds the number; the web server reads the page from its storage; the page travels back; the GPU draws it; you see it.</p>
@@ -412,10 +422,10 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 </section>
 
 <section class="sec" aria-labelledby="h-e">
-  <header><h2 id="h-e">Screen E: on a phone</h2><p>The same viewer at 390 px wide: the model fills the screen and the part card is a bottom sheet. Parts are chips the student swipes through.</p></header>
+  <header><h2 id="h-e">Screen E: on a phone</h2><p>The same viewer at 390 px wide, here showing the two phones most students own: an iPhone and an Android. Their shells are the makers' published sizes; switch between them and the same parts stay selected.</p></header>
   <div class="phone-row">
     <div class="phone">
-      <div class="bar"><span class="title">Smartphone</span><span class="spacer"></span><button class="btn btn--sm" type="button">Take apart</button></div>
+      <div class="bar"><div class="seg" role="group" aria-label="Phone" id="phoneSeg"><button type="button" data-phone="iphone" aria-pressed="true">iPhone 13 Pro</button><button type="button" data-phone="galaxy" aria-pressed="false">Galaxy S23</button></div></div>
       <div class="stage" id="stageE"><div class="labels" aria-hidden="true"></div></div>
       <div class="sheet" id="sheetE"></div>
     </div>
@@ -424,7 +434,8 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
       <ul>
         <li>The model takes the whole width; one finger turns it, two fingers zoom.</li>
         <li>Parts are a row of chips; the selected one's card rises as a sheet and can be dragged up to read more.</li>
-        <li>The phone model is a generic phone, not one brand's measurements, and says so.</li>
+        <li>The outside of each phone is its maker's published size; the inside layout follows the iFixit teardown photos and is marked approximate.</li>
+        <li>Product names identify the devices; no logos are drawn. Not affiliated with Apple, Samsung, Lenovo or iFixit.</li>
         <li>Under reduced motion, nothing turns by itself and Take apart jumps straight to the apart view.</li>
         <li>Without WebGL the Photo view opens instead, with the same parts as numbered pins.</li>
       </ul>
@@ -448,23 +459,35 @@ code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 
 </section>
 
 <section class="sec" aria-labelledby="h-g">
-  <header><h2 id="h-g">Screen G: the photo view</h2><p>The 3D view's twin for machines without WebGL, for printing, and when 3D is too busy. A real board, the parts pinned, the same list. Here a microATX board.</p></header>
+  <header><h2 id="h-g">Screen G: the photo view</h2><p>The 3D view's twin for machines without WebGL, for printing, and when 3D is too busy. A real photo, the parts pinned, the same list. Here an ordinary 15-inch laptop (Lenovo IdeaPad 3) with its bottom cover off.</p></header>
   <div class="frame">
     <div class="flat2d">
-      <div class="photo-map" id="mapG"><img src="photos/board-uatx.jpg" alt="A real microATX motherboard seen from above: the CPU socket in the middle, four memory slots at the bottom, expansion slots on the left, ports along the top."></div>
+      <div class="photo-map" id="mapG"><img src="photos/ideapad3-inside.jpg" alt="A real Lenovo IdeaPad 3 laptop with its bottom cover off: a fan on the left, a copper heat pipe across the middle, a long battery along the front, and small cards on the right."></div>
       <div class="legend" id="legendG"></div>
     </div>
   </div>
-  <p class="note">Photo: Smial, Free Art License, Wikimedia Commons ("Gigabyte GA-H87M-D3H motherboard µATX with Intel Socket 1150").</p>
+  <p class="note">Photo: DanielAdvancedDeviceRepair, iFixit, "Full teardown. Lenovo IdeaPad 3-15IAU7", step 3, CC BY-NC-SA 3.0.</p>
+</section>
+
+<section class="sec" aria-labelledby="h-h">
+  <header><h2 id="h-h">Screen H: two phones, same parts</h2><p>An iPhone and an Android phone, taken apart. Different makers, the same anatomy: pick a part and it lights up on both. This is the idea the app teaches.</p></header>
+  <div class="frame">
+    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><span class="title">Compare</span><span class="spacer"></span><span class="tag">Topic: how a computer fits together</span></div>
+    <div class="compare">
+      <figure class="cmp"><div class="photo-map" id="mapH1"><img src="photos/iphone13pro-parts.jpg" alt="An iPhone 13 Pro taken apart and laid out: the screen, the frame, the battery, the main board, the cameras and many small parts."></div><figcaption><b>iPhone 13 Pro</b><span>Photo: Tobias Isakeit, iFixit, "iPhone 13 Pro Teardown", CC BY-NC-SA 3.0</span></figcaption></figure>
+      <figure class="cmp"><div class="photo-map" id="mapH2"><img src="photos/galaxys23-parts.jpg" alt="A Samsung Galaxy S23 taken apart and laid out on a blue mat: the back glass, the cameras, the frame with the screen, the main board and the battery."></div><figcaption><b>Galaxy S23</b><span>Photo: Andrea Alfani, iFixit, "Galaxy S23 Teardown", CC BY-NC-SA 3.0</span></figcaption></figure>
+      <div class="legend legend--row" id="legendH"></div>
+    </div>
+  </div>
 </section>
 
 <section class="sec" aria-labelledby="h-m">
   <header><h2 id="h-m">Content, sizes and pictures</h2><p>Each part is one record of plain data, so wording can be corrected without a build. Sizes come from published standards; photos carry their author and licence.</p></header>
   <div class="tbl-wrap"><table class="model-tbl">
-    <thead><tr><th>Part</th><th>Role</th><th>Size in the model</th><th>Source</th><th>Lecture</th></tr></thead>
+    <thead><tr><th>Device or part</th><th>Role</th><th>Size in the model</th><th>Source</th><th>Topic</th></tr></thead>
     <tbody id="sizes"></tbody>
   </table></div>
-  <p class="note">Open for the instructor (SPEC section 11): standalone or inside labsite; your own photos of the lab PCs opened up; which devices first; which lecture CPU, RAM and the board belong to; hosting.</p>
+  <p class="note">Photos: iFixit teardowns are CC BY-NC-SA 3.0, so the app stays free and non-commercial (no ads, no fees) unless iFixit agrees otherwise. Product names identify the devices; no logos are drawn. Not affiliated with Apple, Samsung, Lenovo or iFixit.</p>
 </section>
 </div>
 
@@ -481,35 +504,36 @@ document.querySelectorAll('[data-theme-set]').forEach((b) => b.addEventListener(
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const token = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
 // ---------------- Content: roles and parts (plain words, one example each; no analogies, no invented numbers)
 const ROLES = {
-  input: { name: 'Input', v: '--role-input', parts: 'keyboard, touch screen, camera, microphone', lecture: 'Week 2' },
-  process: { name: 'Process', v: '--role-process', parts: 'CPU, graphics card, controllers', lecture: 'Week 2' },
-  memory: { name: 'Memory', v: '--role-memory', parts: 'RAM', lecture: 'Week 3' },
-  storage: { name: 'Storage', v: '--role-storage', parts: 'SSD, hard disk, phone storage', lecture: 'Week 3' },
-  output: { name: 'Output', v: '--role-output', parts: 'screen, speaker, printer', lecture: 'Week 2' },
-  communicate: { name: 'Communicate', v: '--role-communicate', parts: 'Wi-Fi, network port, antenna, router', lecture: 'Week 9' },
-  power: { name: 'Connect and power', v: '--role-power', parts: 'motherboard, battery, power supply', lecture: 'background' },
+  input: { name: 'Input', v: '--role-input', parts: 'keyboard, touch screen, camera, microphone', lecture: 'Topic: input and output' },
+  process: { name: 'Process', v: '--role-process', parts: 'CPU, graphics card, controllers', lecture: 'Topic: processing' },
+  memory: { name: 'Memory', v: '--role-memory', parts: 'RAM', lecture: 'Topic: memory and storage' },
+  storage: { name: 'Storage', v: '--role-storage', parts: 'SSD, hard disk, phone storage', lecture: 'Topic: memory and storage' },
+  output: { name: 'Output', v: '--role-output', parts: 'screen, speaker, vibration motor', lecture: 'Topic: input and output' },
+  communicate: { name: 'Communicate', v: '--role-communicate', parts: 'Wi-Fi card, antenna, SIM, router', lecture: 'Topic: networks' },
+  power: { name: 'Connect and power', v: '--role-power', parts: 'board, battery, fan, frame', lecture: 'Topic: power and cooling' },
 };
 const PARTS = {
-  cpu: { name: 'CPU', role: 'process', plain: 'It runs the instructions of every app, one small step at a time. Every click, tap and keypress ends up as work for the CPU.', eg: 'When a game stutters while a video exports, both are waiting for the CPU.', size: 'LGA 1700 package: 45 × 37.5 mm', src: 'Wikipedia "LGA 1700"', lecture: 'Week 2: the processing in input, process, output', photo: { file: 'photos/cpu-i7-12700k.jpg', alt: 'A real Intel Core i7 CPU seen from above: a silver metal lid on a green square board.', credit: 'Photo: Eric Gaba, CC BY-SA 4.0, Wikimedia Commons' } },
-  ram: { name: 'RAM', role: 'memory', plain: 'It holds the apps and files you have open right now, so the CPU can reach them fast. It forgets everything when the power goes off.', eg: 'With 30 browser tabs open, a laptop slows down because its RAM is full.', size: '133.35 × 31.25 mm, 288 contacts', src: 'Wikipedia "DIMM" (JEDEC MO-309E)', lecture: 'Week 3: memory and storage', photo: { file: 'photos/ram-ddr4.jpg', alt: 'A real DDR4 RAM stick: a green board with black memory chips and gold contacts along the bottom.', credit: 'Photo: ElooKoN, CC BY-SA 4.0, Wikimedia Commons' } },
-  ssd: { name: 'SSD (M.2)', role: 'storage', plain: 'It keeps your files and apps when the power is off. It has no moving parts, so it is quick and quiet.', eg: 'Your photos are still there the next morning because they are on storage, not in RAM.', size: 'M.2 2280: 22 × 80 mm', src: 'Wikipedia "M.2"', lecture: 'Week 3: secondary storage' },
-  gpu: { name: 'Graphics card', role: 'process', plain: 'It works out what every pixel on the screen should look like. Games and video editing lean on it most.', eg: 'A 3D game needs a stronger graphics card than a word processor does.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Week 2: output' },
-  board: { name: 'Motherboard', role: 'power', plain: 'Every other part plugs into it. Thin copper lines inside it carry data and power between the parts.', eg: 'A repair shop that "changes the board" replaces this whole part.', size: 'ATX: 305 × 244 mm', src: 'Wikipedia "ATX" (Intel ATX specification)', lecture: 'background for Weeks 2 and 3', photo: { file: 'photos/board-uatx.jpg', alt: 'A real microATX motherboard seen from above.', credit: 'Photo: Smial, Free Art License, Wikimedia Commons' } },
-  battery: { name: 'Clock battery', role: 'power', plain: 'A small coin battery keeps the date and time while the PC is switched off.', eg: 'An old PC that forgets the time every morning often needs a new clock battery.', size: 'CR2032 coin cell: 20 mm across', src: 'approximate in this model', lecture: 'background' },
-  ports: { name: 'Ports (USB, sound)', role: 'power', plain: 'The sockets at the back where cables go in: USB for keyboards, mice and drives, and sound for headphones.', eg: 'Your mouse works once its USB plug is in one of these.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Week 2: input and output devices' },
-  lan: { name: 'Network port', role: 'communicate', plain: 'The socket for a network cable. Through it the PC talks to the lab network and the internet.', eg: 'Lab PCs use a cable here instead of Wi-Fi.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Week 9: networks' },
+  cpu: { name: 'CPU', role: 'process', plain: 'It runs the instructions of every app, one small step at a time. Every click, tap and keypress ends up as work for the CPU.', eg: 'When a game stutters while a video exports, both are waiting for the CPU.', size: 'LGA 1700 package: 45 × 37.5 mm', src: 'Wikipedia "LGA 1700"', lecture: 'Topic: processing', photo: { file: 'photos/cpu-i7-12700k.jpg', alt: 'A real Intel Core i7 CPU seen from above: a silver metal lid on a green square board.', credit: 'Photo: Eric Gaba, CC BY-SA 4.0, Wikimedia Commons' } },
+  ram: { name: 'RAM', role: 'memory', plain: 'It holds the apps and files you have open right now, so the CPU can reach them fast. It forgets everything when the power goes off.', eg: 'With 30 browser tabs open, a laptop slows down because its RAM is full.', size: '133.35 × 31.25 mm, 288 contacts', src: 'Wikipedia "DIMM" (JEDEC MO-309E)', lecture: 'Topic: memory and storage', photo: { file: 'photos/ram-ddr4.jpg', alt: 'A real DDR4 RAM stick: a green board with black memory chips and gold contacts along the bottom.', credit: 'Photo: ElooKoN, CC BY-SA 4.0, Wikimedia Commons' } },
+  ssd: { name: 'SSD (M.2)', role: 'storage', plain: 'It keeps your files and apps when the power is off. It has no moving parts, so it is quick and quiet.', eg: 'Your photos are still there the next morning because they are on storage, not in RAM.', size: 'M.2 2280: 22 × 80 mm', src: 'Wikipedia "M.2"', lecture: 'Topic: memory and storage' },
+  gpu: { name: 'Graphics card', role: 'process', plain: 'It works out what every pixel on the screen should look like. Games and video editing lean on it most.', eg: 'A 3D game needs a stronger graphics card than a word processor does.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Topic: input and output' },
+  board: { name: 'Motherboard', role: 'power', plain: 'Every other part plugs into it. Thin copper lines inside it carry data and power between the parts.', eg: 'A repair shop that "changes the board" replaces this whole part.', size: 'ATX: 305 × 244 mm', src: 'Wikipedia "ATX" (Intel ATX specification)', lecture: 'Topic: how a computer fits together', photo: { file: 'photos/board-uatx.jpg', alt: 'A real microATX motherboard seen from above.', credit: 'Photo: Smial, Free Art License, Wikimedia Commons' } },
+  battery: { name: 'Clock battery', role: 'power', plain: 'A small coin battery keeps the date and time while the PC is switched off.', eg: 'An old PC that forgets the time every morning often needs a new clock battery.', size: 'CR2032 coin cell: 20 mm across', src: 'approximate in this model', lecture: 'Topic: power and cooling' },
+  ports: { name: 'Ports (USB, sound)', role: 'power', plain: 'The sockets at the back where cables go in: USB for keyboards, mice and drives, and sound for headphones.', eg: 'Your mouse works once its USB plug is in one of these.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Topic: input and output' },
+  lan: { name: 'Network port', role: 'communicate', plain: 'The socket for a network cable. Through it the PC talks to the lab network and the internet.', eg: 'School computers often use a cable here instead of Wi-Fi.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Topic: networks' },
   // phone
-  screen: { name: 'Screen', role: 'output', plain: 'It shows you everything, and its touch layer is also an input: it feels where your finger is.', eg: 'A cracked screen can still show a picture but stop feeling your touch.', size: 'generic phone, not one brand', src: '—', lecture: 'Week 2: input and output' },
-  pbattery: { name: 'Battery', role: 'power', plain: 'It stores the energy the phone runs on, and is the largest part inside.', eg: 'An old phone that dies at 30% usually has a worn battery.', size: 'generic phone, not one brand', src: '—', lecture: 'background' },
-  logic: { name: 'Main board', role: 'process', plain: 'A small board holding the processor, the memory and the storage chips, all in one piece.', eg: 'The phone\'s CPU, RAM and storage are chips on this board.', size: 'generic phone, not one brand', src: '—', lecture: 'Weeks 2 and 3' },
-  camera: { name: 'Camera', role: 'input', plain: 'It turns light into a picture made of numbers that the processor can save.', eg: 'Scanning a QR code to pay starts with the camera.', size: 'generic phone, not one brand', src: '—', lecture: 'Week 2: input' },
-  back: { name: 'Back cover', role: 'power', plain: 'It closes the phone and protects the parts. Under it are the antennas for Wi-Fi and the mobile network.', eg: 'Some phone cases block the wireless charger; it sits right behind this cover.', size: 'generic phone, not one brand', src: '—', lecture: 'background' },
+  screen: { name: 'Screen', role: 'output', plain: 'It shows you everything, and its touch layer is also an input: it feels where your finger is.', eg: 'A cracked screen can still show a picture but stop feeling your touch.', size: 'whole phone: iPhone 13 Pro 146.7 × 71.5 × 7.65 mm; Galaxy S23 146.3 × 70.9 × 7.6 mm', src: 'Apple and Samsung spec pages', lecture: 'Topic: input and output' },
+  pbattery: { name: 'Battery', role: 'power', plain: 'It stores the energy the phone runs on, and is the largest part inside.', eg: 'An old phone that dies at 30% usually has a worn battery.', size: 'inside layout approximate', src: 'from the iFixit teardown photos', lecture: 'Topic: power and cooling' },
+  logic: { name: 'Main board', role: 'process', plain: 'A small board holding the processor, the memory and the storage chips, all in one piece.', eg: 'The phone\'s CPU, RAM and storage are chips on this board.', size: 'inside layout approximate', src: 'from the iFixit teardown photos', lecture: 'Topic: processing' },
+  camera: { name: 'Camera', role: 'input', plain: 'It turns light into a picture made of numbers that the processor can save.', eg: 'Scanning a QR code to pay starts with the camera.', size: 'inside layout approximate', src: 'from the iFixit teardown photos', lecture: 'Topic: input and output' },
+  back: { name: 'Back cover', role: 'power', plain: 'It closes the phone and protects the parts. Under it are the antennas for Wi-Fi and the mobile network.', eg: 'Some phone cases block the wireless charger; it sits right behind this cover.', size: 'inside layout approximate', src: 'from the iFixit teardown photos', lecture: 'Topic: power and cooling' },
 };
 const roleVar = (r) => `var(${ROLES[r].v})`;
 
@@ -520,7 +544,7 @@ document.getElementById('roles').innerHTML = Object.values(ROLES).map((r) =>
 function cardHTML(id) {
   const p = PARTS[id], r = ROLES[p.role];
   const photo = p.photo ? `<figure class="photo"><img src="${p.photo.file}" alt="${p.photo.alt}"><figcaption>${p.photo.credit}</figcaption></figure>`
-    : `<figure class="photo"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'/%3E"><figcaption>Photo to come: the instructor's own, of the lab PCs opened up.</figcaption></figure>`;
+    : `<figure class="photo"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'/%3E"><figcaption>Photo to come: a real one of this part, credited like the others.</figcaption></figure>`;
   return `${photo}<div class="name"><span class="chip" style="justify-self:start"><i style="--c: var(${r.v})"></i>${r.name}</span><h3>${p.name}</h3></div>
     <p class="what">${p.plain}</p><div class="eg"><b>For example</b>${p.eg}</div>
     <div class="size"><span>${p.size}</span><span class="muted">${p.src}</span></div><span class="tag">${p.lecture}</span>`;
@@ -528,7 +552,13 @@ function cardHTML(id) {
 document.getElementById('cardDemo').innerHTML = cardHTML('cpu');
 
 // Sizes table
-document.getElementById('sizes').innerHTML = ['ram', 'cpu', 'board', 'ssd', 'battery'].map((id) => {
+const DEVICE_SIZES = [
+  ['iPhone 13 Pro', '146.7 × 71.5 × 7.65 mm', 'Apple, iPhone 13 Pro technical specifications'],
+  ['Samsung Galaxy S23', '146.3 × 70.9 × 7.6 mm', 'Samsung, Galaxy S23 specifications'],
+  ['Lenovo IdeaPad 3 15IAU7', '359.2 × 236.5 × 19.9 mm', 'Lenovo PSREF, IdeaPad 3 15IAU7'],
+];
+document.getElementById('sizes').innerHTML = DEVICE_SIZES.map(([n, sz, src]) => `<tr><td>${n}</td><td><span class="tag">whole device</span></td><td>${sz}</td><td>${src}</td><td>—</td></tr>`).join('') +
+  ['ram', 'cpu', 'board', 'ssd', 'battery'].map((id) => {
   const p = PARTS[id]; return `<tr><td>${p.name}</td><td><span class="chip"><i style="--c: ${roleVar(p.role)}"></i>${ROLES[p.role].name}</span></td><td>${p.size}</td><td>${p.src}</td><td>${p.lecture}</td></tr>`; }).join('');
 
 // ---------------- Materials (realistic, theme independent) and the ink outline (themed)
@@ -553,7 +583,8 @@ const M = {
   white: new THREE.MeshStandardMaterial({ color: 0xf1ece4, roughness: 0.7 }),
 };
 const INK = new THREE.LineBasicMaterial({ color: 0x1e1b17 });
-function themeInk() { INK.color.set(token('--edge') || '#1e1b17'); }
+var HULL;
+function themeInk() { INK.color.set(token('--edge') || '#1e1b17'); if (typeof HULL !== 'undefined') HULL.color.set(token('--edge') || '#1e1b17'); }
 themeInk();
 window.addEventListener('ga-theme', themeInk);
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeInk);
@@ -567,6 +598,14 @@ function box(w, h, d, mat, x = 0, y = 0, z = 0, edges = true) {
 function cyl(r, h, mat, x = 0, y = 0, z = 0, seg = 28) {
   const g = new THREE.CylinderGeometry(r, r, h, seg), m = new THREE.Mesh(g, mat);
   m.position.set(x, y, z); m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 40), INK));
+  return m;
+}
+HULL = new THREE.MeshBasicMaterial({ color: token('--edge') || 0x1e1b17, side: THREE.BackSide });
+function rbox(w, h, d, r, mat, x = 0, y = 0, z = 0) {
+  const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 4, r), mat);
+  m.position.set(x, y, z);
+  const hull = new THREE.Mesh(new RoundedBoxGeometry(w + 1.2, h + 1.2, d + 1.2, 4, r + 0.6), HULL);
+  m.add(hull);
   return m;
 }
 /** A part: a group that knows its id, where it sits, and which way it lifts when taken apart. */
@@ -650,28 +689,44 @@ function buildBoard() {
   add('lan', [lan], new THREE.Vector3(-142, 0, 40), new THREE.Vector3(-50, 30, 0), [0, 16, 0]);
   return { scene, parts };
 }
-// A generic phone (not one brand's sizes; marked so): parts stacked front to back along y when taken apart.
-function buildPhone() {
-  const scene = new THREE.Group(), parts = [];
-  const add = (id, kids, y, lift, anchor) => { const p = part(id, kids, new THREE.Vector3(0, y, 0), new THREE.Vector3(0, lift, 0), anchor); parts.push(p); scene.add(p); };
-  add('back', [box(72, 1.2, 150, M.backc)], 0, -38, [30, 0, 60]);
-  const cam = new THREE.Group(); cam.add(box(24, 2, 24, M.chip, 0, 0, 0)); cam.add(cyl(5, 2.5, M.lens, -5, 1, -5)); cam.add(cyl(5, 2.5, M.lens, 5, 1, 5));
-  add('camera', [cam], 2, -14, [0, 2, 0]);
-  scene.children.at(-1).position.set(-18, 2, -55); scene.children.at(-1).userData.home.set(-18, 2, -55);
-  add('pbattery', [box(60, 4, 85, M.battery)], 3.2, 8, [22, 2, 34]);
-  const logic = new THREE.Group(); logic.add(box(66, 1, 40, M.pcb, 0, 0, 0)); logic.add(box(14, 1.5, 14, M.chip, -12, 1, 0)); logic.add(box(10, 1.5, 12, M.chip, 8, 1, 6));
-  add('logic', [logic], 6, 30, [0, 1, 0]);
-  scene.children.at(-1).position.set(0, 6, -50); scene.children.at(-1).userData.home.set(0, 6, -50);
-  add('screen', [box(72, 1.4, 150, M.glass)], 8, 56, [-30, 1, -60]);
+// Two real phones, lying face up: x across the width, z down the length (top of the phone at -z), y through the thickness.
+// Outside sizes are the makers' published ones; inside, where each part sits is approximate (from the iFixit photos).
+const PHONES = {
+  iphone: { name: 'iPhone 13 Pro', w: 71.5, l: 146.7, t: 7.65, r: 9, back: 0xa9bed6, src: 'Apple' },
+  galaxy: { name: 'Galaxy S23', w: 70.9, l: 146.3, t: 7.6, r: 8, back: 0xdcd5c3, src: 'Samsung' },
+};
+function buildPhone(kind = 'iphone') {
+  const P = PHONES[kind], scene = new THREE.Group(), parts = [], top = -P.l / 2;
+  const add = (id, kids, home, lift, anchor) => { const q = part(id, kids, home, new THREE.Vector3(0, lift, 0), anchor); parts.push(q); scene.add(q); };
+  const backMat = new THREE.MeshStandardMaterial({ color: P.back, roughness: 0.3, metalness: 0.25 });
+  add('back', [rbox(P.w, 1, P.l, 3, backMat)], new THREE.Vector3(0, 0.5, 0), -34, [P.w / 2 - 12, 0, P.l / 2 - 20]);
+  const cam = new THREE.Group();
+  if (kind === 'iphone') {                              // a square camera bump, three lenses in a triangle
+    cam.add(rbox(38, 2.2, 38, 6, backMat, 0, 0, 0));
+    for (const [x, z] of [[-8, -8], [-8, 9], [9, 0]]) cam.add(cyl(7, 3.6, M.lens, x, -1.6, z));   // lenses stand out of the bump
+    add('camera', [cam], new THREE.Vector3(-P.w / 2 + 22, -0.6, top + 22), -12, [0, 3, 0]);
+  } else {                                              // three separate lenses in a column
+    for (const z of [-14, 0, 14]) cam.add(cyl(5.6, 2.6, M.lens, 0, 0, z));
+    add('camera', [cam], new THREE.Vector3(-P.w / 2 + 13, -0.6, top + 30), -12, [0, 3, 0]);
+  }
+  add('pbattery', [box(kind === 'iphone' ? 46 : 56, 4, kind === 'iphone' ? 82 : 76, M.battery)], new THREE.Vector3(kind === 'iphone' ? 10 : 0, 3, kind === 'iphone' ? 20 : 24), 12, [0, 2, 10]);
+  const logic = new THREE.Group();
+  if (kind === 'iphone') { logic.add(box(22, 1, 70, M.pcb)); logic.add(box(12, 1.4, 12, M.chip, 0, 1, -12)); logic.add(box(10, 1.4, 14, M.chip, 0, 1, 14)); }
+  else { logic.add(box(60, 1, 44, M.pcb)); logic.add(box(14, 1.4, 14, M.chip, -10, 1, 0)); logic.add(box(12, 1.4, 12, M.chip, 12, 1, 6)); }
+  add('logic', [logic], kind === 'iphone' ? new THREE.Vector3(-21, 3.2, top + 58) : new THREE.Vector3(4, 3.2, top + 32), 30, [0, 1, 0]);
+  const screen = rbox(P.w, 1.2, P.l, P.r / 2, M.glass);
+  add('screen', [screen], new THREE.Vector3(0, P.t - 0.6, 0), 56, [-P.w / 2 + 14, 1, top + 18]);
   return { scene, parts };
 }
 function buildLaptop() {
-  const g = new THREE.Group();
-  g.add(box(320, 16, 220, M.alu, 0, 8, 0));
-  for (let r = 0; r < 5; r++) for (let c = 0; c < 13; c++) g.add(box(17, 1.5, 15, M.chip, -112 + c * 18.7, 16.75, -60 + r * 18, false));
-  g.add(box(110, 0.8, 65, M.slotGrey, 0, 16.4, 70, false));
-  const lid = new THREE.Group(); lid.add(box(320, 210, 7, M.alu, 0, 105, 0)); lid.add(box(296, 186, 0.6, M.glass, 0, 108, 3.8, false));
-  lid.position.set(0, 16, -108); lid.rotation.x = -0.22; g.add(lid);
+  // Lenovo IdeaPad 3 15IAU7: 359.2 × 236.5 × 19.9 mm closed (Lenovo PSREF). Base and lid split of the thickness approximate.
+  const g = new THREE.Group(), W = 359.2, D = 236.5, body = new THREE.MeshStandardMaterial({ color: 0x3a4a63, roughness: 0.55 });
+  g.add(rbox(W, 14.5, D, 4, body, 0, 7.25, 0));
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 14; c++) g.add(box(16, 1.2, 14.5, M.chip, -122 + c * 18.6, 15.1, -70 + r * 17.5, false));
+  g.add(box(105, 0.6, 64, M.slotGrey, -20, 14.8, 68, false));
+  const lid = new THREE.Group(); lid.add(rbox(W, 5.4, D - 4, 4, body, 0, (D - 4) / 2, 0)); lid.children[0].rotation.x = Math.PI / 2;
+  lid.add(box(W - 22, D - 30, 0.6, M.glass, 0, (D - 4) / 2 + 4, 3, false));
+  lid.position.set(0, 14.5, -D / 2 + 2); lid.rotation.x = -0.25; g.add(lid);
   return g;
 }
 function buildRouter() {
@@ -699,7 +754,7 @@ class Stage {
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8070, 1.6));
     const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(200, 400, 260); this.scene.add(sun);
     const fill = new THREE.DirectionalLight(0xffffff, 0.6); fill.position.set(-300, 120, -200); this.scene.add(fill);
-    this.scene.add(object);
+    this.scene.add(object); this.object = object;
     this.ortho = ortho; this.fit = fit;
     this.camera = ortho ? new THREE.OrthographicCamera(-1, 1, 1, -1, -5000, 5000) : new THREE.PerspectiveCamera(30, 1, 1, 8000);
     this.camera.position.set(...camPos);
@@ -740,6 +795,10 @@ class Stage {
       p.traverse((o) => { if (o.isMesh && o.material?.emissive) { if (!o.userData.own) { o.material = o.material.clone(); o.userData.own = true; } o.material.emissive.set(on ? 0x3c8a47 : 0x000000); o.material.emissiveIntensity = on ? 0.55 : 0; } });
     }
     this.dirty = true;
+  }
+  setObject(object, parts) {
+    this.scene.remove(this.object); this.object = object; this.parts = parts; this.scene.add(object);
+    this.t = 0; if (this.sel) this.select(this.sel); this.dirty = true;
   }
   explode(t) { this.tGoal = t; if (REDUCE) this.t = t; this.dirty = true; }
   frame() {
@@ -806,21 +865,29 @@ if (glOK) {
 // ---------------- Screen E: phone
 const ORDER_E = ['screen', 'logic', 'pbattery', 'camera', 'back'];
 const sheetE = document.getElementById('sheetE');
-let stageE;
+let stageE, phoneE = 'iphone', selE = 'pbattery';
 function selectE(id) {
+  selE = id;
   const p = PARTS[id], r = ROLES[p.role];
   sheetE.innerHTML = `<div class="grip"></div><div class="chips" role="group" aria-label="Parts">${ORDER_E.map((x) => `<button type="button" class="chip" data-part="${x}" aria-pressed="${x === id}"><i style="--c: ${roleVar(PARTS[x].role)}"></i>${PARTS[x].name}</button>`).join('')}</div>
-    <div><span class="chip"><i style="--c: var(${r.v})"></i>${r.name}</span></div><h3>${p.name}</h3><p style="font: var(--t-body-sm)">${p.plain}</p>`;
+    <div><span class="chip"><i style="--c: var(${r.v})"></i>${r.name}</span></div><h3>${p.name}</h3><p style="font: var(--t-body-sm)">${p.plain}</p><p class="note">${PHONES[phoneE].name}: ${PHONES[phoneE].l} × ${PHONES[phoneE].w} × ${PHONES[phoneE].t} mm (${PHONES[phoneE].src})</p>`;
   sheetE.querySelectorAll('[data-part]').forEach((b) => b.addEventListener('click', () => selectE(b.dataset.part)));
   stageE?.select(id);
 }
 if (glOK) {
-  const P = buildPhone();
-  stageE = new Stage(document.getElementById('stageE'), { object: P.scene, parts: P.parts, camPos: [250, 230, 290], target: [0, 10, 0], onPick: selectE, turn: true,
+  const P = buildPhone(phoneE);
+  stageE = new Stage(document.getElementById('stageE'), { object: P.scene, parts: P.parts, camPos: [190, 230, 250], target: [0, 10, 0], onPick: selectE, turn: true,
     labels: ORDER_E.map((id) => ({ part: id, text: PARTS[id].name, role: PARTS[id].role, always: true })) });
   stageE.explode(1);
 } else noGL(document.getElementById('stageE'));
 selectE('pbattery');
+// Switching phones keeps the selected part: the same anatomy, another maker.
+document.querySelectorAll('#phoneSeg button').forEach((b) => b.addEventListener('click', () => {
+  phoneE = b.dataset.phone;
+  document.querySelectorAll('#phoneSeg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  if (stageE) { const P = buildPhone(phoneE); stageE.setObject(P.scene, P.parts); stageE.explode(1); }
+  selectE(selE);
+}));
 
 // ---------------- Screen F: projector (the CPU alone, large)
 if (glOK) {
@@ -873,16 +940,17 @@ if (glOK) {
 
 // ---------------- Screen A: device thumbnails, rendered once to pictures (one renderer, no live contexts)
 const DEVICES = [
-  { id: 'pc', name: 'Desktop PC', text: 'The lab PCs. The motherboard and what plugs into it.', roles: ['process', 'memory', 'storage'], build: () => buildBoard().scene, cam: [300, 330, 420], target: [0, 20, 0] },
-  { id: 'laptop', name: 'Laptop', text: 'The same parts as the PC, folded into one thin box.', roles: ['input', 'output', 'storage'], build: buildLaptop, cam: [380, 330, 420], target: [0, 70, 0] },
-  { id: 'phone', name: 'Smartphone', text: 'Screen, battery, camera, and a board with everything else.', roles: ['input', 'output', 'communicate'], build: () => { const p = buildPhone(); p.parts.forEach((x) => x.position.copy(x.userData.home).addScaledVector(x.userData.lift, 0.6)); return p.scene; }, cam: [170, 150, 200], target: [0, 5, 0] },
+  { id: 'pc', name: 'Desktop PC', text: 'A desktop computer: the motherboard and everything that plugs into it.', roles: ['process', 'memory', 'storage'], build: () => buildBoard().scene, cam: [300, 330, 420], target: [0, 20, 0] },
+  { id: 'iphone', name: 'iPhone', text: 'iPhone 13 Pro. Screen, battery, cameras, and one small board with everything else.', roles: ['input', 'output', 'communicate'], build: () => { const p = buildPhone('iphone'); p.parts.forEach((x) => x.position.copy(x.userData.home)); return p.scene; }, cam: [-70, -230, -140], target: [0, 0, -8] },
+  { id: 'galaxy', name: 'Android phone', text: 'Samsung Galaxy S23. Another maker, the same parts.', roles: ['input', 'output', 'communicate'], build: () => { const p = buildPhone('galaxy'); p.parts.forEach((x) => x.position.copy(x.userData.home)); return p.scene; }, cam: [-70, -230, -140], target: [0, 0, -8] },
+  { id: 'laptop', name: 'Laptop', text: 'An ordinary 15-inch laptop (Lenovo IdeaPad 3). The PC\'s parts, folded into one thin box.', roles: ['process', 'memory', 'storage'], build: buildLaptop, cam: [420, 360, 470], target: [0, 70, 0] },
   { id: 'router', name: 'Wi-Fi router', text: 'Where your room meets the internet.', roles: ['communicate', 'power'], build: buildRouter, cam: [260, 220, 300], target: [0, 50, 0] },
 ];
 const JOURNEYS = [
-  ['Press a key', 'Week 2', 'Keyboard, CPU, RAM, graphics card, screen.', 'Inside the laptop'],
-  ['Save a photo to the cloud', 'Weeks 1 and 3', 'Camera, storage, Wi-Fi, router, a data centre.', 'Phone to data centre'],
-  ['Open a website', 'Week 5', 'Wi-Fi card, router, provider, DNS, web server, and back.', 'Laptop to data centre'],
-  ['Pay with a QR code', 'Week 8', 'Camera, app, mobile network, bank, the shop\'s phone.', 'Phone to bank'],
+  ['Press a key', 'Topic: input and output', 'Keyboard, CPU, RAM, graphics card, screen.', 'Inside the laptop'],
+  ['Save a photo to the cloud', 'Topic: memory and storage', 'Camera, storage, Wi-Fi, router, a data centre.', 'Phone to data centre'],
+  ['Open a website', 'Topic: networks and the internet', 'Wi-Fi card, router, provider, DNS, web server, and back.', 'Laptop to data centre'],
+  ['Pay with a QR code', 'Topic: networks and the internet', 'Camera, app, mobile network, bank, the shop\'s phone.', 'Phone to bank'],
 ];
 function renderThumbs() {
   let urls = {};
@@ -904,14 +972,24 @@ window.addEventListener('ga-theme', renderThumbs);
 document.getElementById('journeys').innerHTML = JOURNEYS.map(([t, w, p, s]) => `<a class="journey" href="#h-d" style="text-decoration:none; color:inherit"><span class="tag">${w}</span><b>${t}</b><p>${p}</p><span class="path">${s}</span></a>`).join('');
 
 // ---------------- Screen G: the photo view (pins measured on the photo, percent of its width and height)
-const PINS = [['cpu', 62.5, 45.5], ['ram', 63.5, 77.8], ['gpu', 32.7, 38.4], ['battery', 41.3, 58.6], ['ports', 63.5, 8], ['lan', 50.4, 7.7], ['board', 86, 60]];
-const mapG = document.getElementById('mapG'), legendG = document.getElementById('legendG');
-const nameG = { gpu: 'Graphics card slot', ram: 'RAM slots', cpu: 'CPU socket' };
-PINS.forEach(([id, x, y], i) => mapG.insertAdjacentHTML('beforeend', `<button class="pin" type="button" data-part="${id}" style="left:${x}%; top:${y}%; --c: ${roleVar(PARTS[id].role)}" aria-label="${nameG[id] || PARTS[id].name}" aria-pressed="false">${i + 1}</button>`));
-legendG.innerHTML = `<h3 style="margin-bottom:4px">Parts on this board</h3>` + PINS.map(([id], i) => `<button type="button" data-part="${id}" aria-pressed="false" style="--c: ${roleVar(PARTS[id].role)}"><span>${i + 1}</span><span>${nameG[id] || PARTS[id].name}</span><small>${ROLES[PARTS[id].role].name}</small></button>`).join('');
-const pickG = (id) => document.querySelectorAll('#mapG [data-part], #legendG [data-part]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === id)));
-document.querySelectorAll('#mapG [data-part], #legendG [data-part]').forEach((b) => b.addEventListener('click', () => pickG(b.dataset.part)));
-pickG('cpu');
+// One pin map: a photo, its pins, a legend; pins measured by eye on the photo, in percent of its width and height.
+const SPOT = {
+  lcpu: ['CPU (under the cooler)', 'process'], lfan: ['Fan', 'power'], lwifi: ['Wi-Fi card', 'communicate'], lram: ['RAM slot', 'memory'],
+  lssd: ['SSD (M.2)', 'storage'], lbat: ['Battery', 'power'], lspk: ['Speaker', 'output'], lusb: ['Ports (USB)', 'power'],
+  bat: ['Battery', 'power'], board: ['Main board', 'process'], screen: ['Screen', 'output'], cam: ['Rear cameras', 'input'], sim: ['SIM tray', 'communicate'], back: ['Back and frame', 'power'],
+};
+function pinMap(mapId, legendId, pins, title, group) {
+  const map = document.getElementById(mapId);
+  pins.forEach(([id, x, y], i) => map.insertAdjacentHTML('beforeend', `<button class="pin" type="button" data-group="${group}" data-part="${id}" style="left:${x}%; top:${y}%; --c: ${roleVar(SPOT[id][1])}" aria-label="${SPOT[id][0]}" aria-pressed="false">${i + 1}</button>`));
+  if (legendId) document.getElementById(legendId).innerHTML = `<h3 style="margin-bottom:4px">${title}</h3>` + pins.map(([id], i) => `<button type="button" data-group="${group}" data-part="${id}" aria-pressed="false" style="--c: ${roleVar(SPOT[id][1])}"><span>${i + 1}</span><span>${SPOT[id][0]}</span><small>${ROLES[SPOT[id][1]].name}</small></button>`).join('');
+}
+const pick = (group, id) => document.querySelectorAll(`[data-group="${group}"][data-part]`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === id)));
+pinMap('mapG', 'legendG', [['lcpu', 43.4, 52.6], ['lfan', 25.7, 56.1], ['lram', 69.7, 57], ['lssd', 84.2, 52.6], ['lwifi', 48.7, 61.5], ['lbat', 39.5, 75.4], ['lspk', 95, 77], ['lusb', 9.9, 52.6]], 'Inside this laptop', 'g');
+// The two phones share part ids, so a part picked on one lights up on the other.
+pinMap('mapH1', null, [['bat', 73.7, 62.3], ['board', 28.3, 55.3], ['screen', 43.4, 46.5], ['cam', 15.8, 65.8], ['sim', 59.5, 69.5], ['back', 61.8, 28]], '', 'h');
+pinMap('mapH2', 'legendH', [['bat', 87.5, 50.9], ['board', 80.3, 26.3], ['screen', 61.2, 49.1], ['cam', 34.2, 29.8], ['sim', 76.3, 84.2], ['back', 13.2, 57.9]], 'The same parts in both phones', 'h');
+document.querySelectorAll('[data-group][data-part]').forEach((b) => b.addEventListener('click', () => pick(b.dataset.group, b.dataset.part)));
+pick('g', 'lcpu'); pick('h', 'bat');
 
 loop();
 </script>

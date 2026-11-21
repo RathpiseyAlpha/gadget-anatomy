@@ -1,0 +1,18 @@
+# Gadget Anatomy
+
+A free web app for anyone who wants to know how their devices work, mostly young students. Open up a real iPhone, an
+Android phone, a laptop and a PC in 3D, take them apart, and find out what each part does. Then follow everyday
+actions, such as opening a website or saving a photo to the cloud, from your finger out to a data centre and back.
+
+**Status: planning.** Nothing is built yet. The plan is in [`SPEC.md`](SPEC.md), and the design system with live 3D
+screens is in [`design/design-system.html`](design/design-system.html) (serve the `design/` folder and open it in a
+browser).
+
+## Credits
+
+Teardown photos: [iFixit](https://www.ifixit.com), CC BY-NC-SA 3.0. Other photos: Wikimedia Commons, each with its
+own author and licence. Every source is listed in [`design/SOURCES.md`](design/SOURCES.md).
+
+iPhone, Galaxy, IdeaPad and iFixit are their owners' trademarks, used only to name the devices and the photos' source.
+Gadget Anatomy is not affiliated with Apple, Samsung, Lenovo or iFixit. Because the iFixit photos are licensed for
+non-commercial use, this app is free and non-commercial.

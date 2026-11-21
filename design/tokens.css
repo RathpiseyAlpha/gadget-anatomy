@@ -1,8 +1,8 @@
 /* Gadget Anatomy: design tokens. The one source of colours, type, sizes, shadows and motion.
    The family look is Archboard's (../system-design-editor/design/tokens.css): warm drafting paper, ink outlines, hard
-   offset shadows, JetBrains Mono for the interface, a green highlighter for "active". Changed for year-1 readers:
+   offset shadows, JetBrains Mono for the interface, a green highlighter for "active". Changed for young readers (about 12 and up):
    prose (IBM Plex Sans) carries every sentence, at 17px; the interface is a step larger.
-   Added: one colour per role in the course's input, process, output, storage model (Lecture 2), plus memory (Lecture 3),
+   Added: one colour per role in the input, process, output, storage model school computing courses teach, plus memory,
    communicate and connect & power. A part is tinted by its role on every device.
    Light by default; dark via data-theme="dark" on <html>, or the OS setting when no data-theme is set. */
 
@@ -76,7 +76,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;  /* interface, part names, labels */
   --font-prose: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;        /* every sentence */
 
-  /* Type scale. Nothing under 12px; reading text 17px for year 1. */
+  /* Type scale. Nothing under 12px; reading text 17px for young readers. */
   --t-hint: 400 12px/16px var(--font-mono);
   --t-small: 400 13px/18px var(--font-mono);
   --t-ui: 500 14px/20px var(--font-mono);
