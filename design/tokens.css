@@ -1,0 +1,109 @@
+/* Gadget Anatomy: design tokens. The one source of colours, type, sizes, shadows and motion.
+   The family look is Archboard's (../system-design-editor/design/tokens.css): warm drafting paper, ink outlines, hard
+   offset shadows, JetBrains Mono for the interface, a green highlighter for "active". Changed for year-1 readers:
+   prose (IBM Plex Sans) carries every sentence, at 17px; the interface is a step larger.
+   Added: one colour per role in the course's input, process, output, storage model (Lecture 2), plus memory (Lecture 3),
+   communicate and connect & power. A part is tinted by its role on every device.
+   Light by default; dark via data-theme="dark" on <html>, or the OS setting when no data-theme is set. */
+
+:root {
+  /* Ground and ink (Archboard's) */
+  --paper: #F3ECE1;
+  --sheet: #FAF6EF;
+  --sunken: #EAE2D5;
+  --ink: #1E1B17;
+  --muted: #665F55;        /* 5.5:1 on paper */
+  --line: #DCD3C5;
+  --grid: #E1D7C7;
+  --edge: #1E1B17;
+  --drop: #1E1B17;
+  --stage: #EFE7DA;        /* behind a 3D model */
+
+  /* The highlighter: selected part, primary action, focus */
+  --marker: #B3DA92;
+  --marker-ink: #1E1B17;
+  --marker-strong: #3C8A47;
+  --marker-soft: #E4F1D6;
+  --marker-text: #2B6A35;
+
+  /* Status: always word + icon + colour */
+  --ok: #23703F;   --ok-soft: #DCEFD8;
+  --warn: #8F4E05; --warn-soft: #F8E2BF;
+  --bad: #B3261E;  --bad-soft: #F7D7D2;
+
+  /* Roles (fill behind ink text, and the tint of a part's chip and outline). Same hues as Archboard's categories. */
+  --role-input: #F1B2C2;       /* keyboard, touch screen, camera, microphone */
+  --role-process: #A9C5EB;     /* CPU, GPU, controllers */
+  --role-memory: #C6B8EC;      /* RAM */
+  --role-storage: #B8DA9B;     /* SSD, hard disk, phone flash, memory card */
+  --role-output: #EED98F;      /* screen, speaker, printer */
+  --role-communicate: #F4B98C; /* Wi-Fi card, antenna, network port, router, SIM */
+  --role-power: #E6DED0;       /* motherboard, power supply, battery, cables: connect and power */
+  --role-text: #4B3F8E;        /* a role word on paper, when it needs colour (6.9:1) */
+
+  /* The journey's moving packet and its path */
+  --packet: #E0703A;
+  --path: #9E4316;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1B1916; --sheet: #24211D; --sunken: #2D2924; --ink: #F1EAE0; --muted: #ACA396; --line: #3A352E; --grid: #2C2823;
+    --edge: #D8CFC1; --drop: #050403; --stage: #211E1A;
+    --marker: #4E6E35; --marker-ink: #F1EAE0; --marker-strong: #97D27E; --marker-soft: #26331C; --marker-text: #97D27E;
+    --ok: #7CD69A; --ok-soft: #1B3323; --warn: #F2B866; --warn-soft: #3B2B12; --bad: #FF9C93; --bad-soft: #3D1A17;
+    --role-input: #713A4A; --role-process: #34507A; --role-memory: #4D4078; --role-storage: #3F5C2E; --role-output: #6B5D27;
+    --role-communicate: #7A4E2E; --role-power: #4A443B; --role-text: #C9BEF5;
+    --packet: #F08A55; --path: #F08A55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1B1916; --sheet: #24211D; --sunken: #2D2924; --ink: #F1EAE0; --muted: #ACA396; --line: #3A352E; --grid: #2C2823;
+  --edge: #D8CFC1; --drop: #050403; --stage: #211E1A;
+  --marker: #4E6E35; --marker-ink: #F1EAE0; --marker-strong: #97D27E; --marker-soft: #26331C; --marker-text: #97D27E;
+  --ok: #7CD69A; --ok-soft: #1B3323; --warn: #F2B866; --warn-soft: #3B2B12; --bad: #FF9C93; --bad-soft: #3D1A17;
+  --role-input: #713A4A; --role-process: #34507A; --role-memory: #4D4078; --role-storage: #3F5C2E; --role-output: #6B5D27;
+  --role-communicate: #7A4E2E; --role-power: #4A443B; --role-text: #C9BEF5;
+  --packet: #F08A55; --path: #F08A55;
+  color-scheme: dark;
+}
+
+/* Shape, type, space, motion (theme independent) */
+:root {
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;  /* interface, part names, labels */
+  --font-prose: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;        /* every sentence */
+
+  /* Type scale. Nothing under 12px; reading text 17px for year 1. */
+  --t-hint: 400 12px/16px var(--font-mono);
+  --t-small: 400 13px/18px var(--font-mono);
+  --t-ui: 500 14px/20px var(--font-mono);
+  --t-label: 700 13px/16px var(--font-mono);     /* a label on the 3D model */
+  --t-body: 400 17px/28px var(--font-prose);
+  --t-body-sm: 400 15px/24px var(--font-prose);
+  --t-lede: 400 19px/30px var(--font-prose);
+  --t-h3: 700 17px/24px var(--font-mono);
+  --t-h2: 700 24px/30px var(--font-mono);
+  --t-h1: 800 34px/40px var(--font-mono);
+  --t-display: 800 48px/54px var(--font-mono);   /* the home page's one headline */
+  /* Projector: read from the back of a lecture room */
+  --t-proj-title: 800 60px/68px var(--font-mono);
+  --t-proj-body: 400 30px/44px var(--font-prose);
+
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+  --bw: 2px; --bw-fine: 1.5px;
+  --r-chip: 999px; --r-control: 8px; --r-panel: 14px;
+  --pop-sm: 2px 2px 0 var(--drop);
+  --pop: 3px 3px 0 var(--drop);
+  --pop-lg: 5px 5px 0 var(--drop);
+  --lift: translate(-1px, -1px);
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --dur-press: 90ms;
+  --dur-explode: 900ms;     /* Take apart: parts lift apart once, then stay */
+  --dur-step: 1200ms;       /* the packet moves one journey step */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-explode: 0ms; --dur-step: 0ms; }
+}

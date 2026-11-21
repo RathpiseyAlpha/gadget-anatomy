@@ -1,0 +1,917 @@
+<meta charset="utf-8">
+<title>Gadget Anatomy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* Layout concept: a design-system page in Archboard's family. Sections run down the page; each screen sits in an ink
+   frame at its real proportions and reflows the way the app will. Colour comes only from tokens.css. */
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: var(--t-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 var(--s8); }
+.wrap { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s8); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+h1 { font: var(--t-h1); }
+h2 { font: var(--t-h2); }
+h3 { font: var(--t-h3); }
+p { margin: 0; }
+a { color: var(--marker-text); }
+code { font: 500 0.88em/1 var(--font-mono); background: var(--sunken); padding: 1px 5px; border-radius: 4px; }
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--muted); }
+:focus-visible { outline: 3px solid var(--marker-strong); outline-offset: 2px; }
+
+/* ---------- page head */
+.page-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s5); padding-block: var(--s5); border-bottom: var(--bw) solid var(--edge); margin-bottom: var(--s6); }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 800 18px/24px var(--font-mono); }
+.brand svg { width: 30px; height: 30px; }
+.page-head .spacer { flex: 1; }
+.intro { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s6); align-items: end; }
+.intro .lede { font: var(--t-lede); max-width: 60ch; margin-top: var(--s4); }
+.facts { display: grid; gap: var(--s2); font: var(--t-small); padding: var(--s4); border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); box-shadow: var(--pop); }
+.facts div { display: grid; grid-template-columns: 9.5em 1fr; gap: var(--s3); }
+.facts b { font-weight: 700; }
+
+/* ---------- controls */
+.btn { font: var(--t-ui); display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: 40px; padding: 8px 16px; white-space: nowrap;
+  border: var(--bw) solid var(--edge); border-radius: var(--r-control); background: var(--sheet); color: var(--ink); box-shadow: var(--pop-sm); cursor: pointer; text-decoration: none;
+  transition: transform var(--dur-press) var(--ease), box-shadow var(--dur-press) var(--ease); }
+.btn:hover { transform: var(--lift); box-shadow: var(--pop); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--drop); }
+.btn--primary { background: var(--marker); color: var(--marker-ink); font-weight: 700; }
+.btn--ghost { background: transparent; border-color: transparent; box-shadow: none; }
+.btn--ghost:hover { background: var(--sunken); box-shadow: none; transform: none; }
+.btn--sm { min-height: 32px; padding: 4px 10px; font-size: 13px; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.seg { display: inline-flex; gap: 4px; padding: 3px; border: var(--bw) solid var(--edge); border-radius: 10px; background: var(--sheet); box-shadow: var(--pop-sm); }
+.seg button { font: var(--t-ui); border: var(--bw) solid transparent; border-radius: 7px; background: transparent; color: var(--ink); padding: 4px 12px; min-height: 32px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--marker); color: var(--marker-ink); border-color: var(--edge); font-weight: 700; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 600 12px/16px var(--font-mono); padding: 3px 10px; border-radius: var(--r-chip); border: var(--bw-fine) solid var(--edge); background: var(--sheet); color: var(--ink); white-space: nowrap; }
+.chip i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--edge); background: var(--c, var(--sheet)); flex: none; }
+.role { background: var(--c); }
+.tag { font: 600 12px/16px var(--font-mono); color: var(--muted); }
+
+/* ---------- sections */
+.sec { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+.sec > header { display: grid; gap: var(--s2); max-width: 80ch; }
+.sec > header p { font: var(--t-body-sm); color: var(--muted); }
+.principles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s4); }
+.principles div { border-top: var(--bw) solid var(--edge); padding-top: var(--s3); display: grid; gap: var(--s2); align-content: start; }
+.principles p { font: var(--t-body-sm); }
+
+.roles { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--s3); }
+.role-card { display: grid; gap: var(--s2); align-content: start; padding: var(--s3); border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); }
+.role-card .sw { height: 56px; border-radius: 8px; border: var(--bw-fine) solid var(--edge); background: var(--c); }
+.role-card b { font: 700 15px/20px var(--font-mono); }
+.role-card span { font: 400 13px/19px var(--font-prose); color: var(--muted); }
+
+.type-scale { display: grid; gap: var(--s3); padding: var(--s5); border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); }
+.type-scale div { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: var(--s4); align-items: baseline; border-bottom: var(--bw-fine) solid var(--line); padding-bottom: var(--s3); }
+.type-scale div:last-child { border-bottom: 0; padding-bottom: 0; }
+.type-scale small { font: var(--t-hint); color: var(--muted); }
+
+.comps { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
+.panel { padding: var(--s5); border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); display: grid; gap: var(--s4); }
+.row { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
+.note { font: var(--t-hint); color: var(--muted); }
+
+/* ---------- part card (component) */
+.part-card { display: grid; gap: var(--s3); align-content: start; }
+.part-card .photo { margin: 0; display: grid; gap: 4px; }
+.part-card .photo img { width: 100%; height: 150px; object-fit: contain; background: #121212; border: var(--bw) solid var(--edge); border-radius: var(--r-control); display: block; }
+.part-card .photo figcaption { font: var(--t-hint); color: var(--muted); }
+.part-card .name { display: grid; gap: 6px; }
+.part-card h3 { font: 800 22px/28px var(--font-mono); }
+.part-card .what { font: var(--t-body); }
+.part-card .eg { font: var(--t-body-sm); padding: var(--s3); border-radius: var(--r-control); background: var(--sunken); }
+.part-card .eg b { font: 700 13px/18px var(--font-mono); display: block; margin-bottom: 2px; }
+.part-card .size { font: var(--t-small); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+
+/* ---------- screens */
+.frame { border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--paper); box-shadow: var(--pop-lg); overflow: hidden; container: screen / inline-size; }
+.bar { display: flex; align-items: center; gap: var(--s3); min-height: 56px; padding: 0 var(--s4); background: var(--sheet); border-bottom: var(--bw) solid var(--edge); flex-wrap: wrap; }
+.bar .title { font: 700 15px/20px var(--font-mono); min-width: 0; }
+.bar .spacer { flex: 1; }
+.bar nav { display: flex; gap: var(--s4); font: var(--t-ui); }
+.bar nav a { color: var(--ink); text-decoration: none; border-bottom: 2px solid transparent; }
+.bar nav a[aria-current] { border-bottom-color: var(--edge); font-weight: 700; }
+
+/* Screen A: shelf */
+.shelf { padding: var(--s6) var(--s5); display: grid; gap: var(--s6); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 32px 32px; }
+.shelf .hello { display: grid; gap: var(--s3); max-width: 62ch; }
+.shelf .hello h2 { font: var(--t-display); letter-spacing: -.02em; }
+.shelf .hello p { font: var(--t-lede); }
+.devices { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s4); }
+.device { display: grid; grid-template-rows: 170px auto; border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); box-shadow: var(--pop); overflow: hidden; text-align: left; color: var(--ink); font: inherit; padding: 0; cursor: pointer; }
+.device:hover { transform: var(--lift); box-shadow: var(--pop-lg); }
+.device .thumb { background: var(--stage); border-bottom: var(--bw) solid var(--edge); display: grid; place-items: center; }
+.device .thumb img { max-width: 100%; max-height: 166px; }
+.device .txt { padding: var(--s3) var(--s4) var(--s4); display: grid; gap: 6px; }
+.device b { font: 800 18px/24px var(--font-mono); }
+.device span { font: var(--t-body-sm); color: var(--muted); }
+.device .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.journeys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s3); }
+.journey { display: grid; gap: var(--s2); padding: var(--s4); border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--paper); align-content: start; }
+.journey b { font: 700 16px/22px var(--font-mono); }
+.journey p { font: var(--t-body-sm); }
+.journey .path { font: var(--t-hint); color: var(--muted); }
+.shelf h3 { margin-bottom: var(--s3); }
+
+/* Screen B: anatomy viewer */
+.viewer { display: grid; grid-template-columns: 236px minmax(0, 1fr) 340px; height: 680px; }
+.plist { border-right: var(--bw) solid var(--edge); background: var(--sheet); overflow: auto; padding: var(--s3); display: grid; gap: var(--s3); align-content: start; }
+.plist h4 { margin: 0; font: 700 12px/16px var(--font-mono); color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.plist h4 i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--edge); background: var(--c); }
+.plist ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 2px; }
+.plist button { width: 100%; text-align: left; font: var(--t-ui); padding: 6px 10px; border-radius: 7px; border: var(--bw-fine) solid transparent; background: transparent; color: var(--ink); cursor: pointer; }
+.plist button:hover { background: var(--sunken); }
+.plist button[aria-pressed="true"] { background: var(--marker); color: var(--marker-ink); border-color: var(--edge); font-weight: 700; }
+.stage { position: relative; background: var(--stage); min-width: 0; min-height: 0; overflow: hidden;
+  background-image: radial-gradient(var(--grid) 1.2px, transparent 1.3px); background-size: 22px 22px; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.stage canvas:active { cursor: grabbing; }
+.labels { position: absolute; inset: 0; pointer-events: none; }
+.lbl { position: absolute; transform: translate(-50%, -100%); display: inline-flex; align-items: center; gap: 6px; font: var(--t-label); padding: 4px 9px; border-radius: var(--r-chip);
+  border: var(--bw) solid var(--edge); background: var(--sheet); color: var(--ink); box-shadow: var(--pop-sm); white-space: nowrap; }
+.lbl i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--edge); background: var(--c); }
+.lbl::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 14px; background: var(--edge); }
+.lbl.sel { background: var(--marker); color: var(--marker-ink); }
+.lbl.flat::after { display: none; }
+.lbl.below { transform: translate(-50%, 0); }
+.lbl.below::after { top: auto; bottom: 100%; }
+.stage-tools { position: absolute; left: var(--s3); right: var(--s3); bottom: var(--s3); display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); pointer-events: none; }
+.stage-tools > * { pointer-events: auto; }
+.explode { display: flex; align-items: center; gap: var(--s2); padding: 6px 12px; border: var(--bw) solid var(--edge); border-radius: 10px; background: var(--sheet); box-shadow: var(--pop-sm); font: var(--t-ui); }
+.explode input { width: 140px; accent-color: var(--marker-strong); }
+.hint { font: var(--t-hint); color: var(--muted); background: var(--sheet); padding: 4px 8px; border-radius: 6px; border: var(--bw-fine) solid var(--line); }
+.side { border-left: var(--bw) solid var(--edge); background: var(--sheet); padding: var(--s4); overflow: auto; }
+.nogl { position: absolute; inset: 0; display: grid; place-items: center; padding: var(--s5); text-align: center; font: var(--t-body-sm); color: var(--muted); }
+
+/* Screen C: close-up */
+.closeup { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); min-height: 460px; }
+.closeup .stage { min-height: 460px; }
+.facts-side { padding: var(--s5); display: grid; gap: var(--s4); align-content: start; border-left: var(--bw) solid var(--edge); background: var(--sheet); }
+.measure { display: grid; gap: var(--s2); }
+.measure div { display: flex; justify-content: space-between; gap: var(--s3); font: var(--t-small); border-bottom: var(--bw-fine) dashed var(--line); padding-bottom: 4px; }
+.measure b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.src { font: var(--t-hint); color: var(--muted); }
+
+/* Screen D: journey */
+.ribbon { display: flex; overflow-x: auto; border-bottom: var(--bw) solid var(--edge); background: var(--sheet); }
+.ribbon span { flex: 1 0 auto; padding: 10px 16px; font: var(--t-ui); color: var(--muted); border-right: var(--bw-fine) solid var(--line); display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+.ribbon span[aria-current] { color: var(--ink); background: var(--marker); font-weight: 700; }
+.ribbon span.done { color: var(--ink); }
+.ribbon span.done::before { content: "✓"; font-weight: 800; color: var(--marker-text); }
+.journey-body { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: 520px; }
+.narr { border-left: var(--bw) solid var(--edge); background: var(--sheet); padding: var(--s5); display: grid; gap: var(--s4); align-content: start; }
+.narr .step { font: var(--t-small); color: var(--muted); display: flex; justify-content: space-between; }
+.narr h3 { font: 800 22px/28px var(--font-mono); }
+.narr p { font: var(--t-body); }
+.narr .who { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.dots { display: flex; gap: 6px; align-items: center; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--edge); background: var(--sheet); }
+.dots i.on { background: var(--packet); }
+.dots i.done { background: var(--ink); }
+
+/* Screen E: phone */
+.phone-row { display: flex; flex-wrap: wrap; gap: var(--s6); align-items: flex-start; }
+.phone { width: 390px; max-width: 100%; height: 780px; border: var(--bw) solid var(--edge); border-radius: 36px; overflow: hidden; background: var(--paper); box-shadow: var(--pop-lg); display: grid; grid-template-rows: 56px minmax(0, 1fr) auto; }
+.phone .bar { min-height: 56px; }
+.phone .stage { min-height: 0; }
+.sheet { border-top: var(--bw) solid var(--edge); background: var(--sheet); padding: var(--s3) var(--s4) var(--s5); border-radius: 18px 18px 0 0; display: grid; gap: var(--s3); }
+.sheet .grip { width: 44px; height: 5px; border-radius: 3px; background: var(--line); justify-self: center; }
+.sheet .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.sheet .chips .chip { cursor: pointer; }
+.sheet .chips .chip[aria-pressed="true"] { background: var(--marker); }
+.sheet h3 { font: 800 20px/26px var(--font-mono); }
+.side-notes { max-width: 56ch; display: grid; gap: var(--s3); align-content: start; }
+.side-notes ul { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s2); font: var(--t-body-sm); }
+
+/* Screen F: projector */
+.proj { aspect-ratio: 16 / 9; width: 100%; display: grid; grid-template-columns: 55% 45%; background: var(--paper); container: proj / inline-size; }
+.proj .stage { border-right: var(--bw) solid var(--edge); }
+.proj .say { padding: 5cqw 4cqw; display: grid; gap: 2.2cqw; align-content: center; }
+.proj .say h3 { font: 800 6.4cqw/1.05 var(--font-mono); letter-spacing: -.02em; }
+.proj .say p { font: 400 2.3cqw/1.45 var(--font-prose); max-width: 26ch; }
+.proj .say .chip { font-size: 1.25cqw; padding: .3cqw 1cqw; justify-self: start; }
+.proj .say .chip i { width: .9cqw; height: .9cqw; }
+.proj .foot { font: 500 1.1cqw/1.3 var(--font-mono); color: var(--muted); }
+
+/* Screen G: 2D view */
+.flat2d { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
+.photo-map { position: relative; margin: var(--s5); align-self: start; }
+.photo-map img { width: 100%; display: block; border: var(--bw) solid var(--edge); border-radius: var(--r-control); }
+.pin { position: absolute; transform: translate(-50%, -50%); width: 26px; height: 26px; border-radius: 50%; border: var(--bw) solid #fff; outline: 2px solid #111; background: var(--c);
+  display: grid; place-items: center; font: 800 12px/1 var(--font-mono); color: #1E1B17; cursor: pointer; padding: 0; }
+.pin[aria-pressed="true"] { outline: 4px solid var(--marker); }
+.legend { padding: var(--s5); border-left: var(--bw) solid var(--edge); background: var(--sheet); display: grid; gap: var(--s2); align-content: start; }
+.legend button { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: var(--s3); align-items: center; text-align: left; padding: 6px 8px; border-radius: 8px; border: var(--bw-fine) solid transparent; background: transparent; color: var(--ink); font: var(--t-ui); cursor: pointer; }
+.legend button span:first-child { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--edge); background: var(--c); display: grid; place-items: center; font: 800 11px/1 var(--font-mono); color: #1E1B17; }
+.legend button[aria-pressed="true"] { background: var(--marker); color: var(--marker-ink); border-color: var(--edge); }
+.legend small { font: 400 13px/19px var(--font-prose); color: var(--muted); grid-column: 2; }
+
+.model-tbl { width: 100%; border-collapse: collapse; font: var(--t-small); }
+.model-tbl th, .model-tbl td { text-align: left; padding: 8px 10px; border-bottom: var(--bw-fine) solid var(--line); vertical-align: top; }
+.model-tbl th { font-weight: 700; }
+.tbl-wrap { overflow-x: auto; border: var(--bw) solid var(--edge); border-radius: var(--r-panel); background: var(--sheet); }
+
+/* ---------- the screens answer their own width (they are embedded in this page at any size) */
+@container screen (max-width: 1100px) {
+  .viewer { grid-template-columns: 200px minmax(0, 1fr) 300px; }
+  .devices, .journeys { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container screen (max-width: 860px) {
+  .viewer { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .viewer .stage { height: 420px; }
+  .plist { border-right: 0; border-bottom: var(--bw) solid var(--edge); grid-auto-flow: column; overflow-x: auto; }
+  .side { border-left: 0; border-top: var(--bw) solid var(--edge); }
+  .closeup, .journey-body, .flat2d { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .journey-body .stage { height: 380px; }
+  .facts-side, .narr, .legend { border-left: 0; border-top: var(--bw) solid var(--edge); }
+  .bar nav { display: none; }
+}
+@container screen (max-width: 560px) {
+  .devices, .journeys { grid-template-columns: minmax(0, 1fr); }
+  .shelf .hello h2 { font-size: 32px; line-height: 38px; }
+  .pin { width: 22px; height: 22px; font-size: 11px; }
+}
+@media (max-width: 900px) {
+  .intro, .comps { grid-template-columns: minmax(0, 1fr); }
+  .principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .roles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .principles { grid-template-columns: minmax(0, 1fr); }
+  .type-scale div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .facts div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .btn, .device { transition: none; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+</script>
+
+<div class="wrap">
+<div>
+  <header class="page-head">
+    <span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="9" width="22" height="16" rx="2" fill="var(--role-process)" stroke="var(--edge)" stroke-width="2"/><rect x="10" y="13" width="12" height="8" rx="1" fill="var(--sheet)" stroke="var(--edge)" stroke-width="2"/><path d="M9 9V5M14 9V5M18 9V5M23 9V5M9 29v-4M14 29v-4M18 29v-4M23 29v-4" stroke="var(--edge)" stroke-width="2"/></svg>Gadget Anatomy</span>
+    <span class="chip">Plan, 21 November 2026</span>
+    <span class="spacer"></span>
+    <div class="seg" role="group" aria-label="Theme">
+      <button type="button" data-theme-set="" aria-pressed="true">System</button>
+      <button type="button" data-theme-set="light" aria-pressed="false">Light</button>
+      <button type="button" data-theme-set="dark" aria-pressed="false">Dark</button>
+    </div>
+  </header>
+  <div class="intro">
+    <div>
+      <h1>Design system and key screens</h1>
+      <p class="lede">A web app for first-year ICT students that opens up the phone, laptop and PC they already use, in real 3D, and follows everyday actions from a finger out to a data centre. It wears Archboard's look, with larger reading text and one colour for each job a part does.</p>
+    </div>
+    <div class="facts" aria-label="About this plan">
+      <div><b>Course</b><span>CMFP0060 ICT, year 1, about 90 students</span></div>
+      <div><b>Used on</b><span>lab PCs (one monitor), phones, the lecture projector</span></div>
+      <div><b>Family</b><span>Archboard's tokens and outlines; a separate app</span></div>
+      <div><b>3D</b><span>Three.js 0.170.0; parts built to their published sizes</span></div>
+      <div><b>Status</b><span>Plan only. Nothing is built.</span></div>
+    </div>
+  </div>
+</div>
+
+<section class="sec" aria-labelledby="h-dir">
+  <header><h2 id="h-dir">Direction</h2></header>
+  <div class="principles">
+    <div><h3>The course's own frame</h3><p>Every part is tagged with its job in the model Lecture 2 teaches: input, process, output, storage. Memory (Lecture 3), communicate and connect and power complete it.</p></div>
+    <div><h3>Real, then simple</h3><p>Parts are drawn to their published sizes and shown beside a real photo. Then two plain sentences and one example from a student's day.</p></div>
+    <div><h3>Two scales, one look</h3><p>Inside the device is 3D. Outside, the room, the provider and the data centre use Archboard's isometric blocks. A journey crosses both without a change of style.</p></div>
+    <div><h3>Works on every machine</h3><p>No WebGL, an old phone or a busy projector gets the same content as a photo with labels. Keyboard, reduced motion and both themes everywhere.</p></div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-roles">
+  <header><h2 id="h-roles">Roles: one colour for each job</h2><p>The same colour means the same job on every device. A role word is always written next to its colour, never colour alone.</p></header>
+  <div class="roles" id="roles"></div>
+</section>
+
+<section class="sec" aria-labelledby="h-type">
+  <header><h2 id="h-type">Type</h2><p>Archboard's two faces. Every sentence is in IBM Plex Sans at 17 px for year-1 readers; the interface, part names and labels are in JetBrains Mono. The projector sizes are read from the back of the room.</p></header>
+  <div class="type-scale">
+    <div><small>display 48/54 Mono 800</small><span style="font: var(--t-display); letter-spacing: -.02em">Open it up</span></div>
+    <div><small>h1 34/40 Mono 800</small><span style="font: var(--t-h1)">Desktop PC</span></div>
+    <div><small>h3 17/24 Mono 700</small><span style="font: var(--t-h3)">RAM (memory)</span></div>
+    <div><small>lede 19/30 Plex</small><span style="font: var(--t-lede)">Turn it around, take it apart, and find what each part does.</span></div>
+    <div><small>body 17/28 Plex</small><span style="font: var(--t-body)">RAM holds the apps and files you have open right now. It is fast, and it forgets everything when the power goes off.</span></div>
+    <div><small>label 13/16 Mono 700</small><span><span class="lbl flat" style="position:static; transform:none; --c: var(--role-memory)"><i></i>Gold contacts</span></span></div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-comp">
+  <header><h2 id="h-comp">Components</h2></header>
+  <div class="comps">
+    <div class="panel">
+      <h3>Part card</h3>
+      <div class="part-card" id="cardDemo"></div>
+      <p class="note">Photo first, then the name and its role, two plain sentences, one example, the size with its source, the lecture. The photo's author and licence are always under it.</p>
+    </div>
+    <div class="panel">
+      <h3>Controls</h3>
+      <div class="row">
+        <button class="btn btn--primary" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>Take apart</button>
+        <button class="btn" type="button">Put back together</button>
+        <div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">3D</button><button type="button" aria-pressed="false">Photo</button></div>
+      </div>
+      <div class="row">
+        <span class="chip"><i style="--c: var(--role-process)"></i>Process</span>
+        <span class="chip"><i style="--c: var(--role-memory)"></i>Memory</span>
+        <span class="chip"><i style="--c: var(--role-storage)"></i>Storage</span>
+        <span class="tag">Week 3: memory and storage</span>
+      </div>
+      <div class="row">
+        <span class="lbl flat" style="position:static; transform:none; --c: var(--role-process)"><i></i>CPU</span>
+        <span class="lbl flat sel" style="position:static; transform:none; --c: var(--role-memory)"><i></i>RAM (selected)</span>
+      </div>
+      <h3>Journey step</h3>
+      <div class="dots" aria-label="Step 5 of 9"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+      <div class="row"><button class="btn btn--sm" type="button">Back</button><button class="btn btn--sm btn--primary" type="button">Next step</button><span class="note">Left and right arrows too</span></div>
+      <p class="note">Labels on the 3D model are pills with the role's dot and a short stem down to the part. The selected part's label turns highlighter green, and the part gets a green glow, never only a colour change.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-a">
+  <header><h2 id="h-a">Screen A: the device shelf (home)</h2><p>What a student sees first. The devices they own, each turning slowly in 3D, and the journeys, each tagged with the lecture it belongs to. No sign-in.</p></header>
+  <div class="frame">
+    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><nav aria-label="App"><a href="#h-a" aria-current="page">Devices</a><a href="#h-d">Journeys</a><a href="#h-f">Projector</a></nav><span class="spacer"></span><span class="note">Lab PC 1280 × 720</span></div>
+    <div class="shelf">
+      <div class="hello"><h2>Open it up.</h2><p>Pick a device you use every day. Turn it around, take it apart, and find out what each part does.</p></div>
+      <div><h3>Devices</h3><div class="devices" id="devices"></div></div>
+      <div><h3>Journeys</h3><div class="journeys" id="journeys"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-b">
+  <header><h2 id="h-b">Screen B: the anatomy viewer</h2><p>A desktop PC's motherboard with what plugs into it, at real proportions. Drag to turn, Take apart to lift the parts off the board, then click a part or pick it from the list. Live below.</p></header>
+  <div class="frame">
+    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><span class="title">Desktop PC</span><span class="spacer"></span>
+      <div class="seg" role="group" aria-label="View"><button type="button" aria-pressed="true">3D</button><button type="button" aria-pressed="false">Photo</button></div></div>
+    <div class="viewer">
+      <nav class="plist" id="plistB" aria-label="Parts of the desktop PC"></nav>
+      <div class="stage" id="stageB">
+        <div class="labels" aria-hidden="true"></div>
+        <div class="stage-tools">
+          <label class="explode"><span>Together</span><input id="explodeB" type="range" min="0" max="1" step="0.01" value="0.55" aria-label="Take apart"><span>Apart</span></label>
+          <span class="hint">Drag to turn · Scroll to zoom</span>
+        </div>
+      </div>
+      <aside class="side" aria-live="polite"><div class="part-card" id="cardB"></div></aside>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-c">
+  <header><h2 id="h-c">Screen C: a part up close</h2><p>One part alone, turning slowly, with its own pieces labelled. The real photo and the measured size sit beside it. Desktop RAM, a DDR4 stick.</p></header>
+  <div class="frame">
+    <div class="closeup">
+      <div class="stage" id="stageC"><div class="labels" aria-hidden="true"></div></div>
+      <div class="facts-side">
+        <figure class="part-card" style="margin:0"><div class="photo"><img src="photos/ram-ddr4.jpg" alt="A real DDR4 RAM stick: a green board with black memory chips and a row of gold contacts along the bottom edge."><figcaption>Photo: ElooKoN, CC BY-SA 4.0, Wikimedia Commons</figcaption></div></figure>
+        <div><h3>RAM, a DDR4 stick</h3><p style="font: var(--t-body); margin-top: 6px">The gold contacts slide into a slot on the motherboard. The notch is off centre, so the stick only fits one way round.</p></div>
+        <div class="measure">
+          <div><span>Length</span><b>133.35 mm</b></div>
+          <div><span>Height</span><b>31.25 mm</b></div>
+          <div><span>Gold contacts</span><b>288 (144 each side)</b></div>
+          <div><span>Laptop RAM (SO-DIMM) length</span><b>about 67.6 mm</b></div>
+        </div>
+        <p class="src">Sizes: Wikipedia "DIMM", citing JEDEC MO-309E. Chip size and notch position are approximate in this model.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-d">
+  <header><h2 id="h-d">Screen D: a journey step</h2><p>Open a website, step 5 of 9. The ribbon shows how far the request has travelled; the scene is drawn in Archboard's isometric style; the packet moves along the step it is on. No times or speeds: they would be invented.</p></header>
+  <div class="frame">
+    <div class="bar"><span class="brand" style="font-size:15px">Gadget Anatomy</span><span class="title">Open a website</span><span class="tag">Week 5: the Internet and the Web</span><span class="spacer"></span><button class="btn btn--sm btn--ghost" type="button">All journeys</button></div>
+    <div class="ribbon" aria-label="Where the request is"><span class="done">Inside the laptop</span><span class="done">Your room</span><span class="done">Your internet provider</span><span aria-current="step">The internet</span><span>A data centre</span></div>
+    <div class="journey-body">
+      <div class="stage" id="stageD"><div class="labels" aria-hidden="true"></div></div>
+      <div class="narr">
+        <div class="step"><span>Step 5 of 9</span><div class="dots" aria-hidden="true"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+        <h3>A DNS server finds the address</h3>
+        <p>Computers find each other by numbers, not names. Your internet provider asks a DNS server for the number that belongs to <b>www.itc.edu.kh</b>, and the request goes on to that number.</p>
+        <div class="who"><span class="chip"><i style="--c: var(--role-communicate)"></i>DNS server</span><span class="chip"><i style="--c: var(--role-communicate)"></i>Internet provider</span></div>
+        <div class="row"><button class="btn btn--sm" type="button">Back</button><button class="btn btn--sm btn--primary" type="button">Next step</button></div>
+        <p class="note">Steps: you type and press Enter; the CPU hands the request to the Wi-Fi card; radio to the router; the router to your provider; DNS finds the number; the web server reads the page from its storage; the page travels back; the GPU draws it; you see it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-e">
+  <header><h2 id="h-e">Screen E: on a phone</h2><p>The same viewer at 390 px wide: the model fills the screen and the part card is a bottom sheet. Parts are chips the student swipes through.</p></header>
+  <div class="phone-row">
+    <div class="phone">
+      <div class="bar"><span class="title">Smartphone</span><span class="spacer"></span><button class="btn btn--sm" type="button">Take apart</button></div>
+      <div class="stage" id="stageE"><div class="labels" aria-hidden="true"></div></div>
+      <div class="sheet" id="sheetE"></div>
+    </div>
+    <div class="side-notes">
+      <h3>Small screens</h3>
+      <ul>
+        <li>The model takes the whole width; one finger turns it, two fingers zoom.</li>
+        <li>Parts are a row of chips; the selected one's card rises as a sheet and can be dragged up to read more.</li>
+        <li>The phone model is a generic phone, not one brand's measurements, and says so.</li>
+        <li>Under reduced motion, nothing turns by itself and Take apart jumps straight to the apart view.</li>
+        <li>Without WebGL the Photo view opens instead, with the same parts as numbered pins.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-f">
+  <header><h2 id="h-f">Screen F: the projector</h2><p>One part, one sentence, nothing else: the instructor talks over it. Read from the back of the room. Never anything about a student.</p></header>
+  <div class="frame">
+    <div class="proj">
+      <div class="stage" id="stageF"><div class="labels" aria-hidden="true"></div></div>
+      <div class="say">
+        <span class="chip"><i style="--c: var(--role-process)"></i>Process</span>
+        <h3>CPU</h3>
+        <p>It runs the instructions of every app, one small step at a time, billions of times a second.</p>
+        <span class="foot">Desktop PC · press → for the next part</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="h-g">
+  <header><h2 id="h-g">Screen G: the photo view</h2><p>The 3D view's twin for machines without WebGL, for printing, and when 3D is too busy. A real board, the parts pinned, the same list. Here a microATX board.</p></header>
+  <div class="frame">
+    <div class="flat2d">
+      <div class="photo-map" id="mapG"><img src="photos/board-uatx.jpg" alt="A real microATX motherboard seen from above: the CPU socket in the middle, four memory slots at the bottom, expansion slots on the left, ports along the top."></div>
+      <div class="legend" id="legendG"></div>
+    </div>
+  </div>
+  <p class="note">Photo: Smial, Free Art License, Wikimedia Commons ("Gigabyte GA-H87M-D3H motherboard µATX with Intel Socket 1150").</p>
+</section>
+
+<section class="sec" aria-labelledby="h-m">
+  <header><h2 id="h-m">Content, sizes and pictures</h2><p>Each part is one record of plain data, so wording can be corrected without a build. Sizes come from published standards; photos carry their author and licence.</p></header>
+  <div class="tbl-wrap"><table class="model-tbl">
+    <thead><tr><th>Part</th><th>Role</th><th>Size in the model</th><th>Source</th><th>Lecture</th></tr></thead>
+    <tbody id="sizes"></tbody>
+  </table></div>
+  <p class="note">Open for the instructor (SPEC section 11): standalone or inside labsite; your own photos of the lab PCs opened up; which devices first; which lecture CPU, RAM and the board belong to; hosting.</p>
+</section>
+</div>
+
+<script>
+// Theme: System / Light / Dark (no storage needed for a plan page; the choice lasts for this visit)
+document.querySelectorAll('[data-theme-set]').forEach((b) => b.addEventListener('click', () => {
+  const t = b.dataset.themeSet;
+  if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  document.querySelectorAll('[data-theme-set]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  window.dispatchEvent(new Event('ga-theme'));
+}));
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const token = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// ---------------- Content: roles and parts (plain words, one example each; no analogies, no invented numbers)
+const ROLES = {
+  input: { name: 'Input', v: '--role-input', parts: 'keyboard, touch screen, camera, microphone', lecture: 'Week 2' },
+  process: { name: 'Process', v: '--role-process', parts: 'CPU, graphics card, controllers', lecture: 'Week 2' },
+  memory: { name: 'Memory', v: '--role-memory', parts: 'RAM', lecture: 'Week 3' },
+  storage: { name: 'Storage', v: '--role-storage', parts: 'SSD, hard disk, phone storage', lecture: 'Week 3' },
+  output: { name: 'Output', v: '--role-output', parts: 'screen, speaker, printer', lecture: 'Week 2' },
+  communicate: { name: 'Communicate', v: '--role-communicate', parts: 'Wi-Fi, network port, antenna, router', lecture: 'Week 9' },
+  power: { name: 'Connect and power', v: '--role-power', parts: 'motherboard, battery, power supply', lecture: 'background' },
+};
+const PARTS = {
+  cpu: { name: 'CPU', role: 'process', plain: 'It runs the instructions of every app, one small step at a time. Every click, tap and keypress ends up as work for the CPU.', eg: 'When a game stutters while a video exports, both are waiting for the CPU.', size: 'LGA 1700 package: 45 × 37.5 mm', src: 'Wikipedia "LGA 1700"', lecture: 'Week 2: the processing in input, process, output', photo: { file: 'photos/cpu-i7-12700k.jpg', alt: 'A real Intel Core i7 CPU seen from above: a silver metal lid on a green square board.', credit: 'Photo: Eric Gaba, CC BY-SA 4.0, Wikimedia Commons' } },
+  ram: { name: 'RAM', role: 'memory', plain: 'It holds the apps and files you have open right now, so the CPU can reach them fast. It forgets everything when the power goes off.', eg: 'With 30 browser tabs open, a laptop slows down because its RAM is full.', size: '133.35 × 31.25 mm, 288 contacts', src: 'Wikipedia "DIMM" (JEDEC MO-309E)', lecture: 'Week 3: memory and storage', photo: { file: 'photos/ram-ddr4.jpg', alt: 'A real DDR4 RAM stick: a green board with black memory chips and gold contacts along the bottom.', credit: 'Photo: ElooKoN, CC BY-SA 4.0, Wikimedia Commons' } },
+  ssd: { name: 'SSD (M.2)', role: 'storage', plain: 'It keeps your files and apps when the power is off. It has no moving parts, so it is quick and quiet.', eg: 'Your photos are still there the next morning because they are on storage, not in RAM.', size: 'M.2 2280: 22 × 80 mm', src: 'Wikipedia "M.2"', lecture: 'Week 3: secondary storage' },
+  gpu: { name: 'Graphics card', role: 'process', plain: 'It works out what every pixel on the screen should look like. Games and video editing lean on it most.', eg: 'A 3D game needs a stronger graphics card than a word processor does.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Week 2: output' },
+  board: { name: 'Motherboard', role: 'power', plain: 'Every other part plugs into it. Thin copper lines inside it carry data and power between the parts.', eg: 'A repair shop that "changes the board" replaces this whole part.', size: 'ATX: 305 × 244 mm', src: 'Wikipedia "ATX" (Intel ATX specification)', lecture: 'background for Weeks 2 and 3', photo: { file: 'photos/board-uatx.jpg', alt: 'A real microATX motherboard seen from above.', credit: 'Photo: Smial, Free Art License, Wikimedia Commons' } },
+  battery: { name: 'Clock battery', role: 'power', plain: 'A small coin battery keeps the date and time while the PC is switched off.', eg: 'An old PC that forgets the time every morning often needs a new clock battery.', size: 'CR2032 coin cell: 20 mm across', src: 'approximate in this model', lecture: 'background' },
+  ports: { name: 'Ports (USB, sound)', role: 'power', plain: 'The sockets at the back where cables go in: USB for keyboards, mice and drives, and sound for headphones.', eg: 'Your mouse works once its USB plug is in one of these.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Week 2: input and output devices' },
+  lan: { name: 'Network port', role: 'communicate', plain: 'The socket for a network cable. Through it the PC talks to the lab network and the internet.', eg: 'Lab PCs use a cable here instead of Wi-Fi.', size: 'approximate in this model', src: 'not yet measured', lecture: 'Week 9: networks' },
+  // phone
+  screen: { name: 'Screen', role: 'output', plain: 'It shows you everything, and its touch layer is also an input: it feels where your finger is.', eg: 'A cracked screen can still show a picture but stop feeling your touch.', size: 'generic phone, not one brand', src: '—', lecture: 'Week 2: input and output' },
+  pbattery: { name: 'Battery', role: 'power', plain: 'It stores the energy the phone runs on, and is the largest part inside.', eg: 'An old phone that dies at 30% usually has a worn battery.', size: 'generic phone, not one brand', src: '—', lecture: 'background' },
+  logic: { name: 'Main board', role: 'process', plain: 'A small board holding the processor, the memory and the storage chips, all in one piece.', eg: 'The phone\'s CPU, RAM and storage are chips on this board.', size: 'generic phone, not one brand', src: '—', lecture: 'Weeks 2 and 3' },
+  camera: { name: 'Camera', role: 'input', plain: 'It turns light into a picture made of numbers that the processor can save.', eg: 'Scanning a QR code to pay starts with the camera.', size: 'generic phone, not one brand', src: '—', lecture: 'Week 2: input' },
+  back: { name: 'Back cover', role: 'power', plain: 'It closes the phone and protects the parts. Under it are the antennas for Wi-Fi and the mobile network.', eg: 'Some phone cases block the wireless charger; it sits right behind this cover.', size: 'generic phone, not one brand', src: '—', lecture: 'background' },
+};
+const roleVar = (r) => `var(${ROLES[r].v})`;
+
+// Roles section
+document.getElementById('roles').innerHTML = Object.values(ROLES).map((r) =>
+  `<div class="role-card" style="--c: var(${r.v})"><div class="sw"></div><b>${r.name}</b><span>${r.parts}</span><span class="tag">${r.lecture}</span></div>`).join('');
+
+function cardHTML(id) {
+  const p = PARTS[id], r = ROLES[p.role];
+  const photo = p.photo ? `<figure class="photo"><img src="${p.photo.file}" alt="${p.photo.alt}"><figcaption>${p.photo.credit}</figcaption></figure>`
+    : `<figure class="photo"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'/%3E"><figcaption>Photo to come: the instructor's own, of the lab PCs opened up.</figcaption></figure>`;
+  return `${photo}<div class="name"><span class="chip" style="justify-self:start"><i style="--c: var(${r.v})"></i>${r.name}</span><h3>${p.name}</h3></div>
+    <p class="what">${p.plain}</p><div class="eg"><b>For example</b>${p.eg}</div>
+    <div class="size"><span>${p.size}</span><span class="muted">${p.src}</span></div><span class="tag">${p.lecture}</span>`;
+}
+document.getElementById('cardDemo').innerHTML = cardHTML('cpu');
+
+// Sizes table
+document.getElementById('sizes').innerHTML = ['ram', 'cpu', 'board', 'ssd', 'battery'].map((id) => {
+  const p = PARTS[id]; return `<tr><td>${p.name}</td><td><span class="chip"><i style="--c: ${roleVar(p.role)}"></i>${ROLES[p.role].name}</span></td><td>${p.size}</td><td>${p.src}</td><td>${p.lecture}</td></tr>`; }).join('');
+
+// ---------------- Materials (realistic, theme independent) and the ink outline (themed)
+const M = {
+  pcb: new THREE.MeshStandardMaterial({ color: 0x1f6b3c, roughness: 0.55, metalness: 0.05 }),
+  board: new THREE.MeshStandardMaterial({ color: 0x23211f, roughness: 0.6 }),
+  chip: new THREE.MeshStandardMaterial({ color: 0x18181a, roughness: 0.45 }),
+  gold: new THREE.MeshStandardMaterial({ color: 0xd8a83a, roughness: 0.3, metalness: 0.9 }),
+  alu: new THREE.MeshStandardMaterial({ color: 0xc4c8ce, roughness: 0.32, metalness: 0.85 }),
+  slot: new THREE.MeshStandardMaterial({ color: 0x2d2f36, roughness: 0.6 }),
+  slotGrey: new THREE.MeshStandardMaterial({ color: 0x8a8e96, roughness: 0.6 }),
+  label: new THREE.MeshStandardMaterial({ color: 0xece9e2, roughness: 0.8 }),
+  substrate: new THREE.MeshStandardMaterial({ color: 0x2f5d2c, roughness: 0.6 }),
+  heat: new THREE.MeshStandardMaterial({ color: 0x3a3d44, roughness: 0.4, metalness: 0.6 }),
+  gpu: new THREE.MeshStandardMaterial({ color: 0x2a2c31, roughness: 0.5, metalness: 0.3 }),
+  fan: new THREE.MeshStandardMaterial({ color: 0x15161a, roughness: 0.7 }),
+  cap: new THREE.MeshStandardMaterial({ color: 0x9aa0a8, roughness: 0.35, metalness: 0.7 }),
+  glass: new THREE.MeshStandardMaterial({ color: 0x0e1116, roughness: 0.15, metalness: 0.2 }),
+  battery: new THREE.MeshStandardMaterial({ color: 0x2b2d33, roughness: 0.6 }),
+  backc: new THREE.MeshStandardMaterial({ color: 0x9fb4c8, roughness: 0.35, metalness: 0.3 }),
+  lens: new THREE.MeshStandardMaterial({ color: 0x050608, roughness: 0.1, metalness: 0.5 }),
+  white: new THREE.MeshStandardMaterial({ color: 0xf1ece4, roughness: 0.7 }),
+};
+const INK = new THREE.LineBasicMaterial({ color: 0x1e1b17 });
+function themeInk() { INK.color.set(token('--edge') || '#1e1b17'); }
+themeInk();
+window.addEventListener('ga-theme', themeInk);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeInk);
+
+function box(w, h, d, mat, x = 0, y = 0, z = 0, edges = true) {
+  const g = new THREE.BoxGeometry(w, h, d), m = new THREE.Mesh(g, mat);
+  m.position.set(x, y, z);
+  if (edges) m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 25), INK));
+  return m;
+}
+function cyl(r, h, mat, x = 0, y = 0, z = 0, seg = 28) {
+  const g = new THREE.CylinderGeometry(r, r, h, seg), m = new THREE.Mesh(g, mat);
+  m.position.set(x, y, z); m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 40), INK));
+  return m;
+}
+/** A part: a group that knows its id, where it sits, and which way it lifts when taken apart. */
+function part(id, children, home, lift, anchor = [0, 0, 0]) {
+  const g = new THREE.Group();
+  children.forEach((c) => g.add(c));
+  g.position.copy(home);
+  g.userData = { id, home: home.clone(), lift, anchor: new THREE.Vector3(...anchor) };
+  return g;
+}
+
+// ---------------- Models (mm). RAM, CPU, motherboard per SPEC section 6; the rest approximate and marked so.
+// DDR4 DIMM standing up: x along its 133.35 mm length, y up its 31.25 mm height, z through its 1.27 mm board.
+function buildRAM(withLabels) {
+  const L = 133.35, H = 31.25, T = 1.27, g = new THREE.Group(), notchX = 133.35 / 2 - 71.85; // notch position approximate
+  g.add(box(L, H - 4, T, M.pcb, 0, (H - 4) / 2 + 4, 0));
+  const leftW = L / 2 + notchX - 0.5, rightW = L / 2 - notchX - 0.5;
+  g.add(box(leftW, 4, T, M.pcb, -L / 2 + leftW / 2, 2, 0));
+  g.add(box(rightW, 4, T, M.pcb, L / 2 - rightW / 2, 2, 0));
+  for (let i = 0; i < 8; i++) {                              // memory chips, about 10 × 12 mm (approximate)
+    const x = -L / 2 + 12 + i * 15.2 + (i >= 4 ? 6 : 0) - 1.5;
+    g.add(box(10, 12, 1.1, M.chip, x, 17, T / 2 + 0.55));
+  }
+  g.add(box(26, 9, 0.2, M.label, L / 2 - 20, 26.5, T / 2 + 1.2, false));
+  const pad = new THREE.BoxGeometry(0.6, 3, 0.05), n = 144, inst = new THREE.InstancedMesh(pad, M.gold, n * 2), mtx = new THREE.Matrix4();
+  let k = 0;
+  for (let side of [1, -1]) for (let i = 0; i < n; i++) {
+    let x = -L / 2 + 3.6 + i * 0.85; if (x > notchX - 0.4) x += 1.2;
+    mtx.makeTranslation(x, 1.8, side * (T / 2 + 0.03)); inst.setMatrixAt(k++, mtx);
+  }
+  g.add(inst);
+  if (withLabels) g.userData.labels = [
+    { text: 'Memory chips', role: 'memory', at: [-L / 2 + 27, 23.5, T / 2 + 1.2] },
+    { text: 'Gold contacts', role: 'memory', at: [-L / 2 + 14, 0, T / 2], below: true },
+    { text: 'Notch: fits one way only', role: 'memory', at: [notchX, 0, 0], below: true },
+    { text: 'Label', role: 'memory', at: [L / 2 - 20, 31, T / 2 + 1.2] },
+  ];
+  return g;
+}
+// CPU, LGA 1700: 45 × 37.5 mm package lying flat; heat spreader size approximate.
+function buildCPU() {
+  const g = new THREE.Group();
+  g.add(box(45, 1.2, 37.5, M.substrate, 0, 0.6, 0));
+  g.add(box(36, 2.6, 30, M.alu, 0, 2.5, 0));
+  g.add(box(26, 0.15, 7, M.heat, 0, 3.86, 4, false));      // printed marking on the lid
+  return g;
+}
+function buildBoard() {
+  const scene = new THREE.Group(), parts = [];
+  const add = (id, kids, home, lift, anchor) => { const p = part(id, kids, home, lift, anchor); parts.push(p); scene.add(p); return p; };
+  // The board: ATX 305 × 244 mm, 1.6 mm thick. Origin at its centre; x across 305, z across 244, y up.
+  const boardKids = [box(305, 1.6, 244, M.board, 0, -0.8, 0)];
+  const socket = box(56, 4, 50, M.slotGrey, -40, 2, -42); boardKids.push(socket);
+  [[-40, -84, 70, 14], [-90, -42, 14, 60]].forEach(([x, z, w, d]) => boardKids.push(box(w, 18, d, M.heat, x, 9, z)));     // VRM heatsinks (approximate)
+  for (let i = 0; i < 4; i++) boardKids.push(box(7, 7.5, 140, i % 2 ? M.slotGrey : M.slot, 40 + i * 9.5, 3.75, -30));     // DIMM slots
+  boardKids.push(box(89, 11, 7.5, M.slot, -40, 5.5, 40));                                                                 // PCIe x16 slot
+  boardKids.push(box(89, 11, 7.5, M.slot, -40, 5.5, 85));
+  boardKids.push(box(42, 10, 42, M.heat, 70, 5, 75));                                                                      // chipset heatsink
+  boardKids.push(box(15, 13, 52, M.white, 140, 6.5, -20));                                                                 // 24-pin power
+  for (let i = 0; i < 6; i++) boardKids.push(cyl(3.2, 9, M.cap, -2 + i * 8, 4.5, -82));
+  boardKids.push(box(8, 4, 22, M.slot, -40, 2, 0));                                                                        // M.2 connector
+  add('board', boardKids, new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0), [-120, 2, 100]);
+  // CPU in its socket
+  const cpu = buildCPU(); add('cpu', [cpu], new THREE.Vector3(-40, 4, -42), new THREE.Vector3(0, 70, 0), [0, 4, 0]);
+  // Two RAM sticks standing in slots 1 and 3, turned so their length runs along z
+  for (const [i, sx] of [[0, 40], [1, 59]]) {
+    const r = buildRAM(false); r.rotation.y = Math.PI / 2;
+    add(i ? 'ram' : 'ram', [r], new THREE.Vector3(sx, 7.5, -30), new THREE.Vector3(0, 60 + i * 6, 0), [0, 31, 0]);
+  }
+  // M.2 SSD, 22 × 80 mm, lying flat, then the graphics card (approximate) standing in the PCIe slot
+  const ssd = new THREE.Group(); ssd.add(box(80, 0.8, 22, M.pcb, 0, 0.4, 0)); ssd.add(box(30, 1.2, 14, M.chip, -10, 1.4, 0)); ssd.add(box(12, 1.2, 12, M.chip, 22, 1.4, 0)); ssd.add(box(14, 0.2, 9, M.label, 8, 1.9, 0, false));
+  add('ssd', [ssd], new THREE.Vector3(4, 3, 0), new THREE.Vector3(0, 46, 0), [0, 2, 0]);
+  const gpu = new THREE.Group(); gpu.add(box(240, 110, 2, M.pcb, 0, 55, -6)); gpu.add(box(240, 104, 32, M.gpu, 0, 56, 12));
+  gpu.add(cyl(36, 1.5, M.fan, -55, 56, 28.8).rotateX(Math.PI / 2)); gpu.add(cyl(36, 1.5, M.fan, 40, 56, 28.8).rotateX(Math.PI / 2));
+  add('gpu', [gpu], new THREE.Vector3(-30, 11, 40), new THREE.Vector3(0, 190, 30), [0, 112, 0]);
+  add('battery', [cyl(10, 3.2, M.cap)], new THREE.Vector3(10, 1.6, 60), new THREE.Vector3(0, 40, 0), [0, 2, 0]);
+  // Rear ports along the back edge (x = -152): USB and sound block, and the network port
+  const io = new THREE.Group(); io.add(box(20, 40, 120, M.alu, 0, 20, 0)); for (let i = 0; i < 4; i++) io.add(box(6, 6, 14, M.slot, -10.5, 8 + i * 8, -40));
+  add('ports', [io], new THREE.Vector3(-142, 0, -40), new THREE.Vector3(-50, 30, 0), [0, 40, 0]);
+  const lan = new THREE.Group(); lan.add(box(20, 16, 17, M.alu, 0, 8, 0)); lan.add(box(4, 11, 13, M.slot, -9, 8, 0));
+  add('lan', [lan], new THREE.Vector3(-142, 0, 40), new THREE.Vector3(-50, 30, 0), [0, 16, 0]);
+  return { scene, parts };
+}
+// A generic phone (not one brand's sizes; marked so): parts stacked front to back along y when taken apart.
+function buildPhone() {
+  const scene = new THREE.Group(), parts = [];
+  const add = (id, kids, y, lift, anchor) => { const p = part(id, kids, new THREE.Vector3(0, y, 0), new THREE.Vector3(0, lift, 0), anchor); parts.push(p); scene.add(p); };
+  add('back', [box(72, 1.2, 150, M.backc)], 0, -38, [30, 0, 60]);
+  const cam = new THREE.Group(); cam.add(box(24, 2, 24, M.chip, 0, 0, 0)); cam.add(cyl(5, 2.5, M.lens, -5, 1, -5)); cam.add(cyl(5, 2.5, M.lens, 5, 1, 5));
+  add('camera', [cam], 2, -14, [0, 2, 0]);
+  scene.children.at(-1).position.set(-18, 2, -55); scene.children.at(-1).userData.home.set(-18, 2, -55);
+  add('pbattery', [box(60, 4, 85, M.battery)], 3.2, 8, [22, 2, 34]);
+  const logic = new THREE.Group(); logic.add(box(66, 1, 40, M.pcb, 0, 0, 0)); logic.add(box(14, 1.5, 14, M.chip, -12, 1, 0)); logic.add(box(10, 1.5, 12, M.chip, 8, 1, 6));
+  add('logic', [logic], 6, 30, [0, 1, 0]);
+  scene.children.at(-1).position.set(0, 6, -50); scene.children.at(-1).userData.home.set(0, 6, -50);
+  add('screen', [box(72, 1.4, 150, M.glass)], 8, 56, [-30, 1, -60]);
+  return { scene, parts };
+}
+function buildLaptop() {
+  const g = new THREE.Group();
+  g.add(box(320, 16, 220, M.alu, 0, 8, 0));
+  for (let r = 0; r < 5; r++) for (let c = 0; c < 13; c++) g.add(box(17, 1.5, 15, M.chip, -112 + c * 18.7, 16.75, -60 + r * 18, false));
+  g.add(box(110, 0.8, 65, M.slotGrey, 0, 16.4, 70, false));
+  const lid = new THREE.Group(); lid.add(box(320, 210, 7, M.alu, 0, 105, 0)); lid.add(box(296, 186, 0.6, M.glass, 0, 108, 3.8, false));
+  lid.position.set(0, 16, -108); lid.rotation.x = -0.22; g.add(lid);
+  return g;
+}
+function buildRouter() {
+  const g = new THREE.Group();
+  g.add(box(220, 34, 150, M.white, 0, 17, 0));
+  for (let i = 0; i < 5; i++) g.add(box(5, 1, 5, new THREE.MeshStandardMaterial({ color: 0x3c8a47, emissive: 0x2b6a35, emissiveIntensity: 0.8 }), -60 + i * 14, 34.6, 70, false));
+  for (const x of [-80, 0, 80]) { const a = cyl(5, 130, M.slot, x, 34 + 65, -70); a.rotation.z = x === 0 ? 0 : x < 0 ? 0.18 : -0.18; g.add(a); }
+  return g;
+}
+
+// ---------------- A stage: renderer, camera, controls, labels, picking, explode, render on demand
+let glOK = true;
+try { const c = document.createElement('canvas'); glOK = !!(c.getContext('webgl2') || c.getContext('webgl')); } catch { glOK = false; }
+const stages = [];
+// A theme change repaints every stage (outlines and themed colours) once the new tokens apply.
+const redraw = () => requestAnimationFrame(() => stages.forEach((st) => { st.dirty = true; }));
+window.addEventListener('ga-theme', redraw); matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+class Stage {
+  constructor(host, { object, parts = [], ortho = false, camPos = [300, 260, 360], target = [0, 0, 0], fit = 1, turn = true, labels = [], onPick = null, zoom = true }) {
+    this.host = host; this.parts = parts; this.labels = labels; this.onPick = onPick; this.t = 0; this.tGoal = 0; this.sel = null;
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    host.prepend(this.renderer.domElement);
+    this.scene = new THREE.Scene();
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8070, 1.6));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(200, 400, 260); this.scene.add(sun);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.6); fill.position.set(-300, 120, -200); this.scene.add(fill);
+    this.scene.add(object);
+    this.ortho = ortho; this.fit = fit;
+    this.camera = ortho ? new THREE.OrthographicCamera(-1, 1, 1, -1, -5000, 5000) : new THREE.PerspectiveCamera(30, 1, 1, 8000);
+    this.camera.position.set(...camPos);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.target.set(...target); this.controls.enableDamping = !REDUCE; this.controls.enableZoom = zoom;
+    this.controls.autoRotate = turn && !REDUCE; this.controls.autoRotateSpeed = 0.6;
+    this.controls.addEventListener('start', () => { this.controls.autoRotate = false; });
+    this.controls.addEventListener('change', () => this.dirty = true);
+    this.layer = host.querySelector('.labels');
+    this.labelEls = labels.map((l) => { const e = document.createElement('span'); e.className = l.below ? 'lbl below' : 'lbl'; e.style.setProperty('--c', roleVar(l.role)); e.innerHTML = `<i></i>${l.text}`; this.layer.append(e); return e; });
+    // Picking: a click that did not drag
+    let down = null;
+    this.renderer.domElement.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
+    this.renderer.domElement.addEventListener('pointerup', (e) => {
+      if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5 || !this.onPick) return;
+      const r = this.renderer.domElement.getBoundingClientRect(), ray = new THREE.Raycaster();
+      ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), this.camera);
+      const hit = ray.intersectObjects(this.parts, true).find((h) => h.object.isMesh);
+      let o = hit?.object; while (o && !o.userData.id) o = o.parent;
+      if (o) this.onPick(o.userData.id);
+    });
+    new ResizeObserver(() => this.resize()).observe(host);
+    new IntersectionObserver(([en]) => { this.visible = en.isIntersecting; }).observe(host);
+    this.resize(); stages.push(this);
+  }
+  resize() {
+    const w = this.host.clientWidth, h = this.host.clientHeight;
+    if (!w || !h) return;
+    this.renderer.setSize(w, h, false);
+    if (this.ortho) { const s = this.fit; this.camera.left = -s * w / h; this.camera.right = s * w / h; this.camera.top = s; this.camera.bottom = -s; }
+    else this.camera.aspect = w / h;
+    this.camera.updateProjectionMatrix(); this.dirty = true;
+  }
+  select(id) {
+    this.sel = id;
+    for (const p of this.parts) {
+      const on = p.userData.id === id;
+      p.traverse((o) => { if (o.isMesh && o.material?.emissive) { if (!o.userData.own) { o.material = o.material.clone(); o.userData.own = true; } o.material.emissive.set(on ? 0x3c8a47 : 0x000000); o.material.emissiveIntensity = on ? 0.55 : 0; } });
+    }
+    this.dirty = true;
+  }
+  explode(t) { this.tGoal = t; if (REDUCE) this.t = t; this.dirty = true; }
+  frame() {
+    if (!this.visible) return;
+    if (Math.abs(this.t - this.tGoal) > 0.001) { this.t += (this.tGoal - this.t) * 0.12; this.dirty = true; } else this.t = this.tGoal;
+    for (const p of this.parts) p.position.copy(p.userData.home).addScaledVector(p.userData.lift, this.t);
+    if (this.controls.autoRotate) this.dirty = true;
+    this.controls.update();
+    if (!this.dirty) return;
+    this.dirty = false;
+    this.renderer.render(this.scene, this.camera);
+    // Labels: projected anchors (parts first, then fixed points)
+    const r = this.renderer.domElement.getBoundingClientRect(), v = new THREE.Vector3();
+    this.labels.forEach((l, i) => {
+      if (l.part) { const p = this.parts.find((x) => x.userData.id === l.part); v.copy(p.userData.anchor).applyMatrix4(p.matrixWorld); }
+      else v.set(...l.at).applyMatrix4(l.obj.matrixWorld);
+      v.project(this.camera);
+      const el = this.labelEls[i];
+      el.style.left = `${(v.x + 1) / 2 * r.width}px`; el.style.top = `${(1 - v.y) / 2 * r.height + (l.below ? 14 : -14)}px`;
+      el.classList.toggle('sel', !!l.part && l.part === this.sel);
+      el.style.display = !l.part || l.always || l.part === this.sel ? '' : 'none';
+    });
+  }
+}
+function loop() { for (const s of stages) s.frame(); requestAnimationFrame(loop); }
+
+function noGL(host) { host.insertAdjacentHTML('beforeend', '<div class="nogl">This browser cannot draw 3D (WebGL is off). The app opens the Photo view instead, with the same parts.</div>'); }
+
+// ---------------- Screen B: the anatomy viewer
+const ORDER_B = ['cpu', 'gpu', 'ram', 'ssd', 'lan', 'board', 'ports', 'battery'];
+const cardB = document.getElementById('cardB');
+let stageB;
+function selectB(id) {
+  document.querySelectorAll('#plistB button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === id)));
+  cardB.innerHTML = cardHTML(id);
+  stageB?.select(id);
+}
+const byRole = {};
+ORDER_B.forEach((id) => (byRole[PARTS[id].role] ??= []).push(id));
+document.getElementById('plistB').innerHTML = Object.entries(byRole).map(([r, ids]) =>
+  `<div><h4 style="--c: ${roleVar(r)}"><i></i>${ROLES[r].name}</h4><ul>${ids.map((id) => `<li><button type="button" data-part="${id}" aria-pressed="false">${PARTS[id].name}</button></li>`).join('')}</ul></div>`).join('');
+document.querySelectorAll('#plistB button').forEach((b) => b.addEventListener('click', () => selectB(b.dataset.part)));
+
+if (glOK) {
+  const B = buildBoard();
+  stageB = new Stage(document.getElementById('stageB'), { object: B.scene, parts: B.parts, camPos: [330, 500, 640], target: [0, 60, 30], onPick: selectB,
+    labels: [{ part: 'cpu', text: 'CPU', role: 'process', always: true }, { part: 'ram', text: 'RAM', role: 'memory', always: true }, { part: 'gpu', text: 'Graphics card', role: 'process', always: true },
+      { part: 'ssd', text: 'SSD', role: 'storage', always: true }, { part: 'board', text: 'Motherboard', role: 'power' }, { part: 'battery', text: 'Clock battery', role: 'power' },
+      { part: 'ports', text: 'Ports', role: 'power' }, { part: 'lan', text: 'Network port', role: 'communicate' }] });
+  const ex = document.getElementById('explodeB');
+  stageB.explode(+ex.value);
+  ex.addEventListener('input', () => stageB.explode(+ex.value));
+} else noGL(document.getElementById('stageB'));
+selectB('ram');
+
+// ---------------- Screen C: RAM close-up
+if (glOK) {
+  const ram = buildRAM(true);
+  ram.position.set(0, -15, 0);
+  const labels = ram.userData.labels.map((l) => ({ ...l, obj: ram }));
+  new Stage(document.getElementById('stageC'), { object: ram, camPos: [40, 60, 210], target: [0, 0, 0], labels });
+} else noGL(document.getElementById('stageC'));
+
+// ---------------- Screen E: phone
+const ORDER_E = ['screen', 'logic', 'pbattery', 'camera', 'back'];
+const sheetE = document.getElementById('sheetE');
+let stageE;
+function selectE(id) {
+  const p = PARTS[id], r = ROLES[p.role];
+  sheetE.innerHTML = `<div class="grip"></div><div class="chips" role="group" aria-label="Parts">${ORDER_E.map((x) => `<button type="button" class="chip" data-part="${x}" aria-pressed="${x === id}"><i style="--c: ${roleVar(PARTS[x].role)}"></i>${PARTS[x].name}</button>`).join('')}</div>
+    <div><span class="chip"><i style="--c: var(${r.v})"></i>${r.name}</span></div><h3>${p.name}</h3><p style="font: var(--t-body-sm)">${p.plain}</p>`;
+  sheetE.querySelectorAll('[data-part]').forEach((b) => b.addEventListener('click', () => selectE(b.dataset.part)));
+  stageE?.select(id);
+}
+if (glOK) {
+  const P = buildPhone();
+  stageE = new Stage(document.getElementById('stageE'), { object: P.scene, parts: P.parts, camPos: [250, 230, 290], target: [0, 10, 0], onPick: selectE, turn: true,
+    labels: ORDER_E.map((id) => ({ part: id, text: PARTS[id].name, role: PARTS[id].role, always: true })) });
+  stageE.explode(1);
+} else noGL(document.getElementById('stageE'));
+selectE('pbattery');
+
+// ---------------- Screen F: projector (the CPU alone, large)
+if (glOK) {
+  const c = buildCPU(); c.scale.setScalar(1);
+  new Stage(document.getElementById('stageF'), { object: c, camPos: [55, 60, 70], target: [0, 1, 0], zoom: false });
+} else noGL(document.getElementById('stageF'));
+
+// ---------------- Screen D: journey scene, isometric (orthographic) blocks in Archboard's style
+function buildJourney() {
+  const g = new THREE.Group(), themed = [];
+  // Colours come from the tokens (so the scene follows the theme), as Archboard's blocks do.
+  const flat = (v) => { const m = new THREE.MeshStandardMaterial({ roughness: 0.9 }); themed.push([m, v]); return m; };
+  const plate = (w, d, x, z, v) => g.add(box(w, 6, d, flat(v), x, -3, z));
+  plate(560, 220, 40, 0, '--sheet');                                   // the internet's floor
+  plate(170, 170, 290, 0, '--sunken');                                 // the data centre
+  const node = (w, h, d, x, z, v) => { const b = box(w, h, d, flat(v), x, h / 2, z); g.add(b); return [x, h, z]; };
+  const nodes = {
+    laptop: node(48, 6, 34, -260, 0, '--role-output'),
+    router: node(46, 16, 32, -170, 0, '--role-communicate'),
+    isp: node(56, 60, 56, -60, 0, '--role-communicate'),
+    dns: node(40, 44, 40, 60, -40, '--role-communicate'),
+    web: node(40, 76, 40, 260, -30, '--role-process'),
+    store: node(40, 46, 40, 320, 40, '--role-storage'),
+  };
+  const lid = box(48, 30, 2, flat('--role-output'), -260, 21, -16); lid.rotation.x = -0.25; g.add(lid);
+  const paint = () => themed.forEach(([m, v]) => m.color.set(token(v) || '#cccccc'));
+  paint(); window.addEventListener('ga-theme', () => requestAnimationFrame(paint)); matchMedia('(prefers-color-scheme: dark)').addEventListener('change', paint);
+  const way = [[-260, 0], [-170, 0], [-60, 0], [60, -40], [260, -30]];
+  const pts = way.map(([x, z]) => new THREE.Vector3(x, 4, z));
+  const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineDashedMaterial({ color: 0x9e4316, dashSize: 8, gapSize: 6 }));
+  line.computeLineDistances(); g.add(line);
+  const packet = new THREE.Mesh(new THREE.SphereGeometry(9, 20, 14), new THREE.MeshStandardMaterial({ color: 0xe0703a, emissive: 0xe0703a, emissiveIntensity: 0.25 }));
+  g.add(packet);
+  g.userData = { nodes, packet, seg: [pts[2], pts[3]] };
+  return g;
+}
+if (glOK) {
+  const J = buildJourney();
+  const lab = (text, role, at) => ({ text, role, at, obj: J });
+  const s = new Stage(document.getElementById('stageD'), { object: J, ortho: true, fit: 190, camPos: [400, 400, 400], target: [30, 0, 0], turn: false, zoom: false,
+    labels: [lab('Your laptop', 'output', [-260, 30, 0]), lab('Wi-Fi router', 'communicate', [-170, 22, 0]), lab('Internet provider', 'communicate', [-60, 66, 0]),
+      lab('DNS server', 'communicate', [60, 50, -40]), lab('Web server', 'process', [260, 82, -30]), lab('Storage', 'storage', [320, 52, 40])] });
+  s.labelEls.forEach((e, i) => { if (i === 3) e.classList.add('sel'); });
+  s.controls.enableRotate = false;
+  const { packet, seg } = J.userData;
+  const start = performance.now();
+  const tick = () => { const k = REDUCE ? 0.6 : ((performance.now() - start) / 1600) % 1; packet.position.lerpVectors(seg[0], seg[1], k).setY(14); s.dirty = true; requestAnimationFrame(tick); };
+  tick();
+} else noGL(document.getElementById('stageD'));
+
+// ---------------- Screen A: device thumbnails, rendered once to pictures (one renderer, no live contexts)
+const DEVICES = [
+  { id: 'pc', name: 'Desktop PC', text: 'The lab PCs. The motherboard and what plugs into it.', roles: ['process', 'memory', 'storage'], build: () => buildBoard().scene, cam: [300, 330, 420], target: [0, 20, 0] },
+  { id: 'laptop', name: 'Laptop', text: 'The same parts as the PC, folded into one thin box.', roles: ['input', 'output', 'storage'], build: buildLaptop, cam: [380, 330, 420], target: [0, 70, 0] },
+  { id: 'phone', name: 'Smartphone', text: 'Screen, battery, camera, and a board with everything else.', roles: ['input', 'output', 'communicate'], build: () => { const p = buildPhone(); p.parts.forEach((x) => x.position.copy(x.userData.home).addScaledVector(x.userData.lift, 0.6)); return p.scene; }, cam: [170, 150, 200], target: [0, 5, 0] },
+  { id: 'router', name: 'Wi-Fi router', text: 'Where your room meets the internet.', roles: ['communicate', 'power'], build: buildRouter, cam: [260, 220, 300], target: [0, 50, 0] },
+];
+const JOURNEYS = [
+  ['Press a key', 'Week 2', 'Keyboard, CPU, RAM, graphics card, screen.', 'Inside the laptop'],
+  ['Save a photo to the cloud', 'Weeks 1 and 3', 'Camera, storage, Wi-Fi, router, a data centre.', 'Phone to data centre'],
+  ['Open a website', 'Week 5', 'Wi-Fi card, router, provider, DNS, web server, and back.', 'Laptop to data centre'],
+  ['Pay with a QR code', 'Week 8', 'Camera, app, mobile network, bank, the shop\'s phone.', 'Phone to bank'],
+];
+function renderThumbs() {
+  let urls = {};
+  if (glOK) {
+    const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); r.setPixelRatio(2); r.setSize(300, 166);
+    for (const d of DEVICES) {
+      const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x8a8070, 1.6)); const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(200, 400, 260); sc.add(sun);
+      sc.add(d.build());
+      const cam = new THREE.PerspectiveCamera(30, 300 / 166, 1, 8000); cam.position.set(...d.cam); cam.lookAt(...d.target);
+      r.render(sc, cam); urls[d.id] = r.domElement.toDataURL('image/png');
+    }
+    r.dispose();
+  }
+  document.getElementById('devices').innerHTML = DEVICES.map((d) => `<button class="device" type="button"><span class="thumb">${urls[d.id] ? `<img src="${urls[d.id]}" alt="">` : ''}</span>
+    <span class="txt"><b>${d.name}</b><span>${d.text}</span><span class="chips">${d.roles.map((r) => `<span class="chip"><i style="--c: ${roleVar(r)}"></i>${ROLES[r].name}</span>`).join('')}</span></span></button>`).join('');
+}
+renderThumbs();
+window.addEventListener('ga-theme', renderThumbs);
+document.getElementById('journeys').innerHTML = JOURNEYS.map(([t, w, p, s]) => `<a class="journey" href="#h-d" style="text-decoration:none; color:inherit"><span class="tag">${w}</span><b>${t}</b><p>${p}</p><span class="path">${s}</span></a>`).join('');
+
+// ---------------- Screen G: the photo view (pins measured on the photo, percent of its width and height)
+const PINS = [['cpu', 62.5, 45.5], ['ram', 63.5, 77.8], ['gpu', 32.7, 38.4], ['battery', 41.3, 58.6], ['ports', 63.5, 8], ['lan', 50.4, 7.7], ['board', 86, 60]];
+const mapG = document.getElementById('mapG'), legendG = document.getElementById('legendG');
+const nameG = { gpu: 'Graphics card slot', ram: 'RAM slots', cpu: 'CPU socket' };
+PINS.forEach(([id, x, y], i) => mapG.insertAdjacentHTML('beforeend', `<button class="pin" type="button" data-part="${id}" style="left:${x}%; top:${y}%; --c: ${roleVar(PARTS[id].role)}" aria-label="${nameG[id] || PARTS[id].name}" aria-pressed="false">${i + 1}</button>`));
+legendG.innerHTML = `<h3 style="margin-bottom:4px">Parts on this board</h3>` + PINS.map(([id], i) => `<button type="button" data-part="${id}" aria-pressed="false" style="--c: ${roleVar(PARTS[id].role)}"><span>${i + 1}</span><span>${nameG[id] || PARTS[id].name}</span><small>${ROLES[PARTS[id].role].name}</small></button>`).join('');
+const pickG = (id) => document.querySelectorAll('#mapG [data-part], #legendG [data-part]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === id)));
+document.querySelectorAll('#mapG [data-part], #legendG [data-part]').forEach((b) => b.addEventListener('click', () => pickG(b.dataset.part)));
+pickG('cpu');
+
+loop();
+</script>
