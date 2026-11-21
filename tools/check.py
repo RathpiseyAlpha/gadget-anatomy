@@ -89,23 +89,28 @@ try:
     time.sleep(0.3)
     check("the down arrow moves to the next part in the list (grouped by job: Main board, then Screen)", pressed(p) == "phone-screen" and p.js("return document.activeElement.dataset.part") == "phone-screen", pressed(p))
 
-    # A click on the model picks the part under the pointer: aim just under the Screen label's stem.
+    # A click on the model picks the part under the pointer: aim just under the dot where the Screen label's line starts.
     p.js("document.querySelector('.plist [data-part=\"phone-sim\"]').click();")
-    time.sleep(0.6)
-    pos = p.js("""const l = [...document.querySelectorAll('.lbl')].find(e => e.textContent === 'Screen' && e.style.display !== 'none'); if (!l) return null;
-      const r = l.getBoundingClientRect(); return [r.left + r.width / 2, r.bottom + 22];""")
+    time.sleep(3.0)
+    pos = p.js("""const l = [...document.querySelectorAll('.lbl')].find(e => e.querySelector('.t').firstChild.textContent === 'Screen' && e.style.display !== 'none'); if (!l) return null;
+      const r = document.getElementById('stage').getBoundingClientRect(); return [r.left + Number(l.dataset.ax), r.top + Number(l.dataset.ay) + 6];""")
     if pos:
         click_at(p, pos[0], pos[1])
         time.sleep(0.5)
     check("clicking the screen in 3D selects the screen", pos is not None and pressed(p) == "phone-screen", f"{pressed(p)} at {pos}")
 
-    before = p.js("return document.getElementById('apart').textContent")
+    before = p.js("return [document.getElementById('apart').textContent, Number(document.getElementById('apartRange').value)]")
     p.js("document.getElementById('apart').click();")
-    after = p.js("return [document.getElementById('apart').textContent, document.getElementById('apartRange').value]")
+    label_now = p.js("return document.getElementById('apart').textContent")
+    time.sleep(0.8)
+    mid = p.js("return Number(document.getElementById('apartRange').value)")
+    wait(p, "return Number(document.getElementById('apartRange').value) === 0", 5)
+    after = p.js("return [document.getElementById('apart').textContent, Number(document.getElementById('apartRange').value)]")
     p.js("document.body.focus();")
     key(p, "t", "KeyT", 84)
     again = p.js("return document.getElementById('apart').textContent")
-    check("Take apart / Put together, and the T key, open and close the model", before == "Put together" and after == ["Take apart", "0"] and again == "Put together", f"{before} -> {after} -> {again}")
+    check("the model opens taken apart; Put together plays it back (the slider follows), and the T key takes it apart again",
+          before == ["Put together", 1] and label_now == "Take apart" and 0 < mid < 1 and after == ["Take apart", 0] and again == "Put together", f"{before} -> {label_now}, {mid} -> {after} -> {again}")
 
     p.js("document.querySelector('[data-mode=photo]').click();")
     time.sleep(0.6)
@@ -129,8 +134,8 @@ try:
     check("picking SIM tray in the legend lights it on both photos", p.js("return [...document.querySelectorAll('.cmp .pin[aria-pressed=true]')].map(b => b.dataset.part).join()") == "phone-sim,phone-sim")
 
     p.goto(URL + "#/x/pc-ram", wait=2.5)
-    x = p.js("return {canvas: !!document.querySelector('.stage canvas'), labels: [...document.querySelectorAll('.lbl')].filter(l => l.style.display !== 'none').map(l => l.textContent), measure: document.querySelector('.measure')?.textContent || ''};")
-    check("the RAM close-up turns the stick in 3D with its pieces labelled and its measured size", x["canvas"] and len(x["labels"]) == 4 and "Notch: fits one way only" in x["labels"] and "133.35 mm" in x["measure"], json.dumps(x)[:200])
+    x = p.js("return {canvas: !!document.querySelector('.stage canvas'), labels: [...document.querySelectorAll('.lbl')].filter(l => l.style.display !== 'none').map(l => [l.querySelector('.t').firstChild.textContent, l.querySelector('small')?.textContent]), measure: document.querySelector('.measure')?.textContent || ''};")
+    check("the RAM close-up turns the stick in 3D with its pieces labelled (name and note) and its measured size", x["canvas"] and len(x["labels"]) == 4 and ["Notch", "fits one way only"] in x["labels"] and "133.35 mm" in x["measure"], json.dumps(x)[:200])
 
     p.goto(URL + "#/show/laptop/lap-fan", wait=2.5)
     a1 = p.js("return [document.getElementById('pname').textContent, document.getElementById('pnum').textContent]")
@@ -212,6 +217,76 @@ for w, h in ((1280, 720), (1366, 768), (1920, 1080)):
     finally:
         p.close()
 
+# ---------------------------------------------------------------- 3b. Taking apart: the /breakdown frame check
+# Each device is scrubbed to six points of its take-apart. At each: every label inside the stage, no two touching,
+# the column in the same top-to-bottom order as the parts its lines go to (so no two lines cross). The six frames are
+# saved side by side as check-sheet-<device>.png to look at (the contact sheet; .claude/skills/take-apart).
+SHEET = [0, 0.2, 0.4, 0.6, 0.8, 1]
+LAYOUT = """const st = document.getElementById('stage').getBoundingClientRect();
+  const ls = [...document.querySelectorAll('.lbl')].filter(l => l.style.display !== 'none').map(l => { const r = l.getBoundingClientRect();
+    return {name: l.querySelector('.t').firstChild.textContent, n: l.querySelector('.n').textContent, x: r.left - st.left, y: r.top - st.top, w: r.width, h: r.height, ay: Number(l.dataset.ay)}; });
+  const bad = [];
+  for (const a of ls) if (a.x < 0 || a.y < 0 || a.x + a.w > st.width + 0.5 || a.y + a.h > st.height + 0.5) bad.push('outside: ' + a.name);
+  for (let i = 0; i < ls.length; i++) for (let j = i + 1; j < ls.length; j++) { const a = ls[i], b = ls[j];
+    if (a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h) bad.push('overlap: ' + a.name + ' / ' + b.name); }
+  const byTop = [...ls].sort((a, b) => a.y - b.y).map(l => l.name).join(), byPart = [...ls].sort((a, b) => a.ay - b.ay).map(l => l.name).join();
+  if (byTop !== byPart) bad.push('lines cross: ' + byTop + ' vs ' + byPart);
+  return {bad, labels: ls.map(l => l.n + ' ' + l.name), column: document.querySelector('.labels').classList.contains('col')};"""
+try:
+    import base64
+    import io
+    from PIL import Image
+except ImportError:
+    Image = None
+WANT = {"iphone": {"2 Screen", "3 Battery", "5 Rear cameras"}, "galaxy": {"2 Screen", "3 Battery", "5 Rear cameras"},
+        "laptop": {"1 Keyboard", "3 Battery", "4 RAM", "4 SSD", "5 Fan and heat pipe"},
+        "pc": {"1 Graphics card", "2 RAM", "3 SSD", "4 CPU"}, "router": {"1 Antennas", "5 Main board", "4 Network ports"}}
+p = page(1366, 768)
+try:
+    for dev, sel in (("iphone", "phone-sim"), ("galaxy", "phone-sim"), ("laptop", "lap-cpu"), ("pc", "pc-clock"), ("router", "rt-lights")):
+        p.goto(URL + f"#/d/{dev}/{sel}", wait=4.2)
+        bad, frames, end = [], [], set()
+        for t in SHEET:
+            p.js(f"const r = document.getElementById('apartRange'); r.value = '{t}'; r.dispatchEvent(new Event('input'));")
+            time.sleep(0.25)
+            r = p.js(LAYOUT)
+            bad += [f"t={t} {b}" for b in r["bad"]]
+            if not r["column"]:
+                bad.append(f"t={t} no column")
+            if t == 1:
+                end = set(r["labels"])
+            if Image:
+                box = p.js("const r = document.getElementById('stage').getBoundingClientRect(); return [r.left, r.top, r.width, r.height];")
+                png = p.call("Page.captureScreenshot", format="png", clip={"x": box[0], "y": box[1], "width": box[2], "height": box[3], "scale": 0.5})["data"]
+                frames.append(Image.open(io.BytesIO(base64.b64decode(png))).convert("RGB"))
+        if frames:
+            fw, fh = frames[0].size
+            sheet = Image.new("RGB", (fw * len(frames), fh), "white")
+            for k, f in enumerate(frames):
+                sheet.paste(f, (k * fw, 0))
+            sheet.save(HERE / f"check-sheet-{dev}.png")
+        check(f"take-apart frames, {dev}: six points from together to apart; labels inside, apart, lines never crossing; numbered by the order parts come off",
+              not bad and WANT[dev] <= end, "; ".join(bad)[:240] + f" end={sorted(end)}")
+    # The stagger in the real page: at 30% the outer layers are moving and the battery (third layer) has not started.
+    p.goto(URL + "#/d/iphone/phone-battery", wait=4.0)
+    ay = []
+    for t in (0, 0.3, 0.6):
+        p.js(f"const r = document.getElementById('apartRange'); r.value = '{t}'; r.dispatchEvent(new Event('input'));")
+        time.sleep(0.25)
+        ay.append(p.js("return Number([...document.querySelectorAll('.lbl')].find(l => l.classList.contains('sel')).dataset.ay)"))
+    check("one layer at a time: at 30% the battery has not moved yet; at 60% it has", abs(ay[0] - ay[1]) < 1 and abs(ay[2] - ay[0]) > 10, json.dumps(ay))
+    # Save a clip (projector): a real recording of the model coming apart, saved as a download.
+    p.goto(URL + "#/show/router/rt-board", wait=1.5)
+    p.js("window.__dl = null; HTMLAnchorElement.prototype.click = function () { if (this.download) fetch(this.href).then(r => r.blob()).then(b => { window.__dl = [this.download, b.size, b.type]; }); };")
+    p.js("document.getElementById('clip').click();")
+    busy = p.js("return document.getElementById('clip').disabled && document.getElementById('clipMsg').textContent")
+    wait(p, "return !!window.__dl", 15)
+    dl = p.js("return [window.__dl, document.getElementById('clipMsg').textContent]")
+    check("Save a clip records the router coming apart and saves it as a video", busy and dl[0] and dl[0][0].startswith("router-taken-apart.") and dl[0][1] > 20000 and dl[0][2].startswith("video/") and "Saved" in dl[1], json.dumps(dl))
+    check("no script errors while taking apart and recording", not p.js("return window.__errs"), json.dumps(p.js("return window.__errs")))
+finally:
+    p.close()
+
 # ---------------------------------------------------------------- 4. Phones: the page actions sit in a menu
 p = page(375, 812)
 try:
@@ -222,6 +297,8 @@ try:
     key(p, "Escape", vk=27)
     closed = p.js("return getComputedStyle(document.getElementById('barActions')).display === 'none' && document.activeElement.id === 'more'")
     check("375px: the page actions are in a menu; the dots button opens it, Escape closes it and returns focus", hidden and opened and closed, f"{hidden} {opened} {closed}")
+    side = p.js("const l = document.querySelector('.plist'); return [l.scrollWidth, l.clientWidth, [...document.querySelectorAll('.plist [data-part]')].every(b => b.getBoundingClientRect().right <= innerWidth)]")
+    check("375px: the parts wrap into a grid; nothing scrolls sideways", side[0] <= side[1] and side[2], json.dumps(side))
 finally:
     p.close()
 

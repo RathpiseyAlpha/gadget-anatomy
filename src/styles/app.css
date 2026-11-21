@@ -136,6 +136,20 @@ main:focus { outline: none; }
 .lbl::after { content: ""; position: absolute; left: 50%; top: 100%; width: 2px; height: 12px; background: var(--edge); }
 .lbl.below { transform: translate(-50%, 0); } .lbl.below::after { top: auto; bottom: 100%; }
 .lbl.sel { background: var(--marker); color: var(--marker-ink); z-index: 1; }
+.lbl .n, .lbl small { display: none; }
+/* The take-apart label column (.claude/skills/take-apart): numbered labels at the right, leader lines to the parts */
+.leaders { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.leaders polyline { fill: none; stroke: var(--edge); stroke-width: 1.5; stroke-linejoin: round; }
+.leaders polyline.sel { stroke-width: 2.5; }
+.leaders circle { fill: var(--c, var(--sheet)); stroke: var(--edge); stroke-width: 1.5; }
+.labels:not(.col) .leaders, .labels:not(.col) .col-cap { display: none; }
+.col-cap { position: absolute; top: 16px; right: 16px; width: min(194px, calc(34% - 16px)); margin: 0; font: var(--t-hint); color: var(--muted); }
+.labels.col .lbl { transform: none; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; white-space: normal; padding: 6px 10px 6px 6px; border-radius: var(--r-control); }
+.labels.col .lbl::after, .labels.col .lbl i { display: none; }
+.labels.col .lbl .n { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--c, var(--sheet)); border: 1.5px solid var(--edge); font: 700 13px/1 var(--font-mono); color: var(--ink); }
+.labels.col .lbl .t { display: grid; font: var(--t-label); overflow-wrap: anywhere; }
+.labels.col .lbl small { display: block; font: var(--t-hint); color: var(--muted); }
+.labels.col .lbl.sel small { color: var(--marker-ink); }
 
 /* photo with pins */
 .photo-map { position: relative; }
@@ -229,6 +243,7 @@ main:focus { outline: none; }
 .proj .role-tag i { width: max(12px, 1cqw); height: max(12px, 1cqw); }
 .foot-proj { display: flex; flex-wrap: wrap; gap: 4px 2cqw; font: 500 max(13px, 1.1cqw)/1.4 var(--font-mono); color: var(--muted); }
 .proj .stage .photo-map { margin: 4cqw; }
+.clip-msg { margin: 0; font: var(--t-hint); color: var(--muted); } .clip-msg:empty { display: none; }
 
 /* ---------- credits */
 .credits { display: grid; gap: var(--s7); align-content: start; padding: var(--s6) max(16px, env(safe-area-inset-right, 0px)) var(--s8) max(16px, env(safe-area-inset-left, 0px)); }
@@ -277,8 +292,10 @@ tr:last-child td { border-bottom: 0; }
   .stage-wrap { grid-row: 1; }
   .viewer .stage { height: 56vh; min-height: 320px; }
   .range { display: none; }   /* on a phone the Take apart button is enough */
-  .plist { grid-row: 2; border-right: 0; border-block: var(--bw) solid var(--edge); overflow-x: auto; overflow-y: hidden; padding: var(--s2); }
-  .plist ul { grid-auto-flow: column; grid-auto-columns: max-content; }
+  /* Phones: the parts wrap into a grid (never a sideways scroller) */
+  .plist { grid-row: 2; border-right: 0; border-block: var(--bw) solid var(--edge); overflow: visible; padding: var(--s2); }
+  .plist ul { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .plist .pname { white-space: normal; }
   .side, .closeup .side { grid-row: 3; border-left: 0; overflow: visible; }
   .closeup .stage { height: 52vh; }
   .cmp-main { overflow: visible; }

@@ -2,7 +2,8 @@
 
 Status: **M1 and M2 built, 2026-11-21**: the anatomy half (shelf, 3D viewer for the five devices, photo view, two-phone
 comparison, part close-ups, projector view, credits) and the four journeys, checked by `src/content/content.test.ts`
-and `tools/check.py` (86 browser checks). **M3 (more input, output and storage devices) is next** (section 12.7).
+and `tools/check.py` (95 browser checks). On 2026-11-22 the take-apart was rebuilt on the `/breakdown` method
+(decision 12, skill `.claude/skills/take-apart`). **M3 (more input, output and storage devices) is next** (section 12.7).
 Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
 
 ## 1. What it is
@@ -149,6 +150,7 @@ E: phone layout (iPhone and Galaxy). F: projector. G: photo view (the laptop). H
 | 9 | **As built (M1)**: addresses in the hash (`#/d/iphone/phone-battery`, `#/compare`, `#/x/pc-ram`, `#/show/laptop`, `#/credits`) so links to one part can be shared and the site runs from any folder; each device opens partly taken apart (the laptop fully: its top half lifts off and moves back, so the inside lies open); a device's own photo of a part wins over the general one; without WebGL every device opens in the photo view (the router, with no photo, as its list and cards). | Shareable links for teachers; the inside must be visible at once; a photo must show the device on screen; nothing is lost on old machines. |
 | 8 | **Body text in IBM Plex Sans at 17 px**, interface and part names in JetBrains Mono (Archboard's faces). | Young readers need a comfortable prose face; the mono keeps the family look. |
 | 11 | **Journeys as built (M2)**: `#/j/<journey>/<step>`; a ribbon of the places the journey crosses (where it is now, ticks where it has been); a board in Archboard's isometric look with the trip running left to right, one plate per place, blocks coloured by job, the whole route faint and the current step bold with a travelling packet (still at its end under reduced motion); one step at a time on the right (what happens, the things at work, a link to the part in 3D), Back and Next, the arrow keys, numbered step buttons; without WebGL the steps are all still there in words. Four journeys: press a key (6 steps), save a photo to the cloud (7), open a website (9), pay with a QR code (7); no times or speeds anywhere. The home page fits one screen at 1280 × 720 with the devices and the journeys. | The instructor hates scrolling; one idea per step; every part on a journey links back to its anatomy. |
+| 12 | **Take-apart after the `/breakdown` method (2026-11-22)**, from Artem Novitckii's MIT-licensed Claude Code animation skill, played live instead of rendered to video: each device lists its parts in **layers**, outermost first; opening a device plays them coming off one layer at a time (each starting while the one before is halfway), and the slider scrubs the same timeline; labels sit in a **numbered column** at the right (the number is the order the part comes off), joined to their parts by leader lines with one bend that never cross; at most six labels, names up to 18 characters, a note (the part's job, or one fact on a close-up) up to 22; the model moves left to give the column room; phones keep floating labels. `tools/check.py` scrubs every device to six points, fails on a label outside the stage, two labels touching or two lines crossing, and saves the six frames as a **contact sheet** (`tools/check-sheet-<device>.png`) to look at for lines ending on hidden parts. The projector view's **Save a clip** records the model coming apart, with its labels, as a video to download. Not taken from `/breakdown`: its tall phone-video format, its fixed dark backdrop and its jokey notes. The router's case now moves back as it lifts, so its ports are in view. | The skill's planning, timing and label rules teach one part at a time and keep labels readable; the frame check makes them testable; a clip lets teachers share the take-apart without other software. |
 | 10 | **Layout rules after the UX audit (2026-11-21)**: working pages (viewer, compare, close-up, projector) fit one screen from 1280 × 720 up and never scroll as a page (checked at 1280 × 720, 1366 × 768 and 1920 × 1080); one compact parts row each, the job written under the name; every control at least 44 px; one breakpoint (narrow, under 768 px), where panels stack, the page may scroll and the page's actions move into a menu; the footer only on the home and credits pages, the "not affiliated" line under every part card; the job shown as a colour dot and a word, not a pill. Kept on purpose from the Archboard look: hard offset shadows and an 800-weight display headline. | The instructor asked for less clutter and no scrolling; the VectorLab UX audit (19 rule sets) set the touch-target, breakpoint, label, verb, weight and motion rules. |
 
 ## 11. Open
@@ -251,11 +253,10 @@ command line is needed at the first levels.
 - **More detail in the models**: screws, ribbon cables and connectors, the CPU cooler and thermal paste, the RAM latches,
   the M.2 screw, standoffs, the battery adhesive. Sizes from repair manuals and measured parts, marked approximate where
   they are not.
-- **Animation approach**: the `/breakdown` skill (Artem Novitckii's MIT-licensed Claude Code animation skills) renders a
-  vertical MP4 in which an object comes apart layer by layer with leader lines and labels, checked frame by frame on a
-  contact sheet. The app keeps that method but plays it live: a scrubbable three.js timeline, layer by layer, one
-  leader-labelled part at a time, with the same check that no label covers another. The skill itself (Mac or Linux,
-  renders video, not installed here) fits short teaching videos made from the same models later, not the app.
+- **Animation approach** (built, decision 12): the `/breakdown` method played live, with layers outermost first, a
+  staggered take-apart, a numbered leader-line label column, a six-frame contact-sheet check, and a clip to download.
+  M4 adds the steps between: each layer split into its real teardown steps (screws, clips, cables), one step per
+  press, with the tool named. The skill itself (Mac or Linux, renders video) is not needed by the app.
 - The steps teach how a device is built, and say "practise here, not on your own device".
 
 ### 12.6 Game scenarios: learn by doing it yourself
@@ -282,7 +283,8 @@ shown step by step, then played by the learner alone:
 
 1. **M2** journeys (already planned).
 2. **M3** more input, output and storage devices (12.1), starting with the hard disk, keyboard, mouse, printer and monitor.
-3. **M4** detailed assembly timelines (12.5) for the PC and the laptop.
+3. **M4** detailed assembly timelines (12.5) for the PC and the laptop, on the take-apart already built (decision 12):
+   screws, cables, tools and real teardown order per step.
 4. **M5** the Build a PC game (12.6).
 5. **M6** Device Lab levels 1 to 3 (12.4).
 6. **M7** network scenes (12.2) and how-things-work scenes (12.3): LAN and WAN, the internet, undersea cables, NFC, RFID.

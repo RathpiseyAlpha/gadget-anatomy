@@ -4,7 +4,8 @@ A free, standalone web app for anyone who wants to know how their devices work, 
 (iPhone, Android phone, laptop, PC, router) in 3D that come apart, and journeys that follow everyday actions out to the
 internet (SPEC.md). Owner: Heng Rathpisey. Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
 Status: **M1 and M2 built** (anatomy: shelf, 3D viewer, photo view, compare, close-ups, projector, credits; journeys:
-`src/content/journeys.ts`, `src/three/journey.ts`, `src/ui/journey.ts`). M3 (more devices) is next (SPEC 12.7). `design/` holds the design page (the plan's screens) and the tokens, copied to `src/styles/tokens.css`.
+`src/content/journeys.ts`, `src/three/journey.ts`, `src/ui/journey.ts`), and the take-apart after the `/breakdown`
+method (SPEC decision 12). M3 (more devices) is next (SPEC 12.7). `design/` holds the design page (the plan's screens) and the tokens, copied to `src/styles/tokens.css`.
 
 Code: `src/content/` (typed data: roles, parts, devices, photos; wording is changed there only), `src/three/models.ts`
 (every 3D model, built in code in millimetres), `src/three/stage.ts` (the viewer: fit, turn, labels, picking, take
@@ -16,6 +17,8 @@ apart, theme, reduced motion, dispose), `src/ui/` (one function per page, each r
 - `design/tokens.css`: colours, type, sizes, shadows, motion. Archboard's look (`../system-design-editor`), with a
   larger prose size and one colour per job (`--role-*`).
 - `design/SOURCES.md`: every photo's author and licence, every size's source, the trademark note.
+- `.claude/skills/take-apart/SKILL.md`: before adding a device or part to the 3D models, or changing its layers,
+  lifts or labels: the steps, the label limits, and the contact sheet to look at.
 
 ## Rules
 
@@ -31,6 +34,8 @@ apart, theme, reduced motion, dispose), `src/ui/` (one function per page, each r
   names only to identify devices; "Not affiliated with ..." on every page.
 - Every 3D view has the same content without WebGL (the photo view with pins), a keyboard path (parts list), reduced
   motion (no auto-turn, no animated take-apart) and both themes.
+- Every device comes apart in `layers`, outermost first, with at most five `labelled` parts; its contact sheet
+  (`tools/check-sheet-<device>.png`) is looked at, not only passed (skill `take-apart`).
 - Nothing on the projector view shows anything about a student.
 - Layout (SPEC decision 10): working pages fit one screen from 1280 × 720 up with no page scrolling; controls at
   least 44 px; one breakpoint (under 768 px); buttons start with a verb; three font weights (800 only for the two display

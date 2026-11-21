@@ -7,7 +7,7 @@ import { buildCPU, buildDevice, buildRAM, type Model } from '../three/models.ts'
 import { Stage, webglAvailable } from '../three/stage.ts';
 import * as THREE from 'three';
 import { chip, credit, esc, FOOT, NOTE, partCard, pinColor, roleColor, topBar, wireTopBar, type View } from './common.ts';
-import { photoMap } from './viewer.ts';
+import { photoMap, stageLabels } from './viewer.ts';
 
 // ---------------- Two phones, same parts
 export function compare(root: HTMLElement, partId: string | null): View {
@@ -67,7 +67,7 @@ export function closeup(root: HTMLElement, partId: string): View {
   if (webglAvailable()) {
     const object = new THREE.Group(); object.add(group);
     const model: Model = { object, parts: [] };
-    const labels = (group.userData.labels as { text: string; at: [number, number, number]; below?: boolean }[]).map((l) => ({ ...l, color: roleColor(p.role) }));
+    const labels = (group.userData.labels as { text: string; note?: string; at: [number, number, number]; below?: boolean }[]).map((l) => ({ ...l, color: roleColor(p.role) }));
     stage = new Stage(host, { model, view: p.closeup === 'cpu' ? [0.5, 0.9, 1] : [0.2, 0.3, 1], labels, name: `3D model of ${p.name}, turning slowly, with its pieces labelled.`, margin: 1.25 });
   } else host.innerHTML = '<p class="nogl">This browser cannot draw 3D. The photo and the sizes are beside this space.</p>';
   return { dispose: () => stage?.dispose() };
@@ -84,17 +84,35 @@ export function projector(root: HTMLElement, deviceId: string, partId: string | 
       <span id="role"></span>
       <h1 id="pname"></h1>
       <p id="pline"></p>
-      <p class="foot-proj"><span>${esc(d.name)}: part <span id="pnum"></span> of ${d.parts.length}</span><span>← → next part · Esc to stop</span></p>
-      <div class="row proj-tools"><button class="btn btn--sm" type="button" id="prev">Previous part</button><button class="btn btn--sm" type="button" id="next">Next part</button><button class="btn btn--sm" type="button" id="full">Go full screen</button><a class="btn btn--sm btn--ghost" id="leave" href="#">Stop presenting</a></div>
+      <p class="foot-proj"><span>${esc(d.name)}: part <span id="pnum"></span> of ${d.parts.length}</span><span>← → next part · T take apart · Esc to stop</span></p>
+      <div class="row proj-tools"><button class="btn btn--sm" type="button" id="prev">Previous part</button><button class="btn btn--sm" type="button" id="next">Next part</button><button class="btn btn--sm" type="button" id="apart">Put together</button><button class="btn btn--sm" type="button" id="full">Go full screen</button><button class="btn btn--sm" type="button" id="clip">Save a clip</button><a class="btn btn--sm btn--ghost" id="leave" href="#">Stop presenting</a></div>
+      <p class="clip-msg" id="clipMsg" role="status"></p>
     </div>
   </main>`;
   let stage: Stage | null = null;
   const host = root.querySelector<HTMLElement>('#stage')!;
   if (webglAvailable()) {
     stage = new Stage(host, { model: buildDevice(d.id), view: d.view, name: `3D model of the ${d.name}`, turn: true, margin: 1.0,
-      labels: d.parts.map((id) => ({ part: id, text: PARTS[id]!.name, color: roleColor(PARTS[id]!.role) })) });
-    stage.explode(d.apart ?? 0.75);
+      labels: stageLabels(d), layers: d.layers, spread: d.apart ?? 0.6 });
+    stage.explode(1, true);
   } else if (d.photo) host.innerHTML = photoMap(d, 'p');
+  const apartBtn = root.querySelector<HTMLButtonElement>('#apart')!, clipBtn = root.querySelector<HTMLButtonElement>('#clip')!, clipMsg = root.querySelector<HTMLElement>('#clipMsg')!;
+  apartBtn.hidden = clipBtn.hidden = !stage;
+  if (typeof MediaRecorder === 'undefined') clipBtn.hidden = true;
+  const toggle = () => { if (!stage) return; const to = stage.apart > 0.5 ? 0 : 1; stage.explode(to, true); apartBtn.textContent = to ? 'Put together' : 'Take apart'; };
+  apartBtn.addEventListener('click', toggle);
+  // A clip for a class page or a message: the model together, coming apart layer by layer, with its labels.
+  clipBtn.addEventListener('click', async () => {
+    if (!stage) return;
+    clipBtn.disabled = true; apartBtn.disabled = true; clipMsg.textContent = 'Recording the clip…';
+    const blob = await stage.record(`${d.name}, taken apart`);
+    clipBtn.disabled = false; apartBtn.disabled = false; apartBtn.textContent = 'Put together';
+    if (!blob || !blob.size) { clipMsg.textContent = 'This browser cannot record a clip. Try Chrome or Edge.'; return; }
+    const name = `${d.id}-taken-apart.${blob.type.includes('mp4') ? 'mp4' : 'webm'}`;
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+    clipMsg.textContent = `Saved ${name} to your downloads.`;
+  });
   const show = () => {
     const id = d.parts[i]!, p = PARTS[id]!;
     root.querySelector('#role')!.innerHTML = chip(p.role);
@@ -113,6 +131,7 @@ export function projector(root: HTMLElement, deviceId: string, partId: string | 
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); step(1); }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); step(-1); }
+    else if (e.key === 't' && !e.ctrlKey && !e.metaKey && !e.altKey) toggle();
     else if (e.key === 'Escape' && !document.fullscreenElement) location.hash = root.querySelector<HTMLAnchorElement>('#leave')!.getAttribute('href')!;
   };
   window.addEventListener('keydown', onKey);
@@ -136,7 +155,7 @@ export function credits(root: HTMLElement): View {
     </section>
     <section><h2>Names and logos</h2>
       <p>iPhone, Apple, Galaxy, Samsung, IdeaPad, Lenovo and iFixit are their owners' trademarks, used only to name the devices and the photos' source. No logos are drawn on the models. Gadget Anatomy is not affiliated with any of them.</p></section>
-    <section><h2>Code</h2><p>Built with <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> (MIT licence). Fonts: IBM Plex Sans and JetBrains Mono (SIL Open Font License). Source on <a href="https://github.com/RathpiseyAlpha/gadget-anatomy" target="_blank" rel="noopener">GitHub</a>.</p></section>
+    <section><h2>Code</h2><p>Built with <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> (MIT licence). The way the models come apart, one layer at a time with a numbered label column, follows Artem Novitckii's <a href="https://github.com/artemnovitckii/claude-animation-skills" target="_blank" rel="noopener">/breakdown animation skill</a> (MIT licence). Fonts: IBM Plex Sans and JetBrains Mono (SIL Open Font License). Source on <a href="https://github.com/RathpiseyAlpha/gadget-anatomy" target="_blank" rel="noopener">GitHub</a>.</p></section>
   </main>${FOOT}`;
   wireTopBar(root);
   return { dispose() {} };

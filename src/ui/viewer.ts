@@ -18,6 +18,9 @@ export function photoMap(d: Device, group: string) {
     `<button class="pin" type="button" data-group="${group}" data-part="${p.part}" style="left:${p.x}%; top:${p.y}%; --c: ${pinColor(PARTS[p.part]!.role)}" aria-label="${esc(PIN_NAMES[p.part] ?? PARTS[p.part]!.name)}" aria-pressed="false">${i + 1}</button>`).join('')}</div>`;
 }
 
+/** A device's labels on the 3D model: every part, with its job as the note; the labelled ones show once they are off. */
+export const stageLabels = (d: Device) => d.parts.map((id) => ({ part: id, text: PARTS[id]!.name, note: ROLES[PARTS[id]!.role].short, color: roleColor(PARTS[id]!.role), always: d.labelled.includes(id) }));
+
 export function viewer(root: HTMLElement, deviceId: string, partId: string | null, wantPhoto: boolean): View {
   const d = deviceById(deviceId);
   if (!d) { location.hash = '#/'; return { dispose() {} }; }
@@ -70,11 +73,13 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
     if (focus) root.querySelector<HTMLElement>(`.plist [data-part="${id}"]`)?.focus();
   }
 
-  function setApart(t: number) {
-    range.value = String(t);
+  // The button plays the take-apart layer by layer (the slider follows it); the slider scrubs through it.
+  let opened = false;
+  function setApart(t: number, play = false) {
+    if (!play) range.value = String(t);
     apartBtn.setAttribute('aria-pressed', String(t > 0.5));
     apartBtn.textContent = t > 0.5 ? 'Put together' : 'Take apart';
-    stage?.explode(t);
+    stage?.explode(t, play);
   }
 
   function show() {
@@ -90,9 +95,11 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
     } else if (gl) {
       stage = new Stage(stageEl, {
         model: buildDevice(d!.id), view: d!.view, name: `3D model of the ${d!.name}. Pick parts from the list.`, onPick: (id) => select(id),
-        labels: d!.parts.map((id) => ({ part: id, text: PARTS[id]!.name, color: roleColor(PARTS[id]!.role), always: d!.labelled.includes(id) })),
+        labels: stageLabels(d!), layers: d!.layers, spread: d!.apart ?? 0.6, onMove: (t) => { range.value = t.toFixed(2); },
       });
-      setApart(Number(range.value) || (d!.apart ?? 0.6));
+      // The first time the model opens it comes apart once, layer by layer; after that it stays where it was left.
+      setApart(opened ? Number(range.value) : 1, !opened);
+      opened = true;
       hint.textContent = matchMedia('(pointer: coarse)').matches ? 'Drag to turn · pinch to zoom · tap a part' : 'Drag to turn · scroll to zoom · click a part';
       hint.hidden = seenHint();
       stageEl.addEventListener('pointerdown', () => { hint.hidden = true; markHint(); }, { once: true });
@@ -115,11 +122,12 @@ export function viewer(root: HTMLElement, deviceId: string, partId: string | nul
     select(n, true);
   });
   root.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((b) => b.addEventListener('click', () => { photo = b.dataset.mode === 'photo'; show(); }));
-  apartBtn.addEventListener('click', () => setApart(Number(range.value) > 0.5 ? 0 : 1));
+  const toggle = () => setApart((stage?.apart ?? Number(range.value)) > 0.5 ? 0 : 1, true);
+  apartBtn.addEventListener('click', toggle);
   range.addEventListener('input', () => setApart(Number(range.value)));
   const onKey = (e: KeyboardEvent) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key === 't' && !photo) setApart(Number(range.value) > 0.5 ? 0 : 1);
+    if (e.key === 't' && !photo) toggle();
   };
   window.addEventListener('keydown', onKey);
   show();

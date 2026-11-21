@@ -9,6 +9,7 @@ export const DEVICES: Device[] = [
     size: { text: '146.7 × 71.5 × 7.65 mm', source: 'Apple, iPhone 13 Pro technical specifications' },
     parts: ['phone-screen', 'phone-camera', 'phone-board', 'phone-battery', 'phone-sim', 'phone-back'],
     labelled: ['phone-screen', 'phone-battery', 'phone-camera'], first: 'phone-battery',
+    layers: [['phone-sim'], ['phone-screen'], ['phone-battery'], ['phone-board'], ['phone-camera'], ['phone-back']],
     partPhotos: { 'phone-board': PHOTOS.iphoneBoard },
     photo: { ...PHOTOS.iphoneParts, pins: [
       { part: 'phone-battery', x: 73.7, y: 62.3 }, { part: 'phone-board', x: 28.3, y: 55.3 }, { part: 'phone-screen', x: 43.4, y: 46.5 },
@@ -21,6 +22,7 @@ export const DEVICES: Device[] = [
     size: { text: '146.3 × 70.9 × 7.6 mm', source: 'Samsung, Galaxy S23 specifications' },
     parts: ['phone-screen', 'phone-camera', 'phone-board', 'phone-battery', 'phone-sim', 'phone-back'],
     labelled: ['phone-screen', 'phone-battery', 'phone-camera'], first: 'phone-battery',
+    layers: [['phone-sim'], ['phone-screen'], ['phone-battery'], ['phone-board'], ['phone-camera'], ['phone-back']],
     partPhotos: { 'phone-battery': PHOTOS.galaxyBattery },
     photo: { ...PHOTOS.galaxyParts, pins: [
       { part: 'phone-battery', x: 87.5, y: 50.9 }, { part: 'phone-board', x: 80.3, y: 26.3 }, { part: 'phone-screen', x: 61.2, y: 49.1 },
@@ -33,6 +35,7 @@ export const DEVICES: Device[] = [
     size: { text: '359.2 × 236.5 × 19.9 mm', source: 'Lenovo PSREF, IdeaPad 3 15IAU7' },
     parts: ['lap-screen', 'lap-keyboard', 'lap-touchpad', 'lap-cpu', 'lap-fan', 'lap-ram', 'lap-ssd', 'lap-wifi', 'lap-battery', 'lap-speaker', 'lap-usb', 'lap-board', 'lap-cover'],
     labelled: ['lap-keyboard', 'lap-fan', 'lap-ram', 'lap-ssd', 'lap-battery'], first: 'lap-fan', apart: 1,
+    layers: [['lap-keyboard', 'lap-touchpad', 'lap-screen'], ['lap-cover'], ['lap-battery', 'lap-speaker'], ['lap-ssd', 'lap-ram', 'lap-wifi'], ['lap-fan'], ['lap-cpu', 'lap-usb'], ['lap-board']],
     partPhotos: { 'lap-ssd': PHOTOS.ideapadSsd },
     photo: { ...PHOTOS.ideapadInside, pins: [
       { part: 'lap-cpu', x: 43.4, y: 52.6 }, { part: 'lap-fan', x: 25.7, y: 56.1 }, { part: 'lap-ram', x: 69.7, y: 57 }, { part: 'lap-ssd', x: 84.2, y: 52.6 },
@@ -45,6 +48,7 @@ export const DEVICES: Device[] = [
     size: { text: 'ATX board 305 × 244 mm', source: 'Wikipedia "ATX" (Intel ATX specification)' },
     parts: ['pc-cpu', 'pc-gpu', 'pc-ram', 'pc-ssd', 'pc-lan', 'pc-ports', 'pc-board', 'pc-clock'],
     labelled: ['pc-cpu', 'pc-gpu', 'pc-ram', 'pc-ssd'], first: 'pc-ram',
+    layers: [['pc-gpu'], ['pc-ram'], ['pc-ssd'], ['pc-cpu'], ['pc-clock'], ['pc-ports', 'pc-lan'], ['pc-board']],
     photo: { ...PHOTOS.board, pins: [
       { part: 'pc-cpu', x: 62.5, y: 45.5 }, { part: 'pc-ram', x: 63.5, y: 77.8 }, { part: 'pc-gpu', x: 32.7, y: 38.4 }, { part: 'pc-clock', x: 41.3, y: 58.6 },
       { part: 'pc-ports', x: 63.5, y: 8 }, { part: 'pc-lan', x: 50.4, y: 7.7 }, { part: 'pc-board', x: 86, y: 60 }] },
@@ -56,6 +60,7 @@ export const DEVICES: Device[] = [
     size: { text: 'approximate', source: 'a typical home router, not one product' },
     parts: ['rt-antenna', 'rt-board', 'rt-ports', 'rt-lights', 'rt-power', 'rt-case'],
     labelled: ['rt-antenna', 'rt-board', 'rt-ports'], first: 'rt-board',
+    layers: [['rt-antenna'], ['rt-case'], ['rt-lights'], ['rt-ports', 'rt-power'], ['rt-board']],
     view: [0.9, 0.9, 1],
   },
 ];

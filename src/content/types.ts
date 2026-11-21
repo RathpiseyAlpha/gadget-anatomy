@@ -51,14 +51,18 @@ export interface Device {
   size: Size;
   /** Parts in the order the list shows them (grouped by role in the view). */
   parts: string[];
-  /** Parts whose labels stay on in 3D; the selected part's label is always on. */
+  /** Parts whose labels show once they are off; the selected part's label is always on. At most 5 (6 with the
+   *  selected part): the take-apart label column holds six (.claude/skills/take-apart). */
   labelled: string[];
+  /** The take-apart order: layers of parts, outermost first. Every part is in exactly one layer; the parts of one
+   *  layer move together. A layer's number is what its labels show ("comes off 1st"). */
+  layers: string[][];
   /** The part selected when the device opens. */
   first: string;
   photo?: Photo & { pins: Pin[] };
   /** Photos of this device's own parts (a part's card shows this one instead of its general photo). */
   partPhotos?: Record<string, Photo>;
-  /** How far apart the model opens at first (0 together, 1 fully apart). */
+  /** How far each part travels when fully apart, as a share of its lift in the model (default 0.6). */
   apart?: number;
   /** Where the camera looks from (a direction; the distance is worked out from the model's size). */
   view: [number, number, number];

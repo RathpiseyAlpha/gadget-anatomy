@@ -5,6 +5,8 @@ import { ALL_PARTS, PARTS } from './parts.ts';
 import { PHOTOS } from './photos.ts';
 import { ROLES } from './roles.ts';
 import { href, parse } from '../router.ts';
+import { buildCPU, buildRAM } from '../three/models.ts';
+import { COLUMN, layerProgress, playSeconds } from '../three/stage.ts';
 
 const sentences = (s: string) => s.split(/(?<=[.!?])\s+/).filter(Boolean).length;
 
@@ -86,5 +88,50 @@ describe('journeys', () => {
         expect(s.text, s.title).not.toMatch(/\d+\s?(ms|seconds?|minutes?|%|Mbps|km|times)/i);
       }
     }
+  });
+});
+
+describe('taking apart (.claude/skills/take-apart)', () => {
+  it('every device lists each of its parts in exactly one layer, outermost first', () => {
+    for (const d of DEVICES) {
+      const flat = d.layers.flat();
+      expect(new Set(flat).size, d.id).toBe(flat.length);
+      expect([...flat].sort(), d.id).toEqual([...d.parts].sort());
+      expect(d.layers.length, d.id).toBeLessThanOrEqual(8);
+    }
+  });
+
+  it('the label column holds every label: at most five kept on (six with the selected part), names and notes short', () => {
+    for (const d of DEVICES) {
+      expect(d.labelled.length + 1, d.id).toBeLessThanOrEqual(COLUMN.maxLabels);
+      for (const id of d.parts) {
+        expect(PARTS[id]!.name.length, id).toBeLessThanOrEqual(COLUMN.name);
+        expect(ROLES[PARTS[id]!.role].short.length, id).toBeLessThanOrEqual(COLUMN.note);
+      }
+    }
+    for (const g of [buildRAM('dimm'), buildRAM('sodimm'), buildCPU()]) {
+      const labels = g.userData.labels as { text: string; note?: string }[];
+      expect(labels.length).toBeLessThanOrEqual(COLUMN.maxLabels);
+      for (const l of labels) {
+        expect(l.text.length, l.text).toBeLessThanOrEqual(COLUMN.name);
+        expect((l.note ?? '').length, l.text).toBeLessThanOrEqual(COLUMN.note);
+      }
+    }
+  });
+
+  it('the timeline: each layer starts after the one before, overlaps it, and lands by the end', () => {
+    for (const n of [1, 3, 6, 7]) {
+      for (let k = 0; k < n; k++) {
+        expect(layerProgress(0, k, n)).toBe(0);
+        expect(layerProgress(1, k, n)).toBe(1);
+        if (k) {
+          // When a layer starts, the one before is halfway; when the one before lands, this one is halfway.
+          expect(layerProgress(k / (n + 1), k - 1, n)).toBeCloseTo(0.5);
+          expect(layerProgress(k / (n + 1), k, n)).toBeCloseTo(0);
+        }
+      }
+    }
+    expect(playSeconds(7)).toBeLessThanOrEqual(3.4);
+    expect(playSeconds(1)).toBeGreaterThan(0.9);
   });
 });

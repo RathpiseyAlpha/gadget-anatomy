@@ -90,10 +90,10 @@ export function buildRAM(kind: 'dimm' | 'sodimm' = 'dimm') {
   inst.count = k;
   g.add(inst);
   g.userData.labels = [
-    { text: 'Memory chips', at: [-L / 2 + 15, 23.5, T / 2 + 1.2] },
-    { text: kind === 'dimm' ? 'Gold contacts: 288' : 'Gold contacts', at: [L / 2 - 12, 0, T / 2], below: true },
-    { text: 'Notch: fits one way only', at: [notchX, 0, 0], below: true },
-    { text: 'Label', at: [L / 2 - (kind === 'dimm' ? 20 : 11), 31, T / 2 + 1.2] },
+    { text: 'Memory chips', note: 'hold the data', at: [-L / 2 + 15, 23.5, T / 2 + 1.2] },
+    { text: 'Gold contacts', note: kind === 'dimm' ? '288 of them' : 'plug into the slot', at: [L / 2 - 12, 0, T / 2], below: true },
+    { text: 'Notch', note: 'fits one way only', at: [notchX, 0, 0], below: true },
+    { text: 'Sticker', note: 'size and speed', at: [L / 2 - (kind === 'dimm' ? 20 : 11), 31, T / 2 + 1.2] },
   ];
   return g;
 }
@@ -109,9 +109,9 @@ export function buildCPU() {
   for (let i = 0; i < 40; i++) for (let j = 0; j < 34; j++) { mtx.makeTranslation(-21 + i * 1.07, -0.03, -17 + j * 1.03); pads.setMatrixAt(k++, mtx); }
   g.add(pads);
   g.userData.labels = [
-    { text: 'Metal lid (heat spreader)', at: [0, 3.9, -8] },
-    { text: 'Green board', at: [20, 1.2, 16], below: true },
-    { text: 'Gold pads underneath', at: [-20, 0, 14], below: true },
+    { text: 'Metal lid', note: 'spreads the heat', at: [0, 3.9, -8] },
+    { text: 'Green board', note: 'carries the wires', at: [20, 1.2, 16], below: true },
+    { text: 'Gold pads', note: 'underneath', at: [-20, 0, 14], below: true },
   ];
   return g;
 }
@@ -208,10 +208,10 @@ function router(): Model {
   const board = new THREE.Group(); board.add(box(196, 1.5, 124, M.pcb));
   board.add(box(18, 1.6, 18, M.chip, -30, 1.4, 0)); board.add(box(14, 1.6, 14, M.chip, 20, 1.4, -20)); board.add(box(14, 1.6, 14, M.chip, 20, 1.4, 20));
   b.part('rt-board', [board], [0, 11, 4], [0, 46, 0]);
-  b.part('rt-ports', [0, 1, 2, 3, 4].map((i) => box(15, 13, 18, i === 0 ? M.heat : M.slot, -60 + i * 20, 0, 0)), [0, 18, -62], [0, 70, -30]);
-  b.part('rt-power', [cyl(5, 12, M.slot).rotateX(Math.PI / 2)], [80, 16, -66], [30, 70, -30]);
+  b.part('rt-ports', [0, 1, 2, 3, 4].map((i) => box(15, 13, 18, i === 0 ? M.heat : M.slot, -60 + i * 20, 0, 0)), [0, 18, -62], [0, 34, -16]);
+  b.part('rt-power', [cyl(5, 12, M.slot).rotateX(Math.PI / 2)], [80, 16, -66], [24, 34, -16]);
   b.part('rt-lights', [0, 1, 2, 3, 4].map((i) => box(5, 2, 5, M.led, -40 + i * 14, 0, 0, false)), [0, 13, 66], [0, 64, 20]);
-  b.part('rt-case', [box(220, 24, 150, M.white, 0, 0, 0)], [0, 22, 0], [0, 120, 0]);
+  b.part('rt-case', [box(220, 24, 150, M.white, 0, 0, 0)], [0, 22, 0], [0, 100, -230]);   // lifts off and moves back, so the inside lies open in front
   const ant = new THREE.Group();
   for (const x of [-80, 0, 80]) { const a = cyl(5, 130, M.slot, x, 65, 0); a.rotation.z = x === 0 ? 0 : x < 0 ? 0.18 : -0.18; ant.add(a); }
   b.part('rt-antenna', [ant], [0, 34, -70], [0, 150, -30]);
