@@ -178,6 +178,27 @@ try:
     check("the Legion (PC Anatomy's model) opens in 3D with ten parts; its cards name their sources and credit the model", lg["canvas"] and lg["list"] == 10 and lg["card"] == "Cooling system"
           and any("maintenance manual" in x for x in lg["src"]) and "PC Anatomy" in lg["src"] and not lg["brand"], json.dumps(lg)[:240])
 
+    # Depth 2: a part that is an assembly opens into its own level, and Back leads up again.
+    p.goto(URL + "#/d/legion/legionboard", wait=3.0)
+    p.js("document.getElementById('openLink').click();")
+    wait(p, "return location.hash.includes('in=legionboard') && document.querySelectorAll('.plist [data-part]').length === 13", 8)
+    time.sleep(1.0)
+    o1 = p.js("return {hash: location.hash, title: document.querySelector('.title')?.textContent, list: document.querySelectorAll('.plist [data-part]').length, back: document.getElementById('upLink')?.textContent, canvas: !!document.querySelector('.stage canvas'), photo: document.querySelector('[data-mode=photo]').disabled}")
+    check("Open the main board shows the board on its own: 13 parts, its own 3D, a way back to the laptop, no photo view",
+          o1["hash"].startswith("#/d/legion/legioncpu?in=legionboard") and o1["title"].startswith("Main board") and o1["list"] == 13 and o1["back"] == "Back to the gaming laptop" and o1["canvas"] and o1["photo"], json.dumps(o1))
+    p.js("document.querySelector('.plist [data-part=\"legionstorage\"]').click();")
+    time.sleep(0.3)
+    p.js("document.getElementById('openLink').click();")
+    wait(p, "return location.hash.includes('in=legionstorage')", 8)
+    time.sleep(1.0)
+    o2 = p.js("return {title: document.querySelector('.title')?.textContent, list: document.querySelectorAll('.plist [data-part]').length, back: document.getElementById('upLink')?.textContent, card: document.querySelector('.part-card h2')?.textContent}")
+    check("on the board, the SSD opens too (a level inside a level), with the way back to the main board", o2["title"].startswith("SSD") and "Gaming laptop › Main board" in o2["title"] and o2["list"] == 6 and o2["back"] == "Back to the main board" and o2["card"] == "SSD controller", json.dumps(o2))
+    p.js("document.getElementById('upLink').click();")
+    wait(p, "return location.hash.includes('in=legionboard') && !location.hash.includes('legionstorage?')", 8)
+    time.sleep(0.6)
+    o3 = p.js("return [location.hash, document.querySelector('.plist [aria-pressed=true]')?.dataset.part]")
+    check("Back to the main board returns to the board with the SSD selected", o3[0].startswith("#/d/legion/legionstorage?in=legionboard") and o3[1] == "legionstorage", json.dumps(o3))
+
     p.goto(URL + "#/credits", wait=1.5)
     cr = p.js("return {photos: document.querySelectorAll('.photo-list li').length, nc: document.body.innerText.includes('not for commercial use'), rows: document.querySelectorAll('tbody tr').length, links: [...document.querySelectorAll('.photo-list a')].filter(a => a.href.includes('creativecommons.org') || a.href.includes('artlibre')).length, pca: [...document.querySelectorAll('a')].some(a => a.href.includes('github.com/Yoosseph/pc-anatomy')) && document.body.innerText.includes('MIT')};")
     check("the credits list all nine photos with their licences, the non-commercial reason, every published size, and credit PC Anatomy (MIT)", cr["photos"] == 9 and cr["links"] == 9 and cr["nc"] and cr["rows"] >= 9 and cr["pca"], json.dumps(cr))
@@ -215,7 +236,7 @@ for w, h in ((1280, 720), (1366, 768), (1920, 1080)):
     p = page(w, h)
     try:
         bad = []
-        for frag in ("", "#/j/open-a-website/5", "#/j/save-a-photo/7", "#/d/iphone/phone-board", "#/d/galaxy/phone-battery", "#/d/laptop/lap-fan", "#/d/pc/pc-ram", "#/d/router/rt-board", "#/d/legion/legionboard", "#/d/laptop/lap-ssd?photo", "#/compare/phone-battery", "#/x/pc-ram", "#/x/pc-cpu", "#/show/pc/pc-cpu"):
+        for frag in ("", "#/j/open-a-website/5", "#/j/save-a-photo/7", "#/d/iphone/phone-board", "#/d/galaxy/phone-battery", "#/d/laptop/lap-fan", "#/d/pc/pc-ram", "#/d/router/rt-board", "#/d/legion/legionboard", "#/d/legion/legioncpu?in=legionboard", "#/d/legion/legiondisplay-panel?in=legiondisplay", "#/d/legion/legionstorage-nand?in=legionstorage", "#/d/laptop/lap-ssd?photo", "#/compare/phone-battery", "#/x/pc-ram", "#/x/pc-cpu", "#/show/pc/pc-cpu"):
             p.goto(URL + frag, wait=1.6)
             r = p.js(FIT)
             if r:
@@ -249,14 +270,22 @@ except ImportError:
 WANT = {"iphone": {"2 Screen", "3 Battery", "5 Rear cameras"}, "galaxy": {"4 Screen", "5 Battery", "3 Rear cameras"},
         "laptop": {"2 Keyboard", "3 Battery", "4 RAM", "4 SSD", "5 Fan and heat pipe"},
         "pc": {"1 Graphics card", "2 RAM", "3 SSD", "4 CPU"}, "router": {"1 Antennas", "5 Main board", "4 Network ports"},
-        "legion": {"3 Keyboard deck", "3 Screen", "4 Battery", "6 Cooling system", "7 Main board"}}
+        "legion": {"3 Keyboard deck", "3 Screen", "4 Battery", "6 Cooling system", "7 Main board"},
+        "legionboard": {"6 CPU", "6 Graphics chip", "2 RAM sticks", "3 SSD", "4 Wi-Fi card"},
+        "legioncooling": {"2 Fans", "4 Heat pipes", "3 Cooling fins", "5 Contact plates", "6 Thermal paste"},
+        "legionbattery": {"4 Battery cells", "3 Battery frame", "2 Battery chip", "1 Battery cable"},
+        "legiondisplay": {"2 LCD panel", "4 Backlight", "5 Webcam", "5 Screen board", "5 Screen cable"},
+        "legionstorage": {"2 SSD controller", "2 SSD cache", "2 Flash chips", "3 M.2 contacts", "1 SSD screw"},
+        "legionmemory": {"1 Memory chips", "2 ID chip", "2 Tiny capacitors", "4 Stick board", "3 Gold contacts"}}
 for fw_, fh_ in ((1366, 768), (1280, 720)):
   p = page(fw_, fh_)
   try:
     p.goto(URL, wait=1.5)   # a real page load, so the error hook is in place
     armed = p.js("return Array.isArray(window.__errs)")
-    for dev, sel in (("iphone", "phone-sim"), ("galaxy", "phone-sim"), ("laptop", "lap-cpu"), ("pc", "pc-clock"), ("router", "rt-lights"), ("legion", "legion-speakers")):
-        p.goto(URL + f"#/d/{dev}/{sel}", wait=4.2)
+    LEVELS = [("legionboard", "legionboard-pcb"), ("legioncooling", "legioncooling-housing"), ("legionbattery", "legionbattery-carrier"), ("legiondisplay", "legiondisplay-mounts"), ("legionstorage", "legionstorage-substrate"), ("legionmemory", "legionmemory-board")]
+    for dev, sel in (("iphone", "phone-sim"), ("galaxy", "phone-sim"), ("laptop", "lap-cpu"), ("pc", "pc-clock"), ("router", "rt-lights"), ("legion", "legion-speakers"), *LEVELS):
+        frag = f"#/d/legion/{sel}?in={dev}" if dev in dict(LEVELS) else f"#/d/{dev}/{sel}"
+        p.goto(URL + frag, wait=4.2)
         bad, frames, end = [], [], set()
         for t in SHEET:
             p.js(f"const r = document.getElementById('apartRange'); r.value = '{t}'; r.dispatchEvent(new Event('input'));")

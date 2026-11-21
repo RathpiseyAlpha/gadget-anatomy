@@ -1,6 +1,6 @@
 ---
 name: take-apart
-description: How a Gadget Anatomy device comes apart in 3D, layer by layer with a numbered label column, and how to check it frame by frame. Use when adding a device or part to the 3D models, changing a model's layers, lifts or labels, or touching the take-apart animation, the label column, the close-up labels or the clip recording.
+description: How a Gadget Anatomy device comes apart in 3D, layer by layer with a numbered label column, and how to check it frame by frame. Use when adding a device, a part or an assembly that opens (depth 2) to the 3D models, changing a model's layers, lifts or labels, or touching the take-apart animation, the label column, the close-up labels or the clip recording.
 ---
 
 # Take-apart
@@ -15,7 +15,11 @@ Where it lives (the code is the source of truth for every number):
 
 - `src/three/stage.ts`: `layerProgress` (the stagger), `playSeconds`, `inOut3`, `COLUMN` (label limits and column
   size), the column layout, `record()` (Save a clip).
-- `src/content/devices.ts`: each device's `layers`, `labelled` and `apart` (how far parts travel).
+- `src/content/devices.ts`: each device's `layers`, `labelled` and `apart` (how far parts travel), and at depth 2
+  its `assemblies`: levels that open from one of its parts (keyed by that part), each with the same fields. Every
+  level follows the steps below on its own.
+- `src/vendor/pc-anatomy/`: reused PC Anatomy models (read its `CHANGES.md`); `kitModel(level, lifts)` in
+  `models.ts` turns one of its levels into our parts, and `lifts` replaces any of its moves that hide a part.
 - `src/three/models.ts`: each part's `home` and `lift` (where it sits and which way it leaves); close-up labels
   (`text` and `note`).
 - `src/content/content.test.ts` (the take-apart tests) and `tools/check.py` section 3b (the frame check).
@@ -41,18 +45,22 @@ Where it lives (the code is the source of truth for every number):
    node node_modules/vite/bin/vite.js preview --port 4330 --strictPort      (leave running)
    python -I tools/check.py
    ```
-   Add the new device to `WANT` and the device loop in section 3b, with the labels and numbers it must end on. Done
-   when every check passes.
+   Add the new device, and each of its levels (`LEVELS`), to `WANT` and the loop in section 3b, with the labels and
+   numbers it must end on. Done when every check passes.
 5. **Look at the contact sheet.** `tools/check-sheet-<device>.png` holds six frames from together to apart. The frame
    check proves labels stay inside the stage, never touch, and never cross lines; it cannot see **occlusion**. Look at
    every frame and confirm each leader line ends on a part you can actually see. A line that ends on a cover hiding
    its part means the lift is wrong (the router's ports sat behind the case until the case moved back): fix the lift,
-   rebuild, look again. Done when every line in every frame lands on a visible part.
+   rebuild, look again. A layer hidden under the one above it needs a wider `apart` or a lower `view` (the Legion's
+   screen stack). Done when every line in every frame lands on a visible part.
 
 ## Rules the code keeps (so changes keep them too)
 
 - The column sorts labels by where their parts are on screen, so no two leader lines cross; the number is the layer
   number, so it never changes as the model turns.
+- A label's line ends at the top centre of the part's largest piece, so a part made of separate pieces (two fans)
+  points at one of them, not at the gap between.
+- A level lists at most 13 parts (one screen, no scrolling); a device with more is split into assemblies.
 - A label appears as its part lands; the selected part's label is always shown.
 - Below `COLUMN.minStage` wide (phones) the labels float beside their parts instead, and a label that would cover
   another is hidden, the selected one kept.

@@ -60,7 +60,7 @@ describe('addresses', () => {
   it('read and write every view', () => {
     const routes = [
       { view: 'shelf' }, { view: 'device', device: 'iphone', part: 'phone-battery', photo: false },
-      { view: 'device', device: 'laptop', part: null, photo: true }, { view: 'compare', part: 'phone-board' },
+      { view: 'device', device: 'laptop', part: null, photo: true }, { view: 'device', device: 'legion', part: 'legionstorage-nand', photo: false, in: 'legionstorage' }, { view: 'compare', part: 'phone-board' },
       { view: 'closeup', part: 'pc-ram' }, { view: 'show', device: 'pc', part: 'pc-cpu' }, { view: 'journey', journey: 'open-a-website', step: 5 }, { view: 'credits' },
     ] as const;
     for (const r of routes) expect(parse(href(r))).toEqual(r);
@@ -92,6 +92,24 @@ describe('journeys', () => {
 });
 
 describe('taking apart (.claude/skills/take-apart)', () => {
+  it('every level (a device, or an assembly that opens) lists each of its parts in exactly one layer; parts exist', () => {
+    for (const d of DEVICES) for (const lv of [d, ...Object.values(d.assemblies ?? {})]) {
+      for (const id of lv.parts) expect(PARTS[id], `${lv.name}: ${id}`).toBeDefined();
+      expect(lv.parts, lv.name).toContain(lv.first);
+      for (const id of lv.labelled) expect(lv.parts, `${lv.name}: ${id}`).toContain(id);
+      expect(lv.labelled.length + 1, lv.name).toBeLessThanOrEqual(COLUMN.maxLabels);
+      const flat = lv.layers.flat();
+      expect(new Set(flat).size, lv.name).toBe(flat.length);
+      expect([...flat].sort(), lv.name).toEqual([...lv.parts].sort());
+      expect(lv.layers.length, lv.name).toBeLessThanOrEqual(8);
+      expect(lv.parts.length, `${lv.name}: one screen holds about 13 rows`).toBeLessThanOrEqual(13);
+    }
+    for (const d of DEVICES) for (const key of Object.keys(d.assemblies ?? {})) {
+      const holders = [d, ...Object.values(d.assemblies!)].filter((lv) => lv.parts.includes(key));
+      expect(holders.length, `${d.id}: ${key} opens from exactly one level`).toBe(1);
+    }
+  });
+
   it('every device lists each of its parts in exactly one layer, outermost first', () => {
     for (const d of DEVICES) {
       const flat = d.layers.flat();

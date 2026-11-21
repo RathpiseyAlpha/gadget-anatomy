@@ -5,7 +5,8 @@ A free, standalone web app for anyone who wants to know how their devices work, 
 internet (SPEC.md). Owner: Heng Rathpisey. Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
 Status: **M1 and M2 built** (anatomy: shelf, 3D viewer, photo view, compare, close-ups, projector, credits; journeys:
 `src/content/journeys.ts`, `src/three/journey.ts`, `src/ui/journey.ts`), and the take-apart after the `/breakdown`
-method (SPEC decision 12). M3 (more devices) is next (SPEC 12.7). `design/` holds the design page (the plan's screens) and the tokens, copied to `src/styles/tokens.css`.
+method (SPEC decision 12). M3, depth 2 (SPEC section 13), is under way: the Legion 5 (PC Anatomy's models) is built
+with six levels you can open (`Device.assemblies`, address `?in=<assembly>`); the iPhone 13 Pro is next. `design/` holds the design page (the plan's screens) and the tokens, copied to `src/styles/tokens.css`.
 
 Code: `src/content/` (typed data: roles, parts, devices, photos; wording is changed there only), `src/three/models.ts`
 (every 3D model, built in code in millimetres), `src/three/stage.ts` (the viewer: fit, turn, labels, picking, take

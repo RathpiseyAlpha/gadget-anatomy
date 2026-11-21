@@ -19,7 +19,7 @@ function render() {
   const r = parse(location.hash);
   window.scrollTo(0, 0);
   root.className = `page page--${r.view}`;
-  current = r.view === 'device' ? viewer(root, r.device, r.part, r.photo)
+  current = r.view === 'device' ? viewer(root, r.device, r.part, r.photo, r.in ?? null)
     : r.view === 'compare' ? compare(root, r.part)
     : r.view === 'closeup' ? closeup(root, r.part)
     : r.view === 'show' ? projector(root, r.device, r.part)

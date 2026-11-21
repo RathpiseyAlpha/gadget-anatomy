@@ -3,8 +3,10 @@
 Status: **M1 and M2 built, 2026-11-21**: the anatomy half (shelf, 3D viewer for the five devices, photo view, two-phone
 comparison, part close-ups, projector view, credits) and the four journeys, checked by `src/content/content.test.ts`
 and `tools/check.py` (100 browser checks). On 2026-11-22 the take-apart was rebuilt on the `/breakdown` method
-(decision 12, skill `.claude/skills/take-apart`). **Next: M3, depth 2** (section 13): every visible part of a device,
-reusing PC Anatomy's models with credit; the Lenovo Legion 5 first, then the iPhone 13 Pro.
+(decision 12, skill `.claude/skills/take-apart`). **M3, depth 2, under way** (section 13): the **Lenovo Legion 5 is
+built at depth 2** (2026-11-22, PC Anatomy's models with credit): 53 parts on six levels you can open (the laptop, its
+main board, cooling, battery and screen, and on the board its SSD and RAM stick), every part with its sources; one
+realistic look for every device (decision 16); 118 browser checks. **Next: the iPhone 13 Pro at depth 2.**
 Repository: https://github.com/RathpiseyAlpha/gadget-anatomy.
 
 ## 1. What it is
@@ -327,7 +329,7 @@ class progress) is wanted, which would need accounts; and the undersea cable dat
 
 ### 13.3 Order
 
-1. **Lenovo Legion 5 15ACH6H**, a new device (a gaming laptop, next to the IdeaPad): the pilot. PC Anatomy's models
+1. **Lenovo Legion 5 15ACH6H**, a new device (a gaming laptop, next to the IdeaPad): the pilot. **Built 2026-11-22.** PC Anatomy's models
    for the laptop, board, cooling, battery, display, storage and memory stick, about 50 parts at depth 2. Measures the
    real cost.
 2. **iPhone 13 Pro** at depth 2, built new from the iFixit teardown with the same toolkit (PC Anatomy has no phone).

@@ -60,11 +60,23 @@ class Builder {
   }
 }
 
-/** Each part's label sits on top of it: the top centre of its box, in its own coordinates. */
+/** Each part's label sits on top of it, in its own coordinates: the top centre of its largest piece. A part made of
+ *  separate pieces (two fans, two speakers) would otherwise point at the empty space between them. */
 function anchors(parts: THREE.Object3D[]) {
+  const size = new THREE.Vector3();
   for (const p of parts) {
-    const b = new THREE.Box3().setFromObject(p), c = b.getCenter(new THREE.Vector3());
-    p.userData.anchor = new THREE.Vector3(c.x, b.max.y, c.z).sub(p.position);
+    p.updateWorldMatrix(true, true);
+    let best: THREE.Box3 | null = null, area = -1;
+    p.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh || !m.visible) return;
+      const b = new THREE.Box3().setFromObject(m, true); b.getSize(size);
+      const a = Math.max(size.x * size.z, size.x * size.y, size.y * size.z);
+      if (a > area) { area = a; best = b; }
+    });
+    const b: THREE.Box3 = best ?? new THREE.Box3().setFromObject(p), c = b.getCenter(new THREE.Vector3());
+    const top = new THREE.Vector3(c.x, b.max.y, c.z);
+    p.userData.anchor = top.sub(p.getWorldPosition(new THREE.Vector3()));
   }
 }
 
@@ -241,7 +253,8 @@ function router(): Model {
 const TOP_HALF: [number, number, number] = [0, 110, -330];
 const LEGION_LIFTS: Record<string, [number, number, number]> = { 'legion-deck': TOP_HALF, 'legion-trackpad': TOP_HALF, legiondisplay: TOP_HALF, 'legion-hinges': TOP_HALF };
 
-export function buildDevice(id: Device['id']): Model {
-  if (id === 'legion') return kitModel('legion', LEGION_LIFTS);
+/** A device's model, or one of its assemblies on its own (`level`, depth 2). */
+export function buildDevice(id: Device['id'], level: string | null = null): Model {
+  if (id === 'legion') return kitModel((level ?? 'legion') as KitLevel, LEGION_LIFTS);
   return id === 'iphone' || id === 'galaxy' ? phone(id) : id === 'laptop' ? laptop() : id === 'pc' ? pc() : router();
 }

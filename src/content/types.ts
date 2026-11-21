@@ -74,4 +74,19 @@ export interface Device {
   apart?: number;
   /** Where the camera looks from (a direction; the distance is worked out from the model's size). */
   view: [number, number, number];
+  /** Depth 2 (SPEC 13.2): assemblies that open into their own level, keyed by the part that opens them. The part may
+   *  sit in the device's own list or in another assembly's (the laptop's board opens; on it, the SSD opens). */
+  assemblies?: Record<string, Level>;
+}
+
+/** One level of a device you can open: its own parts, take-apart and labels, like a device's. */
+export interface Level {
+  name: string;
+  parts: string[];
+  labelled: string[];
+  layers: string[][];
+  first: string;
+  /** Where the camera looks from; the device's view when left out. */
+  view?: [number, number, number];
+  apart?: number;
 }
